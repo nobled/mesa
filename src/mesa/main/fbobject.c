@@ -50,10 +50,10 @@
 
 
 /** Set this to 1 to help debug FBO incompleteness problems */
-#define DEBUG_FBO 0
+#define DEBUG_FBO 1
 
 /** Set this to 1 to debug/log glBlitFramebuffer() calls */
-#define DEBUG_BLIT 0
+#define DEBUG_BLIT 1
 
 
 /**
