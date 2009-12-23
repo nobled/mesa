@@ -251,9 +251,13 @@ void radeonGenerateMipmap(GLcontext* ctx, GLenum target, struct gl_texture_objec
 	GLuint face = radeon_face_for_target(target);
 	radeon_texture_image *baseimage = get_radeon_texture_image(texObj->Image[face][texObj->BaseLevel]);
 
-	radeon_teximage_map(baseimage, GL_FALSE);
-	radeon_generate_mipmap(ctx, target, texObj);
-	radeon_teximage_unmap(baseimage);
+	if (_mesa_meta_check_generate_mipmap_fallback(ctx, target, texObj) == GL_TRUE) {
+		radeon_teximage_map(baseimage, GL_FALSE);
+		radeon_generate_mipmap(ctx, target, texObj);
+		radeon_teximage_unmap(baseimage);
+	} else {
+		_mesa_meta_GenerateMipmap(ctx, target, texObj);
+	}
 }
 
 
