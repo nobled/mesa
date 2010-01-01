@@ -531,16 +531,43 @@ static int image_matches_texture_obj(struct gl_texture_object *texObj,
 {
 	const struct gl_texture_image *baseImage = texObj->Image[0][texObj->BaseLevel];
 
-	if (!baseImage)
+	if (!baseImage) {
+		if (RADEON_DEBUG & RADEON_TEXTURE) {
+			fprintf(stderr, "No base image\n");
+		}
 		return 0;
+	}
 
-	if (level < texObj->BaseLevel || level > texObj->MaxLevel)
+	if (level < texObj->BaseLevel || level > texObj->MaxLevel) {
+		if (RADEON_DEBUG & RADEON_TEXTURE) {
+			fprintf(stderr, "Image/Object level mismatch\n");
+		}
 		return 0;
+	}
 
 	const unsigned levelDiff = level - texObj->BaseLevel;
 	const unsigned refWidth = MAX2(baseImage->Width >> levelDiff, 1);
 	const unsigned refHeight = MAX2(baseImage->Height >> levelDiff, 1);
 	const unsigned refDepth = MAX2(baseImage->Depth >> levelDiff, 1);
+	
+	if (texImage->Width != refWidth) {
+		if (RADEON_DEBUG & RADEON_TEXTURE) {
+			fprintf(stderr, "Width mismatch\n");
+		}
+		return 0;
+	}
+	if (texImage->Height != refHeight) {
+		if (RADEON_DEBUG & RADEON_TEXTURE) {
+			fprintf(stderr, "Height mismatch\n");
+		}
+		return 0;
+	}
+	if (texImage->Depth != refDepth) {
+		if (RADEON_DEBUG & RADEON_TEXTURE) {
+			fprintf(stderr, "Depth mismatch\n");
+		}
+		return 0;
+	}
 
 	return (texImage->Width == refWidth &&
 			texImage->Height == refHeight &&
