@@ -54,10 +54,6 @@ static const struct vertex vertices[1] = {
 void
 PerfInit(void)
 {
-   if (!PerfExtensionSupported("GL_ARB_framebuffer_object")) {
-      printf("Sorry, this test requires GL_ARB_framebuffer_object\n");
-      exit(1);
-   }
 
    /* setup VBO w/ vertex data */
    glGenBuffersARB(1, &VBO);
@@ -87,7 +83,7 @@ GenMipmap(unsigned count)
       /* dirty the base image */
       glTexSubImage2D(GL_TEXTURE_2D, BaseLevel,
                       0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, texel);
-      glGenerateMipmap(GL_TEXTURE_2D);
+      glGenerateMipmapEXT(GL_TEXTURE_2D);
       if (DrawPoint)
          glDrawArrays(GL_POINTS, 0, 1);
    }
