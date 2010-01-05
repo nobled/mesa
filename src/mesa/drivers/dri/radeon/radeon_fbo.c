@@ -409,21 +409,12 @@ restart:
 		DBG("Render to DEPTH_STENCIL texture OK\n");
 	}
 	else {
-		/* try redoing the FBO */
-		if (retry == 1) {
-			DBG("Render to texture BAD FORMAT %d\n",
-			    texImage->TexFormat);
-			return GL_FALSE;
-		}
-                /* XXX why is the tex format being set here?
-                 * I think this can be removed.
-                 */
-		texImage->TexFormat = radeonChooseTextureFormat(ctx, texImage->InternalFormat, 0,
-								_mesa_get_format_datatype(texImage->TexFormat),
-								1);
-
-		retry++;
-		goto restart;
+		/* Try it and hope */
+		DBG("Render to texture BAD FORMAT %d, %s\n",
+			texImage->TexFormat,
+			_mesa_get_format_name(texImage->TexFormat)
+			);
+		rrb->base.DataType = _mesa_get_format_datatype(texImage->TexFormat);
 	}
 	
 	texFormat = texImage->TexFormat;
