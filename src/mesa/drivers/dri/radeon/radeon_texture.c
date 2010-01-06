@@ -538,7 +538,7 @@ static int image_matches_texture_obj(struct gl_texture_object *texObj,
 		return 0;
 	}
 
-	if (level < texObj->BaseLevel || level > texObj->MaxLevel) {
+	if (level < texObj->BaseLevel) {
 		if (RADEON_DEBUG & RADEON_TEXTURE) {
 			fprintf(stderr, "Image/Object level mismatch\n");
 		}
@@ -583,8 +583,8 @@ static void teximage_assign_miptree(radeonContextPtr rmesa,
 	radeonTexObj *t = radeon_tex_obj(texObj);
 	radeon_texture_image* image = get_radeon_texture_image(texImage);
 
-	/* Since miptree holds only images for levels <BaseLevel..MaxLevel>
-	 * don't allocate the miptree if the teximage won't fit.
+	/* Check to make sure texture dimensions are appropriate
+	 * and that there is a base level
 	 */
 	if (!image_matches_texture_obj(texObj, texImage, level))
 		return;
