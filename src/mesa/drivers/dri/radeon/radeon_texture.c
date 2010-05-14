@@ -244,15 +244,18 @@ void radeonUnmapTexture(GLcontext *ctx, struct gl_texture_object *texObj)
 static void radeon_generate_mipmap(GLcontext *ctx, GLenum target,
 				   struct gl_texture_object *texObj)
 {
+	int i;
+	GLuint face = _mesa_tex_target_to_face(target);
+	radeon_texture_image *baseimage = get_radeon_texture_image(texObj->Image[face][texObj->BaseLevel]);
 	radeonTexObj* t = radeon_tex_obj(texObj);
 	GLuint nr_faces = (t->base.Target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
-	int i, face;
 
 	radeon_print(RADEON_TEXTURE, RADEON_VERBOSE,
 			"%s(%p, tex %p) Target type %s.\n",
 			__func__, ctx, texObj,
 			_mesa_lookup_enum_by_nr(target));
 
+	radeon_teximage_map(baseimage, GL_FALSE);
 	_mesa_generate_mipmap(ctx, target, texObj);
 
 	for (face = 0; face < nr_faces; face++) {
@@ -270,7 +273,7 @@ static void radeon_generate_mipmap(GLcontext *ctx, GLenum target,
 			radeon_miptree_unreference(&image->mt);
 		}
 	}
-	
+	radeon_teximage_unmap(baseimage);
 }
 
 void radeonGenerateMipmap(GLcontext* ctx, GLenum target, struct gl_texture_object *texObj)
@@ -294,9 +297,11 @@ void radeonGenerateMipmap(GLcontext* ctx, GLenum target, struct gl_texture_objec
 		radeon_firevertices(rmesa);
 	}
 
-	radeon_teximage_map(baseimage, GL_FALSE);
-	radeon_generate_mipmap(ctx, target, texObj);
-	radeon_teximage_unmap(baseimage);
+	if (_mesa_meta_check_generate_mipmap_fallback(ctx, target, texObj)) {
+		radeon_generate_mipmap(ctx, target, texObj);
+	} else {
+		_mesa_meta_GenerateMipmap(ctx, target, texObj);
+	}
 }
 
 
