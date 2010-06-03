@@ -438,6 +438,10 @@ __glXInitializeVisualConfigFromTags(__GLcontextModes * config, int count,
       case GLX_Y_INVERTED_EXT:
          config->yInverted = *bp++;
          break;
+      case GLX_USE_GL:
+         if (fbconfig_style_tags)
+            bp++;
+         break;
       case None:
          i = count;
          break;
