@@ -1,3 +1,10 @@
+mesa (7.7.1-3) unstable; urgency=medium
+
+  * Pull from mesa_7_7_branch to get the fix for a regression introduced in
+    7.7.1-2 (closes: #584163)
+
+ -- Julien Cristau <jcristau@debian.org>  Thu, 03 Jun 2010 17:52:40 +0200
+
 mesa (7.7.1-2) unstable; urgency=low
 
   * debian/rules: use DEB_HOST_ARCH_CPU instead of DEB_HOST_GNU_CPU.  Prompted
