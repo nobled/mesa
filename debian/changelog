@@ -8,6 +8,8 @@ mesa (7.8.2-2) UNRELEASED; urgency=low
   * debian/rules:
     - Explicitly build the nouveau DRI driver.
     - Only build Gallium intel on Linux and FreeBSD (and only on x86).
+    - Don't build Gallium nouveau or radeon drivers on s390, since the DRI
+      drivers aren't built there either.
 
  -- Julien Cristau <jcristau@debian.org>  Thu, 15 Jul 2010 17:05:56 +0100
 
