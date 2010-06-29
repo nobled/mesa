@@ -66,7 +66,8 @@ else
 	DIRECT_RENDERING = --enable-driglx-direct
 
   ifeq ($(DEB_HOST_ARCH_OS), linux)
-# Gallium drivers require libdrm-{nouveau,radeon}, only available on Linux
+# These Gallium hardware drivers require libdrm-{nouveau,radeon},
+# respectively, which are currently only available on Linux
 	GALLIUM_DRIVERS += nouveau radeon
 # Although the KMS egl drivers will probably build on kfreebsd & hurd
 # only linux actually has KMS drivers implemented at this point.
@@ -75,15 +76,23 @@ else
 
   ifeq ($(DEB_HOST_ARCH), lpia)
 	DRI_DRIVERS += i915 i965
+# The intel Gallium driver requires libdrm-intel, which is currently
+# only available on Linux and FreeBSD
+    ifneq ($(DEB_HOST_ARCH_OS), hurd)
 	GALLIUM_DRIVERS += intel
+    endif
   else ifneq ($(DEB_HOST_ARCH), s390)
 	DRI_DRIVERS += mach64 mga nouveau r128 r200 r300 r600 radeon savage tdfx
     ifeq ($(DEB_HOST_ARCH_CPU), i386)
 	DRI_DRIVERS += i810 i915 i965 sis unichrome
+      ifneq ($(DEB_HOST_ARCH_OS), hurd)
 	GALLIUM_DRIVERS += intel
+      endif
     else ifeq ($(DEB_HOST_ARCH_CPU), amd64)
 	DRI_DRIVERS += i915 i965 sis unichrome
+      ifneq ($(DEB_HOST_ARCH_OS), hurd)
 	GALLIUM_DRIVERS += intel
+      endif
     endif
   endif
 endif
