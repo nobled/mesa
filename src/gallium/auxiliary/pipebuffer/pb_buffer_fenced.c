@@ -34,13 +34,6 @@
  */
 
 
-#include "pipe/p_config.h"
-
-#if defined(PIPE_OS_LINUX) || defined(PIPE_OS_BSD) || defined(PIPE_OS_SOLARIS)
-#include <unistd.h>
-#include <sched.h>
-#endif
-
 #include "pipe/p_compiler.h"
 #include "pipe/p_defines.h"
 #include "util/u_debug.h"
@@ -81,6 +74,7 @@ struct fenced_manager
     * Following members are mutable and protected by this mutex.
     */
    pipe_mutex mutex;
+   pipe_condvar zero_fenced;
 
    /**
     * Fenced buffer list.
@@ -307,6 +301,8 @@ fenced_buffer_remove_locked(struct fenced_manager *fenced_mgr,
    LIST_DEL(&fenced_buf->head);
    assert(fenced_mgr->num_fenced);
    --fenced_mgr->num_fenced;
+   if (fenced_mgr->num_fenced == 0)
+      pipe_condvar_broadcast(fenced_mgr->zero_fenced);
 
    LIST_ADDTAIL(&fenced_buf->head, &fenced_mgr->unfenced);
    ++fenced_mgr->num_unfenced;
@@ -1008,13 +1004,10 @@ fenced_bufmgr_destroy(struct pb_manager *mgr)
 
    /* Wait on outstanding fences */
    while (fenced_mgr->num_fenced) {
-      pipe_mutex_unlock(fenced_mgr->mutex);
-#if defined(PIPE_OS_LINUX) || defined(PIPE_OS_BSD) || defined(PIPE_OS_SOLARIS)
-      sched_yield();
-#endif
-      pipe_mutex_lock(fenced_mgr->mutex);
       while(fenced_manager_check_signalled_locked(fenced_mgr, TRUE))
          ;
+      if (fenced_mgr->num_fenced)
+         pipe_condvar_wait(fenced_mgr->zero_fenced, fenced_mgr->mutex);
    }
 
 #ifdef DEBUG
@@ -1023,6 +1016,7 @@ fenced_bufmgr_destroy(struct pb_manager *mgr)
 
    pipe_mutex_unlock(fenced_mgr->mutex);
    pipe_mutex_destroy(fenced_mgr->mutex);
+   pipe_condvar_destroy(fenced_mgr->zero_fenced);
 
    if(fenced_mgr->provider)
       fenced_mgr->provider->destroy(fenced_mgr->provider);
@@ -1063,6 +1057,7 @@ fenced_bufmgr_create(struct pb_manager *provider,
    LIST_INITHEAD(&fenced_mgr->unfenced);
    fenced_mgr->num_unfenced = 0;
 
+   pipe_condvar_init(fenced_mgr->zero_fenced);
    pipe_mutex_init(fenced_mgr->mutex);
 
    return &fenced_mgr->base;
