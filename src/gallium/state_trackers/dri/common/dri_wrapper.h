@@ -5,6 +5,7 @@
 #include "dri_util.h"
 #else
 #include "drisw_util.h"
+#include "xmlconfig.h" /* for driOptionCache */
 #endif
 
 #endif
