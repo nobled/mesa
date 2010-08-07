@@ -20,6 +20,7 @@ C_SOURCES = \
 	dri_context.c \
 	dri_screen.c \
 	dri_drawable.c \
+	dri_extensions.c \
 	drisw.c
 
 include ../../../Makefile.template
