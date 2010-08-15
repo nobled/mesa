@@ -75,6 +75,8 @@ cell_draw_create(struct cell_context *cell)
 {
    struct draw_context *draw = draw_create(&cell->pipe);
 
+   if (!draw)
+      return NULL;
 #if 0 /* broken */
    if (getenv("GALLIUM_CELL_VS")) {
       /* plug in SPU-based vertex transformation code */
@@ -150,6 +152,10 @@ cell_create_context(struct pipe_screen *screen,
    cell_init_texture_transfer_funcs(cell);
 
    cell->draw = cell_draw_create(cell);
+   if (!cell->draw) {
+      align_free(cell);
+      return NULL;
+   }
 
    /* Create cache of fragment ops generated code */
    cell->fragment_ops_cache =
