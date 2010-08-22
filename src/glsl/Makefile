@@ -75,7 +75,8 @@ CXX_SOURCES = \
 
 LIBS = \
 	$(TOP)/src/glsl/libglsl.a \
-	$(shell pkg-config --libs talloc)
+	$(shell pkg-config --libs talloc) \
+	-lstdc++
 
 APPS = glsl_compiler glcpp/glcpp
 

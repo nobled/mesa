@@ -28,7 +28,7 @@ SUBDIRS = glcpp
 bin_PROGRAMS = glsl
 
 glsl_LDADD = ./glcpp/libglcpp.la
-glsl_LDFLAGS = @LDFLAGS@ $(talloc_LIBS)
+glsl_LDFLAGS = @LDFLAGS@ $(talloc_LIBS) -lstdc++
 glsl_SOURCES = \
 	main.cpp \
 	builtin_types.h \
