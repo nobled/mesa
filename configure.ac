@@ -48,9 +48,20 @@ solaris*)
     ;;
 esac
 
+dnl This is to hack around the GCC=yes false positive with clang,
+dnl since it's mostly GCC-compatible, but its version is much lower.
+case "$CC" in
+*clang*)
+    CLANG=yes
+    ;;
+*)
+    CLANG=no
+    ;;
+esac
+
 dnl If we're using GCC, make sure that it is at least version 3.3.0.  Older
 dnl versions are explictly not supported.
-if test "x$GCC" = xyes; then
+if test "x$GCC" = xyes -a "x$CLANG" = xno; then
     AC_MSG_CHECKING([whether gcc version is sufficient])
     major=0
     minor=0
