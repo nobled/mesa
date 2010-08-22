@@ -33,6 +33,9 @@
 #include "utils.h"
 #include "xmlpool.h"
 
+/* from src/glsl/glsl_parser_extras.{h,cpp} */
+extern void _mesa_destroy_shader_compiler();
+
 PUBLIC const char __dri2ConfigOptions[] =
    DRI_CONF_BEGIN
       DRI_CONF_SECTION_PERFORMANCE
