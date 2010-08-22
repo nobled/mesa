@@ -54,6 +54,7 @@
 #include "state_tracker/sw_winsys.h"
 
 #include "draw/draw_context.h"
+#include "draw/draw_pipe.h"
 #include "draw/draw_vbuf.h"
 
 
@@ -838,6 +839,8 @@ lp_setup_destroy( struct lp_setup_context *setup )
       lp_scene_destroy(scene);
    }
 
+   setup->vbuf->destroy(setup->vbuf);
+
    lp_scene_queue_destroy(setup->empty_scenes);
 
    FREE( setup );
@@ -891,7 +894,7 @@ lp_setup_create( struct pipe_context *pipe,
 
 fail:
    if (setup->vbuf)
-      ;
+      setup->vbuf->destroy(setup->vbuf);
 
    if (setup->empty_scenes)
       lp_scene_queue_destroy(setup->empty_scenes);
