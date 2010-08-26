@@ -57,7 +57,7 @@ dri_create_context(gl_api api, const __GLcontextModes * visual,
    struct st_api *stapi = screen->st_api;
    struct dri_context *ctx = NULL;
    struct st_context_iface *st_share = NULL;
-   struct st_visual stvis;
+   struct st_visual _stvis, *stvis = &_stvis;
 
    if (sharedContextPrivate) {
       st_share = ((struct dri_context *)sharedContextPrivate)->st;
@@ -75,8 +75,11 @@ dri_create_context(gl_api api, const __GLcontextModes * visual,
    driParseConfigFiles(&ctx->optionCache,
 		       &screen->optionCache, sPriv->myNum, "dri");
 
-   dri_fill_st_visual(&stvis, screen, visual);
-   ctx->st = stapi->create_context(stapi, &screen->base, &stvis, st_share);
+   if (visual)
+      dri_fill_st_visual(stvis, screen, visual);
+   else /* for surfaceless contexts */
+      stvis = NULL;
+   ctx->st = stapi->create_context(stapi, &screen->base, stvis, st_share);
    if (ctx->st == NULL)
       goto fail;
    ctx->st->st_manager_private = (void *) ctx;
@@ -142,25 +145,34 @@ dri_make_current(__DRIcontext * cPriv,
    struct dri_screen *screen = dri_screen(cPriv->driScreenPriv);
    struct dri_context *ctx = dri_context(cPriv);
    struct st_api *stapi = screen->st_api;
-   struct dri_drawable *draw = dri_drawable(driDrawPriv);
-   struct dri_drawable *read = dri_drawable(driReadPriv);
    struct st_context_iface *old_st = stapi->get_current(stapi);
+   struct st_framebuffer_iface *stdrawi, *streadi;
 
    if (old_st && old_st != ctx->st)
       old_st->flush(old_st, PIPE_FLUSH_RENDER_CACHE, NULL);
 
    ++ctx->bind_count;
 
-   if (ctx->dPriv != driDrawPriv) {
-      ctx->dPriv = driDrawPriv;
-      draw->texture_stamp = driDrawPriv->lastStamp - 1;
-   }
-   if (ctx->rPriv != driReadPriv) {
-      ctx->rPriv = driReadPriv;
-      read->texture_stamp = driReadPriv->lastStamp - 1;
+   /* for surfaceless contexts */
+   if (!driDrawPriv && !driReadPriv)
+      stdrawi = streadi = NULL;
+   else {
+      struct dri_drawable *draw = dri_drawable(driDrawPriv);
+      struct dri_drawable *read = dri_drawable(driReadPriv);
+      stdrawi = &draw->base;
+      streadi = &read->base;
+
+      if (ctx->dPriv != driDrawPriv) {
+         ctx->dPriv = driDrawPriv;
+         draw->texture_stamp = driDrawPriv->lastStamp - 1;
+      }
+      if (ctx->rPriv != driReadPriv) {
+         ctx->rPriv = driReadPriv;
+         read->texture_stamp = driReadPriv->lastStamp - 1;
+      }
    }
 
-   stapi->make_current(stapi, ctx->st, &draw->base, &read->base);
+   stapi->make_current(stapi, ctx->st, stdrawi, streadi);
 
    return GL_TRUE;
 }
