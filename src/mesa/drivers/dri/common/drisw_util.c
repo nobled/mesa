@@ -90,6 +90,14 @@ static const __DRIextension **driGetExtensions(__DRIscreen *psp)
     return psp->extensions;
 }
 
+static const __DRIextension *
+get_extension(const __DRIscreen *s, const char *extname) {
+    unsigned i;
+    for (i = 0; s->extensions[i]; i++)
+	if (strcmp(s->extensions[i]->name, extname) == 0)
+	    return s->extensions[i];
+    return NULL;
+}
 
 /**
  * Context functions
@@ -101,6 +109,12 @@ driCreateNewContext(__DRIscreen *psp, const __DRIconfig *config,
 {
     __DRIcontext *pcp;
     void * const shareCtx = (shared != NULL) ? shared->driverPrivate : NULL;
+    const __GLcontextModes *modes = (config != NULL) ? &config->modes : NULL;
+
+    /* Check if the DRI driver supports contexts without drawables
+       - implementing EGL_KHR_surfaceless_{opengl,gles1,gles2} */
+    if (!modes && !get_extension(psp, __DRI_NO_DRAWABLE))
+        return NULL;
 
     pcp = CALLOC_STRUCT(__DRIcontextRec);
     if (!pcp)
@@ -112,8 +126,7 @@ driCreateNewContext(__DRIscreen *psp, const __DRIconfig *config,
     pcp->driDrawablePriv = NULL;
     pcp->driReadablePriv = NULL;
 
-    if (!driDriverAPI.CreateContext(API_OPENGL,
-			    &config->modes, pcp, shareCtx)) {
+    if (!driDriverAPI.CreateContext(API_OPENGL, modes, pcp, shareCtx)) {
 	FREE(pcp);
 	return NULL;
     }
