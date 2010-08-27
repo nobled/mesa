@@ -608,6 +608,12 @@ driCreateNewContext(__DRIscreen *psp, const __DRIconfig *config,
 {
     __DRIcontext *pcp;
     void * const shareCtx = (shared != NULL) ? shared->driverPrivate : NULL;
+    const __GLcontextModes *modes = (config != NULL) ? &config->modes : NULL;
+
+    /* Check if the DRI driver supports contexts without drawables
+       - implements EGL_KHR_surfaceless_{opengl,gles1,gles2} */
+    if (!modes && !get_extension(psp, __DRI_NO_DRAWABLE))
+        return NULL;
 
     pcp = malloc(sizeof *pcp);
     if (!pcp)
@@ -623,7 +629,7 @@ driCreateNewContext(__DRIscreen *psp, const __DRIconfig *config,
     pcp->hHWContext = hwContext;
 
     if ( !(*psp->DriverAPI.CreateContext)(API_OPENGL,
-					  &config->modes, pcp, shareCtx) ) {
+					  modes, pcp, shareCtx) ) {
         free(pcp);
         return NULL;
     }
