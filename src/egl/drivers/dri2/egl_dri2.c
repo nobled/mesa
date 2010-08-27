@@ -79,6 +79,7 @@ struct dri2_egl_display
    __DRI2flushExtension     *flush;
    __DRItexBufferExtension  *tex_buffer;
    __DRIimageExtension      *image;
+   __DRIextension           *no_drawable;
    int                       fd;
 
    char                     *device_name;
@@ -447,6 +448,7 @@ static struct dri2_extension_match dri2_core_extensions[] = {
    { __DRI2_FLUSH, 1, offsetof(struct dri2_egl_display, flush) },
    { __DRI_TEX_BUFFER, 2, offsetof(struct dri2_egl_display, tex_buffer) },
    { __DRI_IMAGE, 1, offsetof(struct dri2_egl_display, image) },
+   { __DRI_NO_DRAWABLE, 1, offsetof(struct dri2_egl_display, no_drawable) },
    { NULL }
 };
 
@@ -752,7 +754,7 @@ dri2_create_screen(_EGLDisplay *disp)
    if (api_mask & (1 << __DRI_API_GLES2))
       disp->ClientAPIsMask |= EGL_OPENGL_ES2_BIT;
 
-   if (dri2_dpy->dri2->base.version >= 2) {
+   if (dri2_dpy->no_drawable && dri2_dpy->no_drawable->version >= 1) {
       disp->Extensions.KHR_surfaceless_gles1 = EGL_TRUE;
       disp->Extensions.KHR_surfaceless_gles2 = EGL_TRUE;
       disp->Extensions.KHR_surfaceless_opengl = EGL_TRUE;
@@ -1094,7 +1096,7 @@ dri2_create_context(_EGLDriver *drv, _EGLDisplay *disp, _EGLConfig *conf,
          break;
       default:
 	 _eglError(EGL_BAD_PARAMETER, "eglCreateContext");
-	 return NULL;
+	 goto cleanup;
       }
       break;
    case EGL_OPENGL_API:
@@ -1102,7 +1104,13 @@ dri2_create_context(_EGLDriver *drv, _EGLDisplay *disp, _EGLConfig *conf,
       break;
    default:
       _eglError(EGL_BAD_PARAMETER, "eglCreateContext");
-      return NULL;
+      goto cleanup;
+   }
+
+   /* If conf was null, but we don't have the surfaceless extensions: */
+   if (conf == NULL && !dri2_dpy->no_drawable) {
+      _eglError(EGL_BAD_PARAMETER, "eglCreateContext");
+      goto cleanup;
    }
 
    if (conf != NULL)
@@ -1121,7 +1129,7 @@ dri2_create_context(_EGLDriver *drv, _EGLDisplay *disp, _EGLConfig *conf,
    } else if (api == __DRI_API_OPENGL) {
       dri2_ctx->dri_context =
 	 dri2_dpy->dri2->createNewContext(dri2_dpy->dri_screen,
-					  dri2_config->dri_config,
+					  dri_config,
 					  dri2_ctx_shared ? 
 					  dri2_ctx_shared->dri_context : NULL,
 					  dri2_ctx);
