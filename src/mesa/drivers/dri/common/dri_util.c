@@ -553,6 +553,14 @@ driDestroyDrawable(__DRIdrawable *pdp)
 
 /*@}*/
 
+static const __DRIextension *
+get_extension(const __DRIscreen *s, const char *extname) {
+    unsigned i;
+    for (i = 0; s->extensions[i]; i++)
+	if (strcmp(s->extensions[i]->name, extname) == 0)
+	    return s->extensions[i];
+    return NULL;
+}
 
 /*****************************************************************/
 /** \name Context handling functions                             */
@@ -636,6 +644,7 @@ dri2CreateNewContextForAPI(__DRIscreen *screen, int api,
 {
     __DRIcontext *context;
     void *shareCtx = (shared != NULL) ? shared->driverPrivate : NULL;
+    const __GLcontextModes *modes = (config != NULL) ? &config->modes : NULL;
     gl_api mesa_api;
 
     if (!(screen->api_mask & (1 << api)))
@@ -651,7 +660,14 @@ dri2CreateNewContextForAPI(__DRIscreen *screen, int api,
     case __DRI_API_GLES2:
 	    mesa_api = API_OPENGLES2;
 	    break;
+    default:
+	    return NULL;
     }
+
+    /* Check if the DRI driver supports contexts without drawables
+       for EGL_KHR_surfaceless_{opengl,gles1,gles2} */
+    if (!modes && !get_extension(screen, __DRI_NO_DRAWABLE))
+        return NULL;
 
     context = malloc(sizeof *context);
     if (!context)
@@ -660,8 +676,8 @@ dri2CreateNewContextForAPI(__DRIscreen *screen, int api,
     context->driScreenPriv = screen;
     context->driDrawablePriv = NULL;
     context->loaderPrivate = data;
-    
-    if (!(*screen->DriverAPI.CreateContext)(api, &config->modes,
+
+    if (!(*screen->DriverAPI.CreateContext)(mesa_api, modes,
 					    context, shareCtx) ) {
         free(context);
         return NULL;
