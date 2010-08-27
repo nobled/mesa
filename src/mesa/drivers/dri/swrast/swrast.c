@@ -33,6 +33,7 @@
 
 #include "main/context.h"
 #include "main/extensions.h"
+#include "main/fbobject.h"
 #include "main/formats.h"
 #include "main/framebuffer.h"
 #include "main/imports.h"
@@ -111,6 +112,7 @@ static const __DRItexBufferExtension swrastTexBufferExtension = {
 };
 
 static const __DRIextension *dri_screen_extensions[] = {
+    &driNoDrawableExtension,
     &swrastTexBufferExtension.base,
     NULL
 };
@@ -503,6 +505,9 @@ swrast_check_and_update_window_size( GLcontext *ctx, GLframebuffer *fb )
 {
     GLsizei width, height;
 
+    if (fb == _mesa_get_incomplete_framebuffer())
+        return;
+
     get_window_size(fb, &width, &height);
     if (fb->Width != width || fb->Height != height) {
 	_mesa_resize_framebuffer(ctx, fb, width, height);
@@ -578,6 +583,7 @@ dri_create_context(gl_api api,
     GLcontext *mesaCtx = NULL;
     GLcontext *sharedCtx = NULL;
     struct dd_function_table functions;
+    __GLcontextModes _visual;
 
     TRACE;
 
@@ -597,6 +603,11 @@ dri_create_context(gl_api api,
     }
 
     mesaCtx = &ctx->Base;
+
+    if (visual == NULL) {
+        memset(&_visual, 0, sizeof _visual);
+        visual = &_visual;
+    }
 
     /* basic context setup */
     if (!_mesa_initialize_context(mesaCtx, visual, sharedCtx, &functions, (void *) cPriv)) {
@@ -671,6 +682,21 @@ dri_make_current(__DRIcontext * cPriv,
 
     if (cPriv) {
 	struct dri_context *ctx = dri_context(cPriv);
+	mesaCtx = &ctx->Base;
+    }
+    else {
+	/* unbind */
+	_mesa_make_current( NULL, NULL, NULL );
+        return GL_TRUE;
+    }
+
+    /* Implement EGL_KHR_surfaceless_{opengl,gles1,gles2}.
+       TODO: Add a __DRInoDrawableExtension to advertise this. */
+    if (!driDrawPriv && !driReadPriv) {
+        mesaDraw = _mesa_get_incomplete_framebuffer();
+        mesaRead = _mesa_get_incomplete_framebuffer();
+    }
+    else {
 	struct dri_drawable *draw;
 	struct dri_drawable *read;
 
@@ -679,31 +705,26 @@ dri_make_current(__DRIcontext * cPriv,
 
 	draw = dri_drawable(driDrawPriv);
 	read = dri_drawable(driReadPriv);
-	mesaCtx = &ctx->Base;
 	mesaDraw = &draw->Base;
 	mesaRead = &read->Base;
-
-	/* check for same context and buffer */
-	if (mesaCtx == _mesa_get_current_context()
-	    && mesaCtx->DrawBuffer == mesaDraw
-	    && mesaCtx->ReadBuffer == mesaRead) {
-	    return GL_TRUE;
-	}
-
-	_glapi_check_multithread();
-
-	swrast_check_and_update_window_size(mesaCtx, mesaDraw);
-	if (mesaRead != mesaDraw)
-	    swrast_check_and_update_window_size(mesaCtx, mesaRead);
-
-	_mesa_make_current( mesaCtx,
-			    mesaDraw,
-			    mesaRead );
     }
-    else {
-	/* unbind */
-	_mesa_make_current( NULL, NULL, NULL );
+
+    /* check for same context and buffer */
+    if (mesaCtx == _mesa_get_current_context()
+        && mesaCtx->DrawBuffer == mesaDraw
+        && mesaCtx->ReadBuffer == mesaRead) {
+        return GL_TRUE;
     }
+
+    _glapi_check_multithread();
+
+    swrast_check_and_update_window_size(mesaCtx, mesaDraw);
+    if (mesaRead != mesaDraw)
+        swrast_check_and_update_window_size(mesaCtx, mesaRead);
+
+    _mesa_make_current( mesaCtx,
+			mesaDraw,
+			mesaRead );
 
     return GL_TRUE;
 }
