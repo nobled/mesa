@@ -859,4 +859,19 @@ struct __DRI2configQueryExtensionRec {
    int (*configQueryi)(__DRIscreen *screen, const char *var, GLint *val);
    int (*configQueryf)(__DRIscreen *screen, const char *var, GLfloat *val);
 };
+
+/**
+ * 'No drawable' extension. The presence of this screen extension indicates
+ * two things:
+ *
+ * Any createNewContext* function (from the core, legacy, or dri2 extensions)
+ * can be called with a __DRIconfig *config parameter of NULL.
+ *
+ * __DRIcoreExtension::bindContext can be called with a valid context and both
+ * __DRIdrawable* parameters set to NULL.
+ */
+
+#define __DRI_NO_DRAWABLE "DRI_NO_DRAWABLE"
+#define __DRI_NO_DRAWABLE_VERSION 1
+
 #endif
