@@ -49,6 +49,7 @@ typedef struct _drmLock drmLock;
  */
 extern const __DRIcoreExtension driCoreExtension;
 extern const __DRIswrastExtension driSWRastExtension;
+extern const __DRIextension driNoDrawableExtension;
 
 
 /**

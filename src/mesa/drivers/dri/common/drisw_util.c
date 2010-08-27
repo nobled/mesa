@@ -32,6 +32,15 @@
 
 
 /**
+ * This extension signals that the driver supports
+ * creating and binding a context with no drawables.
+ */
+const __DRIextension driNoDrawableExtension = {
+    __DRI_NO_DRAWABLE, 1
+};
+
+
+/**
  * Screen functions
  */
 
