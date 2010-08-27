@@ -58,6 +58,14 @@ const __DRIextension driReadDrawableExtension = {
     __DRI_READ_DRAWABLE, __DRI_READ_DRAWABLE_VERSION
 };
 
+/**
+ * Likewise, this extension signals that the driver supports
+ * making a context current with no drawables at all.
+ */
+const __DRIextension driNoDrawableExtension = {
+    __DRI_NO_DRAWABLE, 1
+};
+
 GLint
 driIntersectArea( drm_clip_rect_t rect1, drm_clip_rect_t rect2 )
 {

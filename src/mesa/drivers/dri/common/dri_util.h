@@ -72,6 +72,7 @@ extern const __DRIcopySubBufferExtension driCopySubBufferExtension;
 extern const __DRIswapControlExtension driSwapControlExtension;
 extern const __DRImediaStreamCounterExtension driMediaStreamCounterExtension;
 extern const __DRI2configQueryExtension dri2ConfigQueryExtension;
+extern const __DRIextension driNoDrawableExtension;
 
 /**
  * Used by DRI_VALIDATE_DRAWABLE_INFO
