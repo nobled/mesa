@@ -483,6 +483,20 @@ static const struct glx_screen_vtable drisw_screen_vtable = {
    drisw_create_context
 };
 
+static void
+driswBindExtensions(struct drisw_screen *psc, const __DRIextension **extensions)
+{
+   int i;
+
+   /* FIXME: Figure out what other extensions can be ported here from dri2. */
+   for (i = 0; extensions[i]; i++) {
+      if ((strcmp(extensions[i]->name, __DRI_TEX_BUFFER) == 0)) {
+	 psc->texBuffer = (__DRItexBufferExtension *) extensions[i];
+	 __glXEnableDirectExtension(&psc->base, "GLX_EXT_texture_from_pixmap");
+      }
+   }
+}
+
 static struct glx_screen *
 driCreateScreen(int screen, struct glx_display *priv)
 {
@@ -531,6 +545,9 @@ driCreateScreen(int screen, struct glx_display *priv)
       ErrorMessageF("failed to create dri screen\n");
       goto handle_error;
    }
+
+   extensions = psc->core->getExtensions(psc->driScreen);
+   driswBindExtensions(psc, extensions);
 
    psc->base.configs =
       driConvertConfigs(psc->core, psc->base.configs, driver_configs);
