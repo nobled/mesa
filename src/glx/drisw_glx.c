@@ -46,8 +46,10 @@ struct drisw_screen
 
    __DRIscreen *driScreen;
    __GLXDRIscreen vtable;
-   const __DRIcoreExtension *core;
    const __DRIswrastExtension *swrast;
+   const __DRIcoreExtension *core;
+
+   const __DRItexBufferExtension *texBuffer;
    const __DRIconfig **driver_configs;
 
    void *driver;
@@ -287,6 +289,49 @@ drisw_unbind_context(struct glx_context *context, struct glx_context *new)
    driReleaseDrawables(&pcp->base);
 }
 
+static void
+drisw_bind_tex_image(Display * dpy,
+		    GLXDrawable drawable,
+		    int buffer, const int *attrib_list)
+{
+   struct glx_context *gc = __glXGetCurrentContext();
+   struct drisw_context *pcp = (struct drisw_context *) gc;
+   __GLXDRIdrawable *base = GetGLXDRIDrawable(dpy, drawable);
+   struct drisw_drawable *pdraw = (struct drisw_drawable *) base;
+   struct glx_display *dpyPriv = __glXInitialize(dpy);
+   struct drisw_display *pdp =
+      (struct drisw_display *) dpyPriv->dri2Display;
+   struct drisw_screen *psc;
+
+   if (pdraw != NULL) {
+      psc = (struct drisw_screen *) base->psc;
+
+/* FIXME: copied from dri2_glx.c. Can, should drisw do something like this? */
+#if 0 && __DRI2_FLUSH_VERSION >= 3
+      if (!pdp->invalidateAvailable && psc->f)
+	 psc->f->invalidate(pdraw->driDrawable);
+#endif
+
+      if (psc->texBuffer->base.version >= 2 &&
+	  psc->texBuffer->setTexBuffer2 != NULL) {
+	 (*psc->texBuffer->setTexBuffer2) (pcp->driContext,
+					   pdraw->base.textureTarget,
+					   pdraw->base.textureFormat,
+					   pdraw->driDrawable);
+      }
+      else {
+	 (*psc->texBuffer->setTexBuffer) (pcp->driContext,
+					  pdraw->base.textureTarget,
+					  pdraw->driDrawable);
+      }
+   }
+}
+
+static void
+drisw_release_tex_image(Display * dpy, GLXDrawable drawable, int buffer)
+{
+}
+
 static const struct glx_context_vtable drisw_context_vtable = {
    drisw_destroy_context,
    drisw_bind_context,
@@ -294,8 +339,8 @@ static const struct glx_context_vtable drisw_context_vtable = {
    NULL,
    NULL,
    DRI_glXUseXFont,
-   NULL,
-   NULL,
+   drisw_bind_tex_image,
+   drisw_release_tex_image,
 };
 
 static struct glx_context *
