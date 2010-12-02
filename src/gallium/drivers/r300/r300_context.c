@@ -139,27 +139,11 @@ static void r300_destroy_context(struct pipe_context* context)
 
     r300_update_num_contexts(r300->screen, -1);
 
-    /* Free the structs allocated in r300_setup_atoms() */
-    if (r300->aa_state.state) {
-        FREE(r300->aa_state.state);
-        FREE(r300->blend_color_state.state);
-        FREE(r300->clip_state.state);
-        FREE(r300->fb_state.state);
-        FREE(r300->gpu_flush.state);
-        FREE(r300->hyperz_state.state);
-        FREE(r300->invariant_state.state);
-        FREE(r300->rs_block_state.state);
-        FREE(r300->scissor_state.state);
-        FREE(r300->textures_state.state);
-        FREE(r300->vap_invariant_state.state);
-        FREE(r300->viewport_state.state);
-        FREE(r300->ztop_state.state);
-        FREE(r300->fs_constants.state);
-        FREE(r300->vs_constants.state);
-        if (!r300->screen->caps.has_tcl) {
-            FREE(r300->vertex_stream_state.state);
-        }
-    }
+    /* Free the structs allocated in r300_setup_atoms(). */
+    foreach(atom, &r300->atom_list)
+        if (atom->state != NULL)
+            FREE(atom->state);
+
     FREE(r300);
 }
 
@@ -420,10 +404,14 @@ struct pipe_context* r300_create_context(struct pipe_screen* screen,
     r300->context.destroy = r300_destroy_context;
 
     make_empty_list(&r300->query_list);
+    make_empty_list(&r300->atom_list);
 
     util_slab_create(&r300->pool_transfers,
                      sizeof(struct pipe_transfer), 64,
                      UTIL_SLAB_SINGLETHREADED);
+
+    /* The above calls must not fail, since r300_destroy_context()
+       depends on them. */
 
     r300->cs = rws->cs_create(rws);
     if (r300->cs == NULL)
