@@ -549,6 +549,9 @@ egl_g3d_initialize(_EGLDriver *drv, _EGLDisplay *dpy)
          dpy->Extensions.MESA_drm_image = EGL_TRUE;
    }
 
+   if (dpy->Platform == _EGL_PLATFORM_X11 && gdpy->native->buffer)
+      dpy->Extensions.MESA_drm_image = EGL_TRUE;
+
    if (dpy->Platform == _EGL_PLATFORM_WAYLAND && gdpy->native->buffer)
       dpy->Extensions.MESA_drm_image = EGL_TRUE;
 

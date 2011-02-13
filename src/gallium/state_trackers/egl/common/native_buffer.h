@@ -41,7 +41,8 @@ struct pipe_resource;
  * Just like a native window or a native pixmap, a native buffer is another
  * native type.  Its definition depends on the native display.
  *
- * For DRM platform, the type of a native buffer is struct winsys_handle.
+ * For DRM, Wayland, and X11 platforms, the type of a native buffer
+ * is struct winsys_handle.
  */
 struct native_display_buffer {
    struct pipe_resource *(*import_buffer)(struct native_display *ndpy,

@@ -789,6 +789,29 @@ dri2_display_init_screen(struct native_display *ndpy)
    return TRUE;
 }
 
+static struct pipe_resource *
+dri2_display_import_buffer(struct native_display *ndpy,
+                          const struct pipe_resource *templ,
+                          void *buf)
+{
+   return ndpy->screen->resource_from_handle(ndpy->screen,
+         templ, (struct winsys_handle *) buf);
+}
+
+static boolean
+dri2_display_export_buffer(struct native_display *ndpy,
+                          struct pipe_resource *res,
+                          void *buf)
+{
+   return ndpy->screen->resource_get_handle(ndpy->screen,
+         res, (struct winsys_handle *) buf);
+}
+
+static struct native_display_buffer dri2_display_buffer = {
+   dri2_display_import_buffer,
+   dri2_display_export_buffer
+};
+
 static unsigned
 dri2_display_hash_table_hash(void *key)
 {
@@ -851,6 +874,7 @@ x11_create_dri2_display(Display *dpy,
    dri2dpy->base.is_pixmap_supported = dri2_display_is_pixmap_supported;
    dri2dpy->base.create_window_surface = dri2_display_create_window_surface;
    dri2dpy->base.create_pixmap_surface = dri2_display_create_pixmap_surface;
+   dri2dpy->base.buffer = &dri2_display_buffer;
 
    return &dri2dpy->base;
 }
