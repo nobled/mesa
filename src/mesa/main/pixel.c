@@ -157,7 +157,7 @@ validate_pbo_access(struct gl_context *ctx, struct gl_pixelstore_attrib *pack,
                                  pack->BufferObj);
 
    ok = _mesa_validate_pbo_access(1, &ctx->DefaultPacking, mapsize, 1, 1,
-                                  format, type, ptr);
+                                  format, type, INT_MAX, ptr);
 
    /* restore */
    _mesa_reference_buffer_object(ctx,

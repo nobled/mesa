@@ -226,7 +226,7 @@ _mesa_ReadPixels( GLint x, GLint y, GLsizei width, GLsizei height,
 
    if (_mesa_is_bufferobj(ctx->Pack.BufferObj)) {
       if (!_mesa_validate_pbo_access(2, &ctx->Pack, width, height, 1,
-                                     format, type, pixels)) {
+                                     format, type, 0, pixels)) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
                      "glReadPixels(invalid PBO access)");
          return;
