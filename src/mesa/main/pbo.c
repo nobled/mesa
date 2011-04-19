@@ -155,24 +155,30 @@ _mesa_map_pbo_source(struct gl_context *ctx,
  */
 const GLvoid *
 _mesa_map_validate_pbo_source(struct gl_context *ctx,
-                              GLuint dimensions,
-                              const struct gl_pixelstore_attrib *unpack,
-                              GLsizei width, GLsizei height, GLsizei depth,
-                              GLenum format, GLenum type, const GLvoid *ptr,
-                              const char *where)
+                                 GLuint dimensions,
+                                 const struct gl_pixelstore_attrib *unpack,
+                                 GLsizei width, GLsizei height, GLsizei depth,
+                                 GLenum format, GLenum type, GLsizei clientMemSize,
+                                 const GLvoid *ptr, const char *where)
 {
    ASSERT(dimensions == 1 || dimensions == 2 || dimensions == 3);
 
-   if (!_mesa_is_bufferobj(unpack->BufferObj)) {
-      /* non-PBO access: no validation to be done */
-      return ptr;
+   if (!_mesa_validate_pbo_access(dimensions, unpack, width, height, depth,
+                                  format, type, clientMemSize, ptr)) {
+      if (_mesa_is_bufferobj(unpack->BufferObj)) {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "%s(out of bounds PBO access)", where);
+      } else {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "%s(out of bounds access: bufSize (%d) is too small)",
+                     where, clientMemSize);
+      }
+      return NULL;
    }
 
-   if (!_mesa_validate_pbo_access(dimensions, unpack, width, height, depth,
-                                     format, type, INT_MAX, ptr)) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "%s(out of bounds PBO access)", where);
-      return NULL;
+   if (!_mesa_is_bufferobj(unpack->BufferObj)) {
+      /* non-PBO access: no further validation to be done */
+      return ptr;
    }
 
    if (_mesa_bufferobj_mapped(unpack->BufferObj)) {
@@ -245,24 +251,30 @@ _mesa_map_pbo_dest(struct gl_context *ctx,
  */
 GLvoid *
 _mesa_map_validate_pbo_dest(struct gl_context *ctx,
-                            GLuint dimensions,
-                            const struct gl_pixelstore_attrib *unpack,
-                            GLsizei width, GLsizei height, GLsizei depth,
-                            GLenum format, GLenum type, GLvoid *ptr,
-                            const char *where)
+                               GLuint dimensions,
+                               const struct gl_pixelstore_attrib *unpack,
+                               GLsizei width, GLsizei height, GLsizei depth,
+                               GLenum format, GLenum type, GLsizei clientMemSize,
+                               GLvoid *ptr, const char *where)
 {
    ASSERT(dimensions == 1 || dimensions == 2 || dimensions == 3);
 
-   if (!_mesa_is_bufferobj(unpack->BufferObj)) {
-      /* non-PBO access: no validation to be done */
-      return ptr;
+   if (!_mesa_validate_pbo_access(dimensions, unpack, width, height, depth,
+                                  format, type, clientMemSize, ptr)) {
+      if (_mesa_is_bufferobj(unpack->BufferObj)) {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "%s(out of bounds PBO access)", where);
+      } else {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "%s(out of bounds access: bufSize (%d) is too small)",
+                     where, clientMemSize);
+      }
+      return NULL;
    }
 
-   if (!_mesa_validate_pbo_access(dimensions, unpack, width, height, depth,
-                                  format, type, INT_MAX, ptr)) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "%s(out of bounds PBO access)", where);
-      return NULL;
+   if (!_mesa_is_bufferobj(unpack->BufferObj)) {
+      /* non-PBO access: no further validation to be done */
+      return ptr;
    }
 
    if (_mesa_bufferobj_mapped(unpack->BufferObj)) {
