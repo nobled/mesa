@@ -92,8 +92,8 @@ _mesa_DrawPixels( GLsizei width, GLsizei height,
 
          if (_mesa_is_bufferobj(ctx->Unpack.BufferObj)) {
             /* unpack from PBO */
-            if (!_mesa_validate_pbo_access(2, &ctx->Unpack, width, height, 1,
-                                           format, type, pixels)) {
+            if (!_mesa_validate_pbo_access(2, &ctx->Unpack, width, height,
+                                           1, format, type, INT_MAX, pixels)) {
                _mesa_error(ctx, GL_INVALID_OPERATION,
                            "glDrawPixels(invalid PBO access)");
                goto end;
@@ -251,9 +251,9 @@ _mesa_Bitmap( GLsizei width, GLsizei height,
 
          if (_mesa_is_bufferobj(ctx->Unpack.BufferObj)) {
             /* unpack from PBO */
-            if (!_mesa_validate_pbo_access(2, &ctx->Unpack, width, height, 1,
-                                           GL_COLOR_INDEX, GL_BITMAP,
-                                           (GLvoid *) bitmap)) {
+            if (!_mesa_validate_pbo_access(2, &ctx->Unpack, width, height,
+                                           1, GL_COLOR_INDEX, GL_BITMAP,
+                                           INT_MAX, (const GLvoid *) bitmap)) {
                _mesa_error(ctx, GL_INVALID_OPERATION,
                            "glBitmap(invalid PBO access)");
                return;

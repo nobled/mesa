@@ -735,7 +735,7 @@ getteximage_error_check(struct gl_context *ctx, GLenum target, GLint level,
       const GLuint dimensions = (target == GL_TEXTURE_3D) ? 3 : 2;
       if (!_mesa_validate_pbo_access(dimensions, &ctx->Pack, texImage->Width,
                                      texImage->Height, texImage->Depth,
-                                     format, type, pixels)) {
+                                     format, type, INT_MAX, pixels)) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
                      "glGetTexImage(out of bounds PBO write)");
          return GL_TRUE;
