@@ -623,11 +623,13 @@ _mesa_get_compressed_teximage(struct gl_context *ctx, GLenum target, GLint level
  */
 static GLboolean
 getteximage_error_check(struct gl_context *ctx, GLenum target, GLint level,
-                        GLenum format, GLenum type, GLvoid *pixels )
+                        GLenum format, GLenum type, GLsizei clientMemSize,
+                        GLvoid *pixels )
 {
    struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
    const GLint maxLevels = _mesa_max_texture_levels(ctx, target);
+   const GLuint dimensions = (target == GL_TEXTURE_3D) ? 3 : 2;
    GLenum baseFormat;
 
    if (maxLevels == 0) {
@@ -730,17 +732,21 @@ getteximage_error_check(struct gl_context *ctx, GLenum target, GLint level,
       return GL_TRUE;
    }
 
-   if (_mesa_is_bufferobj(ctx->Pack.BufferObj)) {
-      /* packing texture image into a PBO */
-      const GLuint dimensions = (target == GL_TEXTURE_3D) ? 3 : 2;
-      if (!_mesa_validate_pbo_access(dimensions, &ctx->Pack, texImage->Width,
-                                     texImage->Height, texImage->Depth,
-                                     format, type, INT_MAX, pixels)) {
+   if (!_mesa_validate_pbo_access(dimensions, &ctx->Pack, texImage->Width,
+                                  texImage->Height, texImage->Depth,
+                                  format, type, clientMemSize, pixels)) {
+      if (_mesa_is_bufferobj(ctx->Pack.BufferObj)) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glGetTexImage(out of bounds PBO write)");
-         return GL_TRUE;
+                     "glGetTexImage(out of bounds PBO access)");
+      } else {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "glGetnTexImageARB(out of bounds access:"
+                     " bufSize (%d) is too small)", clientMemSize);
       }
+      return GL_TRUE;
+   }
 
+   if (_mesa_is_bufferobj(ctx->Pack.BufferObj)) {
       /* PBO should not be mapped */
       if (_mesa_bufferobj_mapped(ctx->Pack.BufferObj)) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -772,7 +778,8 @@ _mesa_GetTexImage( GLenum target, GLint level, GLenum format,
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
-   if (getteximage_error_check(ctx, target, level, format, type, pixels)) {
+   if (getteximage_error_check(ctx, target, level, format, type,
+                               INT_MAX, pixels)) {
       return;
    }
 
@@ -809,11 +816,12 @@ _mesa_GetTexImage( GLenum target, GLint level, GLenum format,
  */
 static GLboolean
 getcompressedteximage_error_check(struct gl_context *ctx, GLenum target,
-                                  GLint level, GLvoid *img)
+                                  GLint level, GLsizei clientMemSize, GLvoid *img)
 {
    struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
    const GLint maxLevels = _mesa_max_texture_levels(ctx, target);
+   GLuint compressedSize;
 
    if (maxLevels == 0) {
       _mesa_error(ctx, GL_INVALID_ENUM, "glGetCompressedTexImage(target=0x%x)",
@@ -855,26 +863,31 @@ getcompressedteximage_error_check(struct gl_context *ctx, GLenum target,
       return GL_TRUE;
    }
 
-   if (_mesa_is_bufferobj(ctx->Pack.BufferObj)) {
-      GLuint compressedSize;
+   compressedSize = _mesa_format_image_size(texImage->TexFormat,
+                                            texImage->Width,
+                                            texImage->Height,
+                                            texImage->Depth);
+
+   if (!_mesa_is_bufferobj(ctx->Pack.BufferObj)) {
+      /* do bounds checking on writing to client memory */
+      if (clientMemSize < compressedSize) {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "glGetnCompressedTexImageARB(out of bounds access:"
+                     " bufSize (%d) is too small)", clientMemSize);
+      }
+   } else {
+      /* do bounds checking on PBO write */
+      if ((const GLubyte *) img + compressedSize >
+          (const GLubyte *) ctx->Pack.BufferObj->Size) {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "glGetCompressedTexImage(out of bounds PBO access)");
+         return GL_TRUE;
+      }
 
       /* make sure PBO is not mapped */
       if (_mesa_bufferobj_mapped(ctx->Pack.BufferObj)) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
                      "glGetCompressedTexImage(PBO is mapped)");
-         return GL_TRUE;
-      }
-
-      compressedSize = _mesa_format_image_size(texImage->TexFormat,
-                                               texImage->Width,
-                                               texImage->Height,
-                                               texImage->Depth);
-
-      /* do bounds checking on PBO write */
-      if ((const GLubyte *) img + compressedSize >
-          (const GLubyte *) ctx->Pack.BufferObj->Size) {
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glGetCompressedTexImage(out of bounds PBO write)");
          return GL_TRUE;
       }
    }
@@ -891,7 +904,7 @@ _mesa_GetCompressedTexImageARB(GLenum target, GLint level, GLvoid *img)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
-   if (getcompressedteximage_error_check(ctx, target, level, img)) {
+   if (getcompressedteximage_error_check(ctx, target, level, INT_MAX, img)) {
       return;
    }
 
