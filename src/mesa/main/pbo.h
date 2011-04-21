@@ -47,8 +47,8 @@ _mesa_map_validate_pbo_source(struct gl_context *ctx,
                               GLuint dimensions,
                               const struct gl_pixelstore_attrib *unpack,
                               GLsizei width, GLsizei height, GLsizei depth,
-                              GLenum format, GLenum type, const GLvoid *ptr,
-                              const char *where);
+                              GLenum format, GLenum type, GLsizei clientMemSize,
+                              const GLvoid *ptr, const char *where);
 
 extern void
 _mesa_unmap_pbo_source(struct gl_context *ctx,
@@ -64,8 +64,8 @@ _mesa_map_validate_pbo_dest(struct gl_context *ctx,
                             GLuint dimensions,
                             const struct gl_pixelstore_attrib *unpack,
                             GLsizei width, GLsizei height, GLsizei depth,
-                            GLenum format, GLenum type, GLvoid *ptr,
-                            const char *where);
+                            GLenum format, GLenum type, GLsizei clientMemSize,
+                            GLvoid *ptr, const char *where);
 
 extern void
 _mesa_unmap_pbo_dest(struct gl_context *ctx,

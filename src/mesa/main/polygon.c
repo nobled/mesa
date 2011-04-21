@@ -195,7 +195,8 @@ _mesa_polygon_stipple(struct gl_context *ctx, const GLubyte *pattern)
 {
    pattern = _mesa_map_validate_pbo_source(ctx, 2,
                                            &ctx->Unpack, 32, 32, 1,
-                                           GL_COLOR_INDEX, GL_BITMAP, pattern,
+                                           GL_COLOR_INDEX, GL_BITMAP,
+                                           INT_MAX, pattern,
                                            "glPolygonStipple");
    if (!pattern)
       return;
@@ -241,8 +242,8 @@ _mesa_GetPolygonStipple( GLubyte *dest )
 
    dest = _mesa_map_validate_pbo_dest(ctx, 2,
                                       &ctx->Pack, 32, 32, 1,
-                                      GL_COLOR_INDEX, GL_BITMAP, dest,
-                                      "glGetPolygonStipple");
+                                      GL_COLOR_INDEX, GL_BITMAP,
+                                      INT_MAX, dest, "glGetPolygonStipple");
    if (!dest)
       return;
 
