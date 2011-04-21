@@ -334,10 +334,10 @@ _mesa_PixelMapusv(GLenum map, GLsizei mapsize, const GLushort *values )
 
 
 static void GLAPIENTRY
-_mesa_GetPixelMapfv( GLenum map, GLfloat *values )
+_mesa_GetnPixelMapfvARB( GLenum map, GLsizei bufSize, GLfloat *values )
 {
    GET_CURRENT_CONTEXT(ctx);
-   GLuint mapsize, i;
+   GLint mapsize, i;
    const struct gl_pixelmap *pm;
 
    ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -351,7 +351,7 @@ _mesa_GetPixelMapfv( GLenum map, GLfloat *values )
    mapsize = pm->Size;
 
    if (!validate_pbo_access(ctx, &ctx->Pack, mapsize, GL_INTENSITY,
-                            GL_FLOAT, INT_MAX, values)) {
+                            GL_FLOAT, bufSize, values)) {
       return;
    }
 
@@ -379,7 +379,13 @@ _mesa_GetPixelMapfv( GLenum map, GLfloat *values )
 
 
 static void GLAPIENTRY
-_mesa_GetPixelMapuiv( GLenum map, GLuint *values )
+_mesa_GetPixelMapfv( GLenum map, GLfloat *values )
+{
+   _mesa_GetnPixelMapfvARB(map, INT_MAX, values);
+}
+
+static void GLAPIENTRY
+_mesa_GetnPixelMapuivARB( GLenum map, GLsizei bufSize, GLuint *values )
 {
    GET_CURRENT_CONTEXT(ctx);
    GLint mapsize, i;
@@ -392,10 +398,11 @@ _mesa_GetPixelMapuiv( GLenum map, GLuint *values )
       _mesa_error(ctx, GL_INVALID_ENUM, "glGetPixelMapuiv(map)");
       return;
    }
+
    mapsize = pm->Size;
 
    if (!validate_pbo_access(ctx, &ctx->Pack, mapsize, GL_INTENSITY,
-                            GL_UNSIGNED_INT, INT_MAX, values)) {
+                            GL_UNSIGNED_INT, bufSize, values)) {
       return;
    }
 
@@ -423,7 +430,13 @@ _mesa_GetPixelMapuiv( GLenum map, GLuint *values )
 
 
 static void GLAPIENTRY
-_mesa_GetPixelMapusv( GLenum map, GLushort *values )
+_mesa_GetPixelMapuiv( GLenum map, GLuint *values )
+{
+   _mesa_GetnPixelMapuivARB(map, INT_MAX, values);
+}
+
+static void GLAPIENTRY
+_mesa_GetnPixelMapusvARB( GLenum map, GLsizei bufSize, GLushort *values )
 {
    GET_CURRENT_CONTEXT(ctx);
    GLint mapsize, i;
@@ -436,10 +449,11 @@ _mesa_GetPixelMapusv( GLenum map, GLushort *values )
       _mesa_error(ctx, GL_INVALID_ENUM, "glGetPixelMapusv(map)");
       return;
    }
+
    mapsize = pm->Size;
 
    if (!validate_pbo_access(ctx, &ctx->Pack, mapsize, GL_INTENSITY,
-                            GL_UNSIGNED_SHORT, INT_MAX, values)) {
+                            GL_UNSIGNED_SHORT, bufSize, values)) {
       return;
    }
 
@@ -473,6 +487,12 @@ _mesa_GetPixelMapusv( GLenum map, GLushort *values )
    _mesa_unmap_pbo_dest(ctx, &ctx->Pack);
 }
 
+
+static void GLAPIENTRY
+_mesa_GetPixelMapusv( GLenum map, GLushort *values )
+{
+   _mesa_GetnPixelMapusvARB(map, INT_MAX, values);
+}
 
 
 /**********************************************************************/

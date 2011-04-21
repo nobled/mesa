@@ -767,11 +767,12 @@ getteximage_error_check(struct gl_context *ctx, GLenum target, GLint level,
  * \param level image level.
  * \param format pixel data format for returned image.
  * \param type pixel data type for returned image.
+ * \param bufSize size of the pixels data buffer.
  * \param pixels returned pixel data.
  */
 void GLAPIENTRY
-_mesa_GetTexImage( GLenum target, GLint level, GLenum format,
-                   GLenum type, GLvoid *pixels )
+_mesa_GetnTexImageARB( GLenum target, GLint level, GLenum format,
+                       GLenum type, GLsizei bufSize, GLvoid *pixels )
 {
    struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
@@ -779,7 +780,7 @@ _mesa_GetTexImage( GLenum target, GLint level, GLenum format,
    ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
    if (getteximage_error_check(ctx, target, level, format, type,
-                               INT_MAX, pixels)) {
+                               bufSize, pixels)) {
       return;
    }
 
@@ -808,6 +809,13 @@ _mesa_GetTexImage( GLenum target, GLint level, GLenum format,
    _mesa_unlock_texture(ctx, texObj);
 }
 
+
+void GLAPIENTRY
+_mesa_GetTexImage( GLenum target, GLint level, GLenum format,
+                   GLenum type, GLvoid *pixels )
+{
+   _mesa_GetnTexImageARB(target, level, format, type, INT_MAX, pixels);
+}
 
 
 /**
@@ -897,14 +905,15 @@ getcompressedteximage_error_check(struct gl_context *ctx, GLenum target,
 
 
 void GLAPIENTRY
-_mesa_GetCompressedTexImageARB(GLenum target, GLint level, GLvoid *img)
+_mesa_GetnCompressedTexImageARB(GLenum target, GLint level, GLsizei bufSize,
+                                GLvoid *img)
 {
    struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
-   if (getcompressedteximage_error_check(ctx, target, level, INT_MAX, img)) {
+   if (getcompressedteximage_error_check(ctx, target, level, bufSize, img)) {
       return;
    }
 
@@ -930,4 +939,10 @@ _mesa_GetCompressedTexImageARB(GLenum target, GLint level, GLvoid *img)
                                         texObj, texImage);
    }
    _mesa_unlock_texture(ctx, texObj);
+}
+
+void GLAPIENTRY
+_mesa_GetCompressedTexImageARB(GLenum target, GLint level, GLvoid *img)
+{
+   _mesa_GetnCompressedTexImageARB(target, level, INT_MAX, img);
 }

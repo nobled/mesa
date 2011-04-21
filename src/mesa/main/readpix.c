@@ -167,8 +167,9 @@ _mesa_error_check_format_type(struct gl_context *ctx, GLenum format,
 
 
 void GLAPIENTRY
-_mesa_ReadPixels( GLint x, GLint y, GLsizei width, GLsizei height,
-		  GLenum format, GLenum type, GLvoid *pixels )
+_mesa_ReadnPixelsARB( GLint x, GLint y, GLsizei width, GLsizei height,
+		      GLenum format, GLenum type, GLsizei bufSize,
+                      GLvoid *pixels )
 {
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
@@ -225,14 +226,14 @@ _mesa_ReadPixels( GLint x, GLint y, GLsizei width, GLsizei height,
       return; /* nothing to do */
 
    if (!_mesa_validate_pbo_access(2, &ctx->Pack, width, height, 1,
-                                  format, type, INT_MAX, pixels)) {
+                                  format, type, bufSize, pixels)) {
       if (_mesa_is_bufferobj(ctx->Pack.BufferObj)) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
                      "glReadPixels(out of bounds PBO access)");
       } else {
          _mesa_error(ctx, GL_INVALID_OPERATION,
                      "glReadnPixelsARB(out of bounds access:"
-                     " bufSize (%d) is too small)", INT_MAX);
+                     " bufSize (%d) is too small)", bufSize);
       }
       return;
    }
@@ -246,4 +247,11 @@ _mesa_ReadPixels( GLint x, GLint y, GLsizei width, GLsizei height,
 
    ctx->Driver.ReadPixels(ctx, x, y, width, height,
 			  format, type, &ctx->Pack, pixels);
+}
+
+void GLAPIENTRY
+_mesa_ReadPixels( GLint x, GLint y, GLsizei width, GLsizei height,
+		  GLenum format, GLenum type, GLvoid *pixels )
+{
+   _mesa_ReadnPixelsARB(x, y, width, height, format, type, INT_MAX, pixels);
 }

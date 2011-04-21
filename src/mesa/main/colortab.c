@@ -509,8 +509,8 @@ _mesa_CopyColorSubTable(GLenum target, GLsizei start,
 
 
 static void GLAPIENTRY
-_mesa_GetColorTable( GLenum target, GLenum format,
-                     GLenum type, GLvoid *data )
+_mesa_GetnColorTableARB( GLenum target, GLenum format, GLenum type,
+                         GLsizei bufSize, GLvoid *data )
 {
    GET_CURRENT_CONTEXT(ctx);
    struct gl_texture_unit *texUnit = _mesa_get_current_tex_unit(ctx);
@@ -614,7 +614,7 @@ _mesa_GetColorTable( GLenum target, GLenum format,
 
    data = _mesa_map_validate_pbo_dest(ctx, 
                                       1, &ctx->Pack, table->Size, 1, 1,
-                                      format, type, INT_MAX, data,
+                                      format, type, bufSize, data,
                                       "glGetColorTable");
    if (!data)
       return;
@@ -629,6 +629,13 @@ _mesa_GetColorTable( GLenum target, GLenum format,
    _mesa_unmap_pbo_dest(ctx, &ctx->Pack);
 }
 
+
+static void GLAPIENTRY
+_mesa_GetColorTable( GLenum target, GLenum format,
+                     GLenum type, GLvoid *data )
+{
+   _mesa_GetnColorTableARB(target, format, type, INT_MAX, data);
+}
 
 
 static void GLAPIENTRY
