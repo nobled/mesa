@@ -195,6 +195,10 @@ _mesa_init_convolve_dispatch(struct _glapi_table *disp)
    SET_GetConvolutionParameteriv(disp, _mesa_GetConvolutionParameteriv);
    SET_SeparableFilter2D(disp, _mesa_SeparableFilter2D);
    SET_GetSeparableFilter(disp, _mesa_GetSeparableFilter);
+
+   /* GL_ARB_robustness */
+   SET_GetnConvolutionFilterARB(disp, _mesa_GetnConvolutionFilterARB);
+   SET_GetnSeparableFilterARB(disp, _mesa_GetnSeparableFilterARB);
 }
 
 

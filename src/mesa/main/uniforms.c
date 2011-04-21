@@ -1527,6 +1527,11 @@ _mesa_init_shader_uniform_dispatch(struct _glapi_table *exec)
    SET_Uniform4uivEXT(exec, _mesa_Uniform4uiv);
    SET_GetUniformuivEXT(exec, _mesa_GetUniformuiv);
 
+   /* GL_ARB_robustness */
+   SET_GetnUniformfvARB(exec, _mesa_GetnUniformfvARB);
+   SET_GetnUniformivARB(exec, _mesa_GetnUniformivARB);
+   SET_GetnUniformuivARB(exec, _mesa_GetnUniformuivARB);
+   SET_GetnUniformdvARB(exec, _mesa_GetnUniformdvARB); /* GL 4.0 */
 
 #endif /* FEATURE_GL */
 }

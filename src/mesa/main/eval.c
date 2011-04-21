@@ -916,6 +916,11 @@ _mesa_init_eval_dispatch(struct _glapi_table *disp)
    SET_MapGrid1f(disp, _mesa_MapGrid1f);
    SET_MapGrid2d(disp, _mesa_MapGrid2d);
    SET_MapGrid2f(disp, _mesa_MapGrid2f);
+
+   /* GL_ARB_robustness */
+   SET_GetnMapdvARB(disp, _mesa_GetnMapdvARB);
+   SET_GetnMapfvARB(disp, _mesa_GetnMapfvARB);
+   SET_GetnMapivARB(disp, _mesa_GetnMapivARB);
 }
 
 

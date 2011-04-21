@@ -661,6 +661,11 @@ _mesa_init_pixel_dispatch(struct _glapi_table *disp)
    SET_PixelTransferf(disp, _mesa_PixelTransferf);
    SET_PixelTransferi(disp, _mesa_PixelTransferi);
    SET_PixelZoom(disp, _mesa_PixelZoom);
+
+   /* GL_ARB_robustness */
+   SET_GetnPixelMapfvARB(disp, _mesa_GetnPixelMapfvARB);
+   SET_GetnPixelMapuivARB(disp, _mesa_GetnPixelMapuivARB);
+   SET_GetnPixelMapusvARB(disp, _mesa_GetnPixelMapusvARB);
 }
 
 

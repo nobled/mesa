@@ -797,6 +797,9 @@ _mesa_init_colortable_dispatch(struct _glapi_table *disp)
    SET_GetColorTable(disp, _mesa_GetColorTable);
    SET_GetColorTableParameterfv(disp, _mesa_GetColorTableParameterfv);
    SET_GetColorTableParameteriv(disp, _mesa_GetColorTableParameteriv);
+
+   /* GL_ARB_robustness */
+   SET_GetnColorTableARB(disp, _mesa_GetnColorTableARB);
 }
 
 
