@@ -166,8 +166,8 @@ _mesa_init_histogram_dispatch(struct _glapi_table *disp)
    SET_ResetMinmax(disp, _mesa_ResetMinmax);
 
    /* GL_ARB_robustness */
-   SET_GetnHistogramARB(exec, _mesa_GetnHistogramARB);
-   SET_GetnMinmaxARB(exec, _mesa_GetnMinmaxARB);
+   SET_GetnHistogramARB(disp, _mesa_GetnHistogramARB);
+   SET_GetnMinmaxARB(disp, _mesa_GetnMinmaxARB);
 }
 
 #endif /* FEATURE_histogram */
