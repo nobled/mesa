@@ -2788,7 +2788,7 @@
         <param name="level" type="GLint"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="pixels" type="GLvoid *" output="true" img_width="width" img_height="height" img_depth="depth" img_format="format" img_type="type"/>
+        <param name="pixels" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx sop="135" dimensions_in_reply="true"/>
     </function>
 
@@ -3754,7 +3754,7 @@
         <param name="target" type="GLenum"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="table" type="GLvoid *" output="true" img_width="width" img_format="format" img_type="type"/>
+        <param name="table" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx sop="147" dimensions_in_reply="true"/>
     </function>
 
@@ -3863,7 +3863,7 @@
         <param name="target" type="GLenum"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="image" type="GLvoid *" output="true" img_width="width" img_height="height" img_format="format" img_type="type"/>
+        <param name="image" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx sop="150" dimensions_in_reply="true"/>
     </function>
 
@@ -3908,7 +3908,7 @@
         <param name="reset" type="GLboolean"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="values" type="GLvoid *" output="true" img_width="width" img_format="format" img_type="type"/>
+        <param name="values" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx sop="154" dimensions_in_reply="true" img_reset="reset"/>
     </function>
 
@@ -8259,7 +8259,7 @@
         <param name="reset" type="GLboolean"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="values" type="GLvoid *" output="true" img_width="width" img_format="format" img_type="type"/>
+        <param name="values" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx vendorpriv="5" dimensions_in_reply="true" img_reset="reset"/>
     </function>
 
@@ -8453,7 +8453,7 @@
         <param name="target" type="GLenum"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="image" type="GLvoid *" output="true" img_width="width" img_height="height" img_format="format" img_type="type"/>
+        <param name="image" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx vendorpriv="1" dimensions_in_reply="true"/>
     </function>
 
@@ -8586,7 +8586,7 @@
         <param name="target" type="GLenum"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="table" type="GLvoid *" output="true" img_width="width" img_format="format" img_type="type"/>
+        <param name="table" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx vendorpriv="4098" dimensions_in_reply="true"/>
     </function>
 
@@ -9244,7 +9244,7 @@
         <param name="target" type="GLenum"/>
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
-        <param name="table" type="GLvoid *" output="true" img_width="width" img_format="format" img_type="type"/>
+        <param name="table" type="GLvoid *" output="true" img_format="format" img_type="type"/>
         <glx vendorpriv="4098" dimensions_in_reply="true"/>
     </function>
 
