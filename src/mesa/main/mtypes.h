@@ -2765,6 +2765,7 @@ struct gl_extensions
    GLboolean ARB_blend_func_extended;
    GLboolean ARB_color_buffer_float;
    GLboolean ARB_copy_buffer;
+   GLboolean ARB_debug_output;
    GLboolean ARB_depth_buffer_float;
    GLboolean ARB_depth_clamp;
    GLboolean ARB_depth_texture;
@@ -3152,6 +3153,34 @@ struct gl_dlist_state
    } Current;
 };
 
+/**
+ * An error, warning, or other piece of debug information for an application
+ * to consume via GL_ARB_debug_output.
+ */
+struct gl_debug_msg
+{
+   GLenum source;
+   GLenum type;
+   GLuint id;
+   GLenum severity;
+   GLsizei length;
+   GLcharARB *message;
+};
+#define _MESA_MAX_DEBUG_LOGGED_MESSAGES 3
+#define _MESA_MAX_DEBUG_MESSAGE_LENGTH 4096
+
+/* GL_ARB_debug_output */
+struct gl_debug_state
+{
+   GLDEBUGPROCARB Callback;
+   GLvoid *CallbackData;
+   GLboolean SyncOutput;
+   struct gl_debug_msg Log[_MESA_MAX_DEBUG_LOGGED_MESSAGES];
+   GLint NumMessages;
+   GLint NextMsg;
+   GLint NextMsgLength; /* redundant, but copied here from Log[NextMsg].length
+                           for the sake of the offsetof() code in get.c */
+};
 
 /**
  * Enum for the OpenGL APIs we know about and may support.
@@ -3316,6 +3345,9 @@ struct gl_context
     */
    const char *ErrorDebugFmtString;
    GLuint ErrorDebugCount;
+
+   /* GL_ARB_debug_output */
+   struct gl_debug_state Debug;
 
    GLenum RenderMode;        /**< either GL_RENDER, GL_SELECT, GL_FEEDBACK */
    GLbitfield NewState;      /**< bitwise-or of _NEW_* flags */
