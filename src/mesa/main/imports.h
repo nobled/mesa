@@ -593,6 +593,9 @@ _mesa_str_checksum(const char *str);
 extern int
 _mesa_snprintf( char *str, size_t size, const char *fmt, ... ) PRINTFLIKE(3, 4);
 
+extern int
+_mesa_vsnprintf(char *str, size_t size, const char *fmt, va_list arg);
+
 struct gl_context;
 
 extern void
