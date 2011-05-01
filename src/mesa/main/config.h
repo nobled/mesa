@@ -298,6 +298,12 @@
 #define MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS         1024
 /*@}*/
 
+/** For GL_ARB_debug_output */
+/*@{*/
+#define MAX_DEBUG_LOGGED_MESSAGES   10
+#define MAX_DEBUG_MESSAGE_LENGTH    4096
+/*@}*/
+
 
 /**
  * \name Mesa-specific parameters
