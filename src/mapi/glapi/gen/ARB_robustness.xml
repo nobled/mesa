@@ -29,21 +29,21 @@
         <param name="target" type="GLenum"/>
         <param name="query" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="v" type="GLdouble *" output="true"/>
+        <param name="v" type="GLdouble *" output="true" variable_param="target query"/>
     </function>
 
     <function name="GetnMapfvARB" offset="assign">
         <param name="target" type="GLenum"/>
         <param name="query" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="v" type="GLfloat *" output="true"/>
+        <param name="v" type="GLfloat *" output="true" variable_param="target query"/>
     </function>
 
     <function name="GetnMapivARB" offset="assign">
         <param name="target" type="GLenum"/>
         <param name="query" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="v" type="GLint *" output="true"/>
+        <param name="v" type="GLint *" output="true" variable_param="target query"/>
     </function>
 
 
@@ -51,26 +51,26 @@
     <function name="GetnPixelMapfvARB" offset="assign">
         <param name="map" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="values" type="GLfloat *" output="true"/>
+        <param name="values" type="GLfloat *" output="true" variable_param="map"/>
     </function>
 
     <function name="GetnPixelMapuivARB" offset="assign">
         <param name="map" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="values" type="GLuint *" output="true"/>
+        <param name="values" type="GLuint *" output="true" variable_param="map"/>
     </function>
 
     <function name="GetnPixelMapusvARB" offset="assign">
         <param name="map" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="values" type="GLushort *" output="true"/>
+        <param name="values" type="GLushort *" output="true" variable_param="map"/>
     </function>
 
 
 
     <function name="GetnPolygonStippleARB" offset="assign">
         <param name="bufSize" type="GLsizei"/>
-        <param name="pattern" type="GLubyte *" output="true"/>
+        <param name="pattern" type="GLubyte *" output="true" img_width="32" img_height="32" img_format="GL_COLOR_INDEX" img_type="GL_BITMAP"/>
     </function>
 
     <function name="GetnTexImageARB" offset="assign">
@@ -79,7 +79,7 @@
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="img" type="GLvoid *" output="true"/>
+        <param name="img" type="GLvoid *" output="true" img_format="format" img_type="type"/>
     </function>
 
     <function name="ReadnPixelsARB" offset="assign">
@@ -90,7 +90,7 @@
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="data" type="GLvoid *" output="true"/>
+        <param name="data" type="GLvoid *" output="true" img_width="width" img_height="height" img_format="format" img_type="type" img_target="0"/>
     </function>
 
 
@@ -100,7 +100,7 @@
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="table" type="GLvoid *" output="true"/>
+        <param name="table" type="GLvoid *" output="true" img_format="format" img_type="type"/>
     </function>
 
     <function name="GetnConvolutionFilterARB" offset="assign">
@@ -108,7 +108,7 @@
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="image" type="GLvoid *" output="true"/>
+        <param name="image" type="GLvoid *" output="true" img_format="format" img_type="type"/>
     </function>
 
     <function name="GetnSeparableFilterARB" offset="assign">
@@ -128,7 +128,7 @@
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="values" type="GLvoid *" output="true"/>
+        <param name="values" type="GLvoid *" output="true" img_format="format" img_type="type"/>
     </function>
 
     <function name="GetnMinmaxARB" offset="assign">
@@ -137,7 +137,7 @@
         <param name="format" type="GLenum"/>
         <param name="type" type="GLenum"/>
         <param name="bufSize" type="GLsizei"/>
-        <param name="values" type="GLvoid *" output="true"/>
+        <param name="values" type="GLvoid *" output="true" img_width="2" img_format="format" img_type="type"/>
     </function>
 
 
