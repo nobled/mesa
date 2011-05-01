@@ -39,6 +39,8 @@
 #include "compiler.h"
 #include "glheader.h"
 
+/* XXX: temporary include until files include this directly: */
+#include "errors.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -595,20 +597,6 @@ _mesa_snprintf( char *str, size_t size, const char *fmt, ... ) PRINTFLIKE(3, 4);
 
 extern int
 _mesa_vsnprintf(char *str, size_t size, const char *fmt, va_list arg);
-
-struct gl_context;
-
-extern void
-_mesa_warning( struct gl_context *gc, const char *fmtString, ... ) PRINTFLIKE(2, 3);
-
-extern void
-_mesa_problem( const struct gl_context *ctx, const char *fmtString, ... ) PRINTFLIKE(2, 3);
-
-extern void
-_mesa_error( struct gl_context *ctx, GLenum error, const char *fmtString, ... ) PRINTFLIKE(3, 4);
-
-extern void
-_mesa_debug( const struct gl_context *ctx, const char *fmtString, ... ) PRINTFLIKE(2, 3);
 
 
 #if defined(_MSC_VER) && !defined(snprintf)

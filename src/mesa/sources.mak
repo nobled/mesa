@@ -35,6 +35,7 @@ MAIN_SOURCES = \
 	main/drawtex.c \
 	main/enable.c \
 	main/enums.c \
+	main/errors.c \
 	main/eval.c \
 	main/execmem.c \
 	main/extensions.c \
