@@ -543,6 +543,17 @@ _mesa_init_errors(struct gl_context *ctx)
 /*@{*/
 
 static void
+_mesa_log_api_error(struct gl_context *ctx, ApiError id,
+                    GLint len, const char *buf)
+{
+   GLenum source = GL_DEBUG_SOURCE_API_ARB;
+   GLenum type = GL_DEBUG_TYPE_ERROR_ARB;
+   GLenum severity = GL_DEBUG_SEVERITY_HIGH_ARB;
+
+   _mesa_log_msg(ctx, source, type, id, severity, len, buf);
+}
+
+static void
 output_if_debug(const char *prefixString, const char *outputString,
                 GLboolean newline)
 {
@@ -731,16 +742,23 @@ _mesa_error( struct gl_context *ctx, GLenum error, const char *fmtString, ... )
       }
       else {
          char s[MAXSTRING], s2[MAXSTRING];
+         int len;
          va_list args;
 
          flush_delayed_errors( ctx );
          
          va_start(args, fmtString);
-         _mesa_vsnprintf(s, MAXSTRING, fmtString, args);
+         len = _mesa_vsnprintf(s, MAXSTRING, fmtString, args);
          va_end(args);
 
-         _mesa_snprintf(s2, MAXSTRING, "%s in %s", error_string(error), s);
-         output_if_debug("Mesa: User error", s2, GL_TRUE);
+         if (len < MAXSTRING)
+            len = _mesa_snprintf(s2, MAXSTRING, "%s in %s",
+                                 error_string(error), s);
+
+         if (len < MAXSTRING) {
+            _mesa_log_api_error(ctx, API_ERROR_UNKNOWN, len, s2);
+            output_if_debug("Mesa: User error", s2, GL_TRUE);
+         }
          
          ctx->ErrorDebugFmtString = fmtString;
          ctx->ErrorDebugCount = 0;
