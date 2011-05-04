@@ -721,12 +721,10 @@ _mesa_DebugMessageCallbackARB(GLDEBUGPROCARB callback, GLvoid* userParam)
 void
 _mesa_init_errors_dispatch(struct _glapi_table *disp)
 {
-#if 0
    SET_DebugMessageCallbackARB(disp, _mesa_DebugMessageCallbackARB);
    SET_DebugMessageControlARB(disp, _mesa_DebugMessageControlARB);
    SET_DebugMessageInsertARB(disp, _mesa_DebugMessageInsertARB);
    SET_GetDebugMessageLogARB(disp, _mesa_GetDebugMessageLogARB);
-#endif
 }
 
 void
