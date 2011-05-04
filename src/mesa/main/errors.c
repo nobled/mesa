@@ -735,6 +735,25 @@ _mesa_init_errors(struct gl_context *ctx)
 {
    int s, t, sev;
    struct gl_client_debug *ClientIDs = &ctx->Debug.ClientIDs;
+   GLboolean debug;
+
+   /* Check the MESA_DEBUG environment variable.
+    */
+   {
+      char *env = _mesa_getenv("MESA_DEBUG");
+
+      /* In a debug build, we print warning messages *unless*
+       * MESA_DEBUG is 0.  In a non-debug build, we don't
+       * print warning messages *unless* MESA_DEBUG is
+       * set *to any value*.
+       */
+#ifdef DEBUG
+      debug = (env != NULL && atoi(env) == 0) ? 0 : 1;
+#else
+      debug = (env != NULL) ? 1 : 0;
+#endif
+   }
+   ctx->Extensions.ARB_debug_output = debug;
 
    ctx->Debug.Callback = NULL;
    ctx->Debug.SyncOutput = GL_FALSE;
@@ -804,28 +823,10 @@ _mesa_log_api_error(struct gl_context *ctx, gl_api_error id,
 }
 
 static void
-output_if_debug(const char *prefixString, const char *outputString,
-                GLboolean newline)
+output_if_debug(struct gl_context *ctx, const char *prefixString,
+                const char *outputString, GLboolean newline)
 {
-   static int debug = -1;
-
-   /* Check the MESA_DEBUG environment variable if it hasn't
-    * been checked yet.  We only have to check it once...
-    */
-   if (debug == -1) {
-      char *env = _mesa_getenv("MESA_DEBUG");
-
-      /* In a debug build, we print warning messages *unless*
-       * MESA_DEBUG is 0.  In a non-debug build, we don't
-       * print warning messages *unless* MESA_DEBUG is
-       * set *to any value*.
-       */
-#ifdef DEBUG
-      debug = (env != NULL && atoi(env) == 0) ? 0 : 1;
-#else
-      debug = (env != NULL) ? 1 : 0;
-#endif
-   }
+   GLboolean debug = ctx->Extensions.ARB_debug_output;
 
    /* Now only print the string if we're required to do so. */
    if (debug) {
@@ -891,7 +892,7 @@ flush_delayed_errors( struct gl_context *ctx )
                      ctx->ErrorDebugCount,
                      error_string(ctx->ErrorValue));
 
-      output_if_debug("Mesa", s, GL_TRUE);
+      output_if_debug(ctx, "Mesa", s, GL_TRUE);
 
       ctx->ErrorDebugCount = 0;
    }
@@ -917,7 +918,7 @@ _mesa_warning( struct gl_context *ctx, const char *fmtString, ... )
    if (ctx)
       flush_delayed_errors( ctx );
 
-   output_if_debug("Mesa warning", str, GL_TRUE);
+   output_if_debug(ctx, "Mesa warning", str, GL_TRUE);
 }
 
 
@@ -965,25 +966,7 @@ _mesa_problem( const struct gl_context *ctx, const char *fmtString, ... )
 void
 _mesa_error( struct gl_context *ctx, GLenum error, const char *fmtString, ... )
 {
-   static GLint debug = -1;
-
-   /* Check debug environment variable only once:
-    */
-   if (debug == -1) {
-      const char *debugEnv = _mesa_getenv("MESA_DEBUG");
-
-#ifdef DEBUG
-      if (debugEnv && strstr(debugEnv, "silent"))
-         debug = GL_FALSE;
-      else
-         debug = GL_TRUE;
-#else
-      if (debugEnv)
-         debug = GL_TRUE;
-      else
-         debug = GL_FALSE;
-#endif
-   }
+   GLboolean debug = ctx->Extensions.ARB_debug_output;
 
    if (debug) {      
       if (ctx->ErrorValue == error &&
@@ -1007,7 +990,7 @@ _mesa_error( struct gl_context *ctx, GLenum error, const char *fmtString, ... )
 
          if (len < MAXSTRING) {
             _mesa_log_api_error(ctx, API_ERROR_UNKNOWN, len, s2);
-            output_if_debug("Mesa: User error", s2, GL_TRUE);
+            output_if_debug(ctx, "Mesa: User error", s2, GL_TRUE);
          }
          
          ctx->ErrorDebugFmtString = fmtString;
@@ -1035,7 +1018,7 @@ _mesa_debug( const struct gl_context *ctx, const char *fmtString, ... )
    va_start(args, fmtString);
    _mesa_vsnprintf(s, MAXSTRING, fmtString, args);
    va_end(args);
-   output_if_debug("Mesa", s, GL_FALSE);
+   output_if_debug(ctx, "Mesa", s, GL_FALSE);
 #endif /* DEBUG */
    (void) ctx;
    (void) fmtString;
