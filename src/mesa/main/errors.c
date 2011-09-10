@@ -56,69 +56,69 @@ static char out_of_memory[] = "Debugging error: out of memory";
 #define type_is(t, kind) enum_is(t, TYPE, kind)
 
 enum {
-SOURCE_APPLICATION,
-SOURCE_THIRD_PARTY,
+   SOURCE_APPLICATION,
+   SOURCE_THIRD_PARTY,
 
-SOURCE_COUNT,
-SOURCE_ANY = -1
+   SOURCE_COUNT,
+   SOURCE_ANY = -1
 };
 
 enum {
-TYPE_ERROR,
-TYPE_DEPRECATED,
-TYPE_UNDEFINED,
-TYPE_PORTABILITY,
-TYPE_PERFORMANCE,
-TYPE_OTHER,
+   TYPE_ERROR,
+   TYPE_DEPRECATED,
+   TYPE_UNDEFINED,
+   TYPE_PORTABILITY,
+   TYPE_PERFORMANCE,
+   TYPE_OTHER,
 
-TYPE_COUNT,
-TYPE_ANY = -1
+   TYPE_COUNT,
+   TYPE_ANY = -1
 };
 
 enum {
-SEVERITY_LOW,
-SEVERITY_MEDIUM,
-SEVERITY_HIGH,
+   SEVERITY_LOW,
+   SEVERITY_MEDIUM,
+   SEVERITY_HIGH,
 
-SEVERITY_COUNT,
-SEVERITY_ANY = -1
+   SEVERITY_COUNT,
+   SEVERITY_ANY = -1
 };
 
 static int
 enum_to_index(GLenum e)
 {
    switch (e) {
-      case GL_DEBUG_SOURCE_APPLICATION_ARB:
-        return (int)SOURCE_APPLICATION;
-      case GL_DEBUG_SOURCE_THIRD_PARTY_ARB:
-        return (int)SOURCE_THIRD_PARTY;
+   case GL_DEBUG_SOURCE_APPLICATION_ARB:
+      return (int)SOURCE_APPLICATION;
+   case GL_DEBUG_SOURCE_THIRD_PARTY_ARB:
+      return (int)SOURCE_THIRD_PARTY;
 
-      case GL_DEBUG_TYPE_ERROR_ARB:
-        return (int)TYPE_ERROR;
-      case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB:
-        return (int)TYPE_DEPRECATED;
-      case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB:
-        return (int)TYPE_UNDEFINED;
-      case GL_DEBUG_TYPE_PERFORMANCE_ARB:
-        return (int)TYPE_PERFORMANCE;
-      case GL_DEBUG_TYPE_PORTABILITY_ARB:
-        return (int)TYPE_PORTABILITY;
-      case GL_DEBUG_TYPE_OTHER_ARB:
-        return (int)TYPE_OTHER;
+   case GL_DEBUG_TYPE_ERROR_ARB:
+      return (int)TYPE_ERROR;
+   case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB:
+      return (int)TYPE_DEPRECATED;
+   case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB:
+      return (int)TYPE_UNDEFINED;
+   case GL_DEBUG_TYPE_PERFORMANCE_ARB:
+      return (int)TYPE_PERFORMANCE;
+   case GL_DEBUG_TYPE_PORTABILITY_ARB:
+      return (int)TYPE_PORTABILITY;
+   case GL_DEBUG_TYPE_OTHER_ARB:
+      return (int)TYPE_OTHER;
 
-      case GL_DEBUG_SEVERITY_LOW_ARB:
-        return (int)SEVERITY_LOW;
-      case GL_DEBUG_SEVERITY_MEDIUM_ARB:
-        return (int)SEVERITY_MEDIUM;
-      case GL_DEBUG_SEVERITY_HIGH_ARB:
-        return (int)SEVERITY_HIGH;
+   case GL_DEBUG_SEVERITY_LOW_ARB:
+      return (int)SEVERITY_LOW;
+   case GL_DEBUG_SEVERITY_MEDIUM_ARB:
+      return (int)SEVERITY_MEDIUM;
+   case GL_DEBUG_SEVERITY_HIGH_ARB:
+      return (int)SEVERITY_HIGH;
 
-      case GL_DONT_CARE:
-        return (int)TYPE_ANY;
+   case GL_DONT_CARE:
+      return (int)TYPE_ANY;
 
-      default:
-        assert(0 && "unreachable");
-        return -2;
+   default:
+      assert(0 && "unreachable");
+      return -2;
    };
 }
 
@@ -153,14 +153,15 @@ enum_to_index(GLenum e)
  * doesn't exist in it or any other list yet. Because searching all three
  * lists at O(n) is needlessly expensive, we store KNOWN_SEVERITY.
  */
-enum {
 #define FOUND_BIT      (0x1 << 0)
 #define ENABLED_BIT    (0x1 << 1)
 #define KNOWN_SEVERITY (0x1 << 2)
-/* HashTable reserves zero as a return value meaning 'not found' */
-NOT_FOUND = 0,
-DISABLED = FOUND_BIT,
-ENABLED = ENABLED_BIT | FOUND_BIT
+
+enum {
+   /* HashTable reserves zero as a return value meaning 'not found' */
+   NOT_FOUND = 0,
+   DISABLED = FOUND_BIT,
+   ENABLED = ENABLED_BIT | FOUND_BIT
 };
 
 /**
