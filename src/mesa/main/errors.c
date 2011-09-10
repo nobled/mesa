@@ -260,9 +260,6 @@ static GLboolean
 should_log(struct gl_context *ctx, GLenum source, GLenum type,
            GLuint id, GLenum severity)
 {
-   if (!ctx->Extensions.ARB_debug_output)
-      return GL_FALSE;
-
    if (source == GL_DEBUG_SOURCE_APPLICATION_ARB ||
        source == GL_DEBUG_SOURCE_THIRD_PARTY_ARB) {
       int s, t, sev;
@@ -735,25 +732,6 @@ _mesa_init_errors(struct gl_context *ctx)
 {
    int s, t, sev;
    struct gl_client_debug *ClientIDs = &ctx->Debug.ClientIDs;
-   GLboolean debug;
-
-   /* Check the MESA_DEBUG environment variable.
-    */
-   {
-      char *env = _mesa_getenv("MESA_DEBUG");
-
-      /* In a debug build, we print warning messages *unless*
-       * MESA_DEBUG is 0.  In a non-debug build, we don't
-       * print warning messages *unless* MESA_DEBUG is
-       * set *to any value*.
-       */
-#ifdef DEBUG
-      debug = (env != NULL && atoi(env) == 0) ? 0 : 1;
-#else
-      debug = (env != NULL) ? 1 : 0;
-#endif
-   }
-   ctx->Extensions.ARB_debug_output = debug;
 
    ctx->Debug.Callback = NULL;
    ctx->Debug.SyncOutput = GL_FALSE;
@@ -823,27 +801,22 @@ _mesa_log_api_error(struct gl_context *ctx, gl_api_error id,
 }
 
 static void
-output_if_debug(struct gl_context *ctx, const char *prefixString,
-                const char *outputString, GLboolean newline)
+output_error(const char *prefixString, const char *outputString,
+             GLboolean newline)
 {
-   GLboolean debug = ctx->Extensions.ARB_debug_output;
-
-   /* Now only print the string if we're required to do so. */
-   if (debug) {
-      fprintf(stderr, "%s: %s", prefixString, outputString);
-      if (newline)
-         fprintf(stderr, "\n");
+   fprintf(stderr, "%s: %s", prefixString, outputString);
+   if (newline)
+      fprintf(stderr, "\n");
 
 #if defined(_WIN32) && !defined(_WIN32_WCE)
-      /* stderr from windows applications without console is not usually 
-       * visible, so communicate with the debugger instead */ 
-      {
-         char buf[4096];
-         _mesa_snprintf(buf, sizeof(buf), "%s: %s%s", prefixString, outputString, newline ? "\n" : "");
-         OutputDebugStringA(buf);
-      }
-#endif
+   /* stderr from windows applications without console is not usually
+    * visible, so communicate with the debugger instead */
+   {
+      char buf[4096];
+      _mesa_snprintf(buf, sizeof(buf), "%s: %s%s", prefixString, outputString, newline ? "\n" : "");
+      OutputDebugStringA(buf);
    }
+#endif
 }
 
 
@@ -892,7 +865,7 @@ flush_delayed_errors( struct gl_context *ctx )
                      ctx->ErrorDebugCount,
                      error_string(ctx->ErrorValue));
 
-      output_if_debug(ctx, "Mesa", s, GL_TRUE);
+      output_error("Mesa", s, GL_TRUE);
 
       ctx->ErrorDebugCount = 0;
    }
@@ -918,7 +891,7 @@ _mesa_warning( struct gl_context *ctx, const char *fmtString, ... )
    if (ctx)
       flush_delayed_errors( ctx );
 
-   output_if_debug(ctx, "Mesa warning", str, GL_TRUE);
+   output_error("Mesa warning", str, GL_TRUE);
 }
 
 
@@ -966,36 +939,32 @@ _mesa_problem( const struct gl_context *ctx, const char *fmtString, ... )
 void
 _mesa_error( struct gl_context *ctx, GLenum error, const char *fmtString, ... )
 {
-   GLboolean debug = ctx->Extensions.ARB_debug_output;
+   if (ctx->ErrorValue == error &&
+         ctx->ErrorDebugFmtString == fmtString) {
+      ctx->ErrorDebugCount++;
+   }
+   else {
+      char s[MAXSTRING], s2[MAXSTRING];
+      int len;
+      va_list args;
 
-   if (debug) {      
-      if (ctx->ErrorValue == error &&
-          ctx->ErrorDebugFmtString == fmtString) {
-         ctx->ErrorDebugCount++;
+      flush_delayed_errors( ctx );
+
+      va_start(args, fmtString);
+      len = _mesa_vsnprintf(s, MAXSTRING, fmtString, args);
+      va_end(args);
+
+      if (len < MAXSTRING)
+         len = _mesa_snprintf(s2, MAXSTRING, "%s in %s",
+                              error_string(error), s);
+
+      if (len < MAXSTRING) {
+         _mesa_log_api_error(ctx, API_ERROR_UNKNOWN, len, s2);
+         output_error("Mesa: User error", s2, GL_TRUE);
       }
-      else {
-         char s[MAXSTRING], s2[MAXSTRING];
-         int len;
-         va_list args;
 
-         flush_delayed_errors( ctx );
-         
-         va_start(args, fmtString);
-         len = _mesa_vsnprintf(s, MAXSTRING, fmtString, args);
-         va_end(args);
-
-         if (len < MAXSTRING)
-            len = _mesa_snprintf(s2, MAXSTRING, "%s in %s",
-                                 error_string(error), s);
-
-         if (len < MAXSTRING) {
-            _mesa_log_api_error(ctx, API_ERROR_UNKNOWN, len, s2);
-            output_if_debug(ctx, "Mesa: User error", s2, GL_TRUE);
-         }
-         
-         ctx->ErrorDebugFmtString = fmtString;
-         ctx->ErrorDebugCount = 0;
-      }
+      ctx->ErrorDebugFmtString = fmtString;
+      ctx->ErrorDebugCount = 0;
    }
 
    _mesa_record_error(ctx, error);
@@ -1018,7 +987,7 @@ _mesa_debug( const struct gl_context *ctx, const char *fmtString, ... )
    va_start(args, fmtString);
    _mesa_vsnprintf(s, MAXSTRING, fmtString, args);
    va_end(args);
-   output_if_debug(ctx, "Mesa", s, GL_FALSE);
+   output_error("Mesa", s, GL_FALSE);
 #endif /* DEBUG */
    (void) ctx;
    (void) fmtString;
