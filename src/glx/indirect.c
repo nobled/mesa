@@ -4495,10 +4495,9 @@ __indirect_glGetTexImage(GLenum target, GLint level, GLenum format,
                          GLenum type, GLvoid * pixels)
 {
     struct glx_context *const gc = __glXGetCurrentContext();
-    const __GLXattribute *const state = gc->client_state_private;
     Display *const dpy = gc->currentDpy;
 #ifndef USE_XCB
-    const GLuint cmdlen = 20;
+    const GLuint cmdlen = 16;
 #endif
     if (__builtin_expect(dpy != NULL, 1)) {
 #ifdef USE_XCB
@@ -4510,14 +4509,14 @@ __indirect_glGetTexImage(GLenum target, GLint level, GLenum format,
                                                               gc->
                                                               currentContextTag,
                                                               target, level,
-                                                              format, type,
-                                                              state->
-                                                              storePack.
-                                                              swapEndian),
+                                                              format, type),
                                         NULL);
-        (void) memcpy(pixels, xcb_glx_get_tex_image_data(reply),
-                      xcb_glx_get_tex_image_data_length(reply) *
-                      sizeof(GLvoid));
+        if (xcb_glx_get_tex_image_data_length(reply) == 0)
+            (void) memcpy(pixels, &reply->datum, sizeof(reply->datum));
+        else
+            (void) memcpy(pixels, xcb_glx_get_tex_image_data(reply),
+                          xcb_glx_get_tex_image_data_length(reply) *
+                          sizeof(GLvoid));
         free(reply);
 #else
         GLubyte const *pc =
@@ -4526,10 +4525,7 @@ __indirect_glGetTexImage(GLenum target, GLint level, GLenum format,
         (void) memcpy((void *) (pc + 4), (void *) (&level), 4);
         (void) memcpy((void *) (pc + 8), (void *) (&format), 4);
         (void) memcpy((void *) (pc + 12), (void *) (&type), 4);
-        *(int32_t *) (pc + 16) = 0;
-        *(int8_t *) (pc + 16) = state->storePack.swapEndian;
-        __glXReadPixelReply(dpy, gc, 3, 0, 0, 0, format, type, pixels,
-                            GL_TRUE);
+        (void) __glXReadReply(dpy, 1, pixels, GL_FALSE);
         UnlockDisplay(dpy);
         SyncHandle();
 #endif /* USE_XCB */
@@ -5601,10 +5597,9 @@ __indirect_glGetColorTable(GLenum target, GLenum format, GLenum type,
                            GLvoid * table)
 {
     struct glx_context *const gc = __glXGetCurrentContext();
-    const __GLXattribute *const state = gc->client_state_private;
     Display *const dpy = gc->currentDpy;
 #ifndef USE_XCB
-    const GLuint cmdlen = 16;
+    const GLuint cmdlen = 12;
 #endif
     if (__builtin_expect(dpy != NULL, 1)) {
 #ifdef USE_XCB
@@ -5617,14 +5612,14 @@ __indirect_glGetColorTable(GLenum target, GLenum format, GLenum type,
                                                                   currentContextTag,
                                                                   target,
                                                                   format,
-                                                                  type,
-                                                                  state->
-                                                                  storePack.
-                                                                  swapEndian),
+                                                                  type),
                                           NULL);
-        (void) memcpy(table, xcb_glx_get_color_table_data(reply),
-                      xcb_glx_get_color_table_data_length(reply) *
-                      sizeof(GLvoid));
+        if (xcb_glx_get_color_table_data_length(reply) == 0)
+            (void) memcpy(table, &reply->datum, sizeof(reply->datum));
+        else
+            (void) memcpy(table, xcb_glx_get_color_table_data(reply),
+                          xcb_glx_get_color_table_data_length(reply) *
+                          sizeof(GLvoid));
         free(reply);
 #else
         GLubyte const *pc =
@@ -5632,10 +5627,7 @@ __indirect_glGetColorTable(GLenum target, GLenum format, GLenum type,
         (void) memcpy((void *) (pc + 0), (void *) (&target), 4);
         (void) memcpy((void *) (pc + 4), (void *) (&format), 4);
         (void) memcpy((void *) (pc + 8), (void *) (&type), 4);
-        *(int32_t *) (pc + 12) = 0;
-        *(int8_t *) (pc + 12) = state->storePack.swapEndian;
-        __glXReadPixelReply(dpy, gc, 1, 0, 0, 0, format, type, table,
-                            GL_TRUE);
+        (void) __glXReadReply(dpy, 1, table, GL_FALSE);
         UnlockDisplay(dpy);
         SyncHandle();
 #endif /* USE_XCB */
@@ -5656,9 +5648,8 @@ glGetColorTableEXT(GLenum target, GLenum format, GLenum type, GLvoid * table)
 #endif
     {
         struct glx_context *const gc = __glXGetCurrentContext();
-        const __GLXattribute *const state = gc->client_state_private;
         Display *const dpy = gc->currentDpy;
-        const GLuint cmdlen = 16;
+        const GLuint cmdlen = 12;
         if (__builtin_expect(dpy != NULL, 1)) {
             GLubyte const *pc =
                 __glXSetupVendorRequest(gc, X_GLXVendorPrivateWithReply,
@@ -5666,10 +5657,7 @@ glGetColorTableEXT(GLenum target, GLenum format, GLenum type, GLvoid * table)
             (void) memcpy((void *) (pc + 0), (void *) (&target), 4);
             (void) memcpy((void *) (pc + 4), (void *) (&format), 4);
             (void) memcpy((void *) (pc + 8), (void *) (&type), 4);
-            *(int32_t *) (pc + 12) = 0;
-            *(int8_t *) (pc + 12) = state->storePack.swapEndian;
-            __glXReadPixelReply(dpy, gc, 1, 0, 0, 0, format, type, table,
-                                GL_TRUE);
+            (void) __glXReadReply(dpy, 1, table, GL_FALSE);
             UnlockDisplay(dpy);
             SyncHandle();
         }
@@ -6078,10 +6066,9 @@ __indirect_glGetConvolutionFilter(GLenum target, GLenum format, GLenum type,
                                   GLvoid * image)
 {
     struct glx_context *const gc = __glXGetCurrentContext();
-    const __GLXattribute *const state = gc->client_state_private;
     Display *const dpy = gc->currentDpy;
 #ifndef USE_XCB
-    const GLuint cmdlen = 16;
+    const GLuint cmdlen = 12;
 #endif
     if (__builtin_expect(dpy != NULL, 1)) {
 #ifdef USE_XCB
@@ -6091,12 +6078,14 @@ __indirect_glGetConvolutionFilter(GLenum target, GLenum format, GLenum type,
             xcb_glx_get_convolution_filter_reply(c,
                                                  xcb_glx_get_convolution_filter
                                                  (c, gc->currentContextTag,
-                                                  target, format, type,
-                                                  state->storePack.
-                                                  swapEndian), NULL);
-        (void) memcpy(image, xcb_glx_get_convolution_filter_data(reply),
-                      xcb_glx_get_convolution_filter_data_length(reply) *
-                      sizeof(GLvoid));
+                                                  target, format, type),
+                                                 NULL);
+        if (xcb_glx_get_convolution_filter_data_length(reply) == 0)
+            (void) memcpy(image, &reply->datum, sizeof(reply->datum));
+        else
+            (void) memcpy(image, xcb_glx_get_convolution_filter_data(reply),
+                          xcb_glx_get_convolution_filter_data_length(reply) *
+                          sizeof(GLvoid));
         free(reply);
 #else
         GLubyte const *pc =
@@ -6104,10 +6093,7 @@ __indirect_glGetConvolutionFilter(GLenum target, GLenum format, GLenum type,
         (void) memcpy((void *) (pc + 0), (void *) (&target), 4);
         (void) memcpy((void *) (pc + 4), (void *) (&format), 4);
         (void) memcpy((void *) (pc + 8), (void *) (&type), 4);
-        *(int32_t *) (pc + 12) = 0;
-        *(int8_t *) (pc + 12) = state->storePack.swapEndian;
-        __glXReadPixelReply(dpy, gc, 2, 0, 0, 0, format, type, image,
-                            GL_TRUE);
+        (void) __glXReadReply(dpy, 1, image, GL_FALSE);
         UnlockDisplay(dpy);
         SyncHandle();
 #endif /* USE_XCB */
@@ -6129,9 +6115,8 @@ gl_dispatch_stub_356(GLenum target, GLenum format, GLenum type,
 #endif
     {
         struct glx_context *const gc = __glXGetCurrentContext();
-        const __GLXattribute *const state = gc->client_state_private;
         Display *const dpy = gc->currentDpy;
-        const GLuint cmdlen = 16;
+        const GLuint cmdlen = 12;
         if (__builtin_expect(dpy != NULL, 1)) {
             GLubyte const *pc =
                 __glXSetupVendorRequest(gc, X_GLXVendorPrivateWithReply,
@@ -6140,10 +6125,7 @@ gl_dispatch_stub_356(GLenum target, GLenum format, GLenum type,
             (void) memcpy((void *) (pc + 0), (void *) (&target), 4);
             (void) memcpy((void *) (pc + 4), (void *) (&format), 4);
             (void) memcpy((void *) (pc + 8), (void *) (&type), 4);
-            *(int32_t *) (pc + 12) = 0;
-            *(int8_t *) (pc + 12) = state->storePack.swapEndian;
-            __glXReadPixelReply(dpy, gc, 2, 0, 0, 0, format, type, image,
-                                GL_TRUE);
+            (void) __glXReadReply(dpy, 1, image, GL_FALSE);
             UnlockDisplay(dpy);
             SyncHandle();
         }
@@ -6301,10 +6283,9 @@ __indirect_glGetHistogram(GLenum target, GLboolean reset, GLenum format,
                           GLenum type, GLvoid * values)
 {
     struct glx_context *const gc = __glXGetCurrentContext();
-    const __GLXattribute *const state = gc->client_state_private;
     Display *const dpy = gc->currentDpy;
 #ifndef USE_XCB
-    const GLuint cmdlen = 16;
+    const GLuint cmdlen = 12;
 #endif
     if (__builtin_expect(dpy != NULL, 1)) {
 #ifdef USE_XCB
@@ -6316,14 +6297,14 @@ __indirect_glGetHistogram(GLenum target, GLboolean reset, GLenum format,
                                                               gc->
                                                               currentContextTag,
                                                               target, reset,
-                                                              format, type,
-                                                              state->
-                                                              storePack.
-                                                              swapEndian),
+                                                              format, type),
                                         NULL);
-        (void) memcpy(values, xcb_glx_get_histogram_data(reply),
-                      xcb_glx_get_histogram_data_length(reply) *
-                      sizeof(GLvoid));
+        if (xcb_glx_get_histogram_data_length(reply) == 0)
+            (void) memcpy(values, &reply->datum, sizeof(reply->datum));
+        else
+            (void) memcpy(values, xcb_glx_get_histogram_data(reply),
+                          xcb_glx_get_histogram_data_length(reply) *
+                          sizeof(GLvoid));
         free(reply);
 #else
         GLubyte const *pc =
@@ -6331,11 +6312,7 @@ __indirect_glGetHistogram(GLenum target, GLboolean reset, GLenum format,
         (void) memcpy((void *) (pc + 0), (void *) (&target), 4);
         (void) memcpy((void *) (pc + 4), (void *) (&format), 4);
         (void) memcpy((void *) (pc + 8), (void *) (&type), 4);
-        *(int32_t *) (pc + 12) = 0;
-        *(int8_t *) (pc + 12) = state->storePack.swapEndian;
-        *(int8_t *) (pc + 13) = reset;
-        __glXReadPixelReply(dpy, gc, 1, 0, 0, 0, format, type, values,
-                            GL_TRUE);
+        (void) __glXReadReply(dpy, 1, values, GL_FALSE);
         UnlockDisplay(dpy);
         SyncHandle();
 #endif /* USE_XCB */
@@ -6357,9 +6334,8 @@ gl_dispatch_stub_361(GLenum target, GLboolean reset, GLenum format,
 #endif
     {
         struct glx_context *const gc = __glXGetCurrentContext();
-        const __GLXattribute *const state = gc->client_state_private;
         Display *const dpy = gc->currentDpy;
-        const GLuint cmdlen = 16;
+        const GLuint cmdlen = 12;
         if (__builtin_expect(dpy != NULL, 1)) {
             GLubyte const *pc =
                 __glXSetupVendorRequest(gc, X_GLXVendorPrivateWithReply,
@@ -6367,11 +6343,7 @@ gl_dispatch_stub_361(GLenum target, GLboolean reset, GLenum format,
             (void) memcpy((void *) (pc + 0), (void *) (&target), 4);
             (void) memcpy((void *) (pc + 4), (void *) (&format), 4);
             (void) memcpy((void *) (pc + 8), (void *) (&type), 4);
-            *(int32_t *) (pc + 12) = 0;
-            *(int8_t *) (pc + 12) = state->storePack.swapEndian;
-            *(int8_t *) (pc + 13) = reset;
-            __glXReadPixelReply(dpy, gc, 1, 0, 0, 0, format, type, values,
-                                GL_TRUE);
+            (void) __glXReadReply(dpy, 1, values, GL_FALSE);
             UnlockDisplay(dpy);
             SyncHandle();
         }
