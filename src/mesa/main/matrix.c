@@ -46,6 +46,76 @@
 #include "math/m_matrix.h"
 
 
+static struct gl_matrix_stack *
+get_matrix_stack(struct gl_context *ctx, GLenum mode, const char *caller)
+{
+   switch (mode) {
+   case GL_MODELVIEW:
+      return &ctx->ModelviewMatrixStack;
+   case GL_PROJECTION:
+      return &ctx->ProjectionMatrixStack;
+   case GL_TEXTURE:
+      /* This error check is disabled because if we're called from
+       * glPopAttrib() when the active texture unit is >= MaxTextureCoordUnits
+       * we'll generate an unexpected error.
+       * From the GL_ARB_vertex_shader spec it sounds like we should instead
+       * do error checking in other places when we actually try to access
+       * texture matrices beyond MaxTextureCoordUnits.
+       */
+#if 0
+      if (ctx->Texture.CurrentUnit >= ctx->Const.MaxTextureCoordUnits) {
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "%s(invalid tex unit %d)", caller,
+                     ctx->Texture.CurrentUnit);
+         return;
+      }
+#endif
+      ASSERT(ctx->Texture.CurrentUnit < Elements(ctx->TextureMatrixStack));
+      return &ctx->TextureMatrixStack[ctx->Texture.CurrentUnit];
+   case GL_MATRIX0_NV:
+   case GL_MATRIX1_NV:
+   case GL_MATRIX2_NV:
+   case GL_MATRIX3_NV:
+   case GL_MATRIX4_NV:
+   case GL_MATRIX5_NV:
+   case GL_MATRIX6_NV:
+   case GL_MATRIX7_NV:
+      if (ctx->Extensions.NV_vertex_program) {
+         return &ctx->ProgramMatrixStack[mode - GL_MATRIX0_NV];
+      }
+      else {
+         _mesa_error( ctx,  GL_INVALID_ENUM, "%s(mode)", caller );
+         return NULL;
+      }
+   case GL_MATRIX0_ARB:
+   case GL_MATRIX1_ARB:
+   case GL_MATRIX2_ARB:
+   case GL_MATRIX3_ARB:
+   case GL_MATRIX4_ARB:
+   case GL_MATRIX5_ARB:
+   case GL_MATRIX6_ARB:
+   case GL_MATRIX7_ARB:
+      if (ctx->Extensions.ARB_vertex_program ||
+          ctx->Extensions.ARB_fragment_program) {
+         const GLuint m = mode - GL_MATRIX0_ARB;
+         if (m > ctx->Const.MaxProgramMatrices) {
+            _mesa_error(ctx, GL_INVALID_ENUM,
+                        "%s(GL_MATRIX%d_ARB)", caller, m);
+            return NULL;
+         }
+         return &ctx->ProgramMatrixStack[m];
+      }
+      else {
+         _mesa_error( ctx,  GL_INVALID_ENUM, "%s(mode)", caller );
+         return NULL;
+      }
+      break;
+   default:
+      _mesa_error( ctx,  GL_INVALID_ENUM, "%s(mode)", caller );
+      return NULL;
+   }
+}
+
 /**
  * Apply a perspective projection matrix.
  *
@@ -146,6 +216,7 @@ _mesa_Ortho( GLdouble left, GLdouble right,
 void GLAPIENTRY
 _mesa_MatrixMode( GLenum mode )
 {
+   struct gl_matrix_stack *stack;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
@@ -153,76 +224,11 @@ _mesa_MatrixMode( GLenum mode )
       return;
    FLUSH_VERTICES(ctx, _NEW_TRANSFORM);
 
-   switch (mode) {
-   case GL_MODELVIEW:
-      ctx->CurrentStack = &ctx->ModelviewMatrixStack;
-      break;
-   case GL_PROJECTION:
-      ctx->CurrentStack = &ctx->ProjectionMatrixStack;
-      break;
-   case GL_TEXTURE:
-      /* This error check is disabled because if we're called from
-       * glPopAttrib() when the active texture unit is >= MaxTextureCoordUnits
-       * we'll generate an unexpected error.
-       * From the GL_ARB_vertex_shader spec it sounds like we should instead
-       * do error checking in other places when we actually try to access
-       * texture matrices beyond MaxTextureCoordUnits.
-       */
-#if 0
-      if (ctx->Texture.CurrentUnit >= ctx->Const.MaxTextureCoordUnits) {
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glMatrixMode(invalid tex unit %d)",
-                     ctx->Texture.CurrentUnit);
-         return;
-      }
-#endif
-      ASSERT(ctx->Texture.CurrentUnit < Elements(ctx->TextureMatrixStack));
-      ctx->CurrentStack = &ctx->TextureMatrixStack[ctx->Texture.CurrentUnit];
-      break;
-   case GL_MATRIX0_NV:
-   case GL_MATRIX1_NV:
-   case GL_MATRIX2_NV:
-   case GL_MATRIX3_NV:
-   case GL_MATRIX4_NV:
-   case GL_MATRIX5_NV:
-   case GL_MATRIX6_NV:
-   case GL_MATRIX7_NV:
-      if (ctx->Extensions.NV_vertex_program) {
-         ctx->CurrentStack = &ctx->ProgramMatrixStack[mode - GL_MATRIX0_NV];
-      }
-      else {
-         _mesa_error( ctx,  GL_INVALID_ENUM, "glMatrixMode(mode)" );
-         return;
-      }
-      break;
-   case GL_MATRIX0_ARB:
-   case GL_MATRIX1_ARB:
-   case GL_MATRIX2_ARB:
-   case GL_MATRIX3_ARB:
-   case GL_MATRIX4_ARB:
-   case GL_MATRIX5_ARB:
-   case GL_MATRIX6_ARB:
-   case GL_MATRIX7_ARB:
-      if (ctx->Extensions.ARB_vertex_program ||
-          ctx->Extensions.ARB_fragment_program) {
-         const GLuint m = mode - GL_MATRIX0_ARB;
-         if (m > ctx->Const.MaxProgramMatrices) {
-            _mesa_error(ctx, GL_INVALID_ENUM,
-                        "glMatrixMode(GL_MATRIX%d_ARB)", m);
-            return;
-         }
-         ctx->CurrentStack = &ctx->ProgramMatrixStack[m];
-      }
-      else {
-         _mesa_error( ctx,  GL_INVALID_ENUM, "glMatrixMode(mode)" );
-         return;
-      }
-      break;
-   default:
-      _mesa_error( ctx,  GL_INVALID_ENUM, "glMatrixMode(mode)" );
-      return;
-   }
+   stack = get_matrix_stack(ctx, mode, "glMatrixMode");
+   if (!stack)
+      return; /* error */
 
+   ctx->CurrentStack = stack;
    ctx->Transform.MatrixMode = mode;
 }
 
