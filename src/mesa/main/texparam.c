@@ -103,17 +103,17 @@ validate_texture_wrap_mode(struct gl_context * ctx, GLenum target, GLenum wrap)
  * Only the glGetTexLevelParameter() functions accept proxy targets.
  */
 static struct gl_texture_object *
-get_texobj(struct gl_context *ctx, GLenum target, GLboolean get)
+get_texobj(struct gl_context *ctx, struct gl_texture_unit *texUnit, GLenum target,
+           GLboolean get)
 {
-   struct gl_texture_unit *texUnit;
-
    if (ctx->Texture.CurrentUnit >= ctx->Const.MaxCombinedTextureImageUnits) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
                   "gl%sTexParameter(current unit)", get ? "Get" : "");
       return NULL;
    }
 
-   texUnit = _mesa_get_current_tex_unit(ctx);
+   if (!texUnit)
+      texUnit = _mesa_get_current_tex_unit(ctx);
 
    switch (target) {
    case GL_TEXTURE_1D:
@@ -595,7 +595,7 @@ _mesa_TexParameterf(GLenum target, GLenum pname, GLfloat param)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_FALSE);
+   texObj = get_texobj(ctx, NULL, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -656,7 +656,7 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_FALSE);
+   texObj = get_texobj(ctx, NULL, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -732,7 +732,7 @@ _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_FALSE);
+   texObj = get_texobj(ctx, NULL, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -776,7 +776,7 @@ _mesa_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_FALSE);
+   texObj = get_texobj(ctx, NULL, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -837,7 +837,7 @@ _mesa_TexParameterIiv(GLenum target, GLenum pname, const GLint *params)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_FALSE);
+   texObj = get_texobj(ctx, NULL, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -867,7 +867,7 @@ _mesa_TexParameterIuiv(GLenum target, GLenum pname, const GLuint *params)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_FALSE);
+   texObj = get_texobj(ctx, NULL, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -1076,7 +1076,7 @@ _mesa_GetTexParameterfv( GLenum target, GLenum pname, GLfloat *params )
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   obj = get_texobj(ctx, target, GL_TRUE);
+   obj = get_texobj(ctx, NULL, target, GL_TRUE);
    if (!obj)
       return;
 
@@ -1225,7 +1225,7 @@ _mesa_GetTexParameteriv( GLenum target, GLenum pname, GLint *params )
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   obj = get_texobj(ctx, target, GL_TRUE);
+   obj = get_texobj(ctx, NULL, target, GL_TRUE);
    if (!obj)
       return;
 
@@ -1371,7 +1371,7 @@ _mesa_GetTexParameterIiv(GLenum target, GLenum pname, GLint *params)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_TRUE);
+   texObj = get_texobj(ctx, NULL, target, GL_TRUE);
    if (!texObj)
       return;
    
@@ -1393,7 +1393,7 @@ _mesa_GetTexParameterIuiv(GLenum target, GLenum pname, GLuint *params)
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, target, GL_TRUE);
+   texObj = get_texobj(ctx, NULL, target, GL_TRUE);
    if (!texObj)
       return;
    
