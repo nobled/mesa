@@ -3257,6 +3257,14 @@ struct gl_context
    struct gl_matrix_stack *CurrentStack; /**< Points to one of the above stacks */
    /*@}*/
 
+   /** \name Backing storage for the various 4x4 matrix stacks */
+   /*@{*/
+   GLmatrix ModelviewMatrixStore[MAX_MODELVIEW_STACK_DEPTH];
+   GLmatrix ProjectionMatrixStore[MAX_PROJECTION_STACK_DEPTH];
+   GLmatrix TextureMatrixStore[MAX_TEXTURE_UNITS][MAX_TEXTURE_STACK_DEPTH];
+   GLmatrix ProgramMatrixStore[MAX_PROGRAM_MATRICES][MAX_PROGRAM_MATRIX_STACK_DEPTH];
+   /*@}*/
+
    /** Combined modelview and projection matrix */
    GLmatrix _ModelProjectMatrix;
 

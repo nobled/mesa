@@ -1053,7 +1053,7 @@ void _mesa_update_modelview_project( struct gl_context *ctx, GLuint new_state )
  * initialize it.
  */
 static void
-init_matrix_stack( struct gl_matrix_stack *stack,
+init_matrix_stack( struct gl_matrix_stack *stack, GLmatrix *stackStorage,
                    GLuint maxDepth, GLuint dirtyFlag )
 {
    GLuint i;
@@ -1062,7 +1062,7 @@ init_matrix_stack( struct gl_matrix_stack *stack,
    stack->MaxDepth = maxDepth;
    stack->DirtyFlag = dirtyFlag;
    /* The stack */
-   stack->Stack = (GLmatrix *) CALLOC(maxDepth * sizeof(GLmatrix));
+   stack->Stack = stackStorage;
    for (i = 0; i < maxDepth; i++) {
       _math_matrix_ctr(&stack->Stack[i]);
       _math_matrix_alloc_inv(&stack->Stack[i]);
@@ -1085,7 +1085,6 @@ free_matrix_stack( struct gl_matrix_stack *stack )
    for (i = 0; i < stack->MaxDepth; i++) {
       _math_matrix_dtr(&stack->Stack[i]);
    }
-   FREE(stack->Stack);
    stack->Stack = stack->Top = NULL;
 }
 
@@ -1109,17 +1108,19 @@ void _mesa_init_matrix( struct gl_context * ctx )
 {
    GLint i;
 
+#define init_matrix_stack(stack, storage, flag) \
+        init_matrix_stack(stack, storage, Elements(storage), flag)
    /* Initialize matrix stacks */
-   init_matrix_stack(&ctx->ModelviewMatrixStack, MAX_MODELVIEW_STACK_DEPTH,
+   init_matrix_stack(&ctx->ModelviewMatrixStack, ctx->ModelviewMatrixStore,
                      _NEW_MODELVIEW);
-   init_matrix_stack(&ctx->ProjectionMatrixStack, MAX_PROJECTION_STACK_DEPTH,
+   init_matrix_stack(&ctx->ProjectionMatrixStack, ctx->ProjectionMatrixStore,
                      _NEW_PROJECTION);
    for (i = 0; i < Elements(ctx->TextureMatrixStack); i++)
-      init_matrix_stack(&ctx->TextureMatrixStack[i], MAX_TEXTURE_STACK_DEPTH,
+      init_matrix_stack(&ctx->TextureMatrixStack[i], ctx->TextureMatrixStore[i],
                         _NEW_TEXTURE_MATRIX);
    for (i = 0; i < Elements(ctx->ProgramMatrixStack); i++)
       init_matrix_stack(&ctx->ProgramMatrixStack[i], 
-		        MAX_PROGRAM_MATRIX_STACK_DEPTH, _NEW_TRACK_MATRIX);
+		        ctx->ProgramMatrixStore[i], _NEW_TRACK_MATRIX);
    ctx->CurrentStack = &ctx->ModelviewMatrixStack;
 
    /* Init combined Modelview*Projection matrix */
