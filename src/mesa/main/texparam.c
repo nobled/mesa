@@ -1415,10 +1415,11 @@ _mesa_GetTexLevelParameteriv( GLenum target, GLint level,
    struct gl_texture_object *texObj;
    GLint maxLevels;
    GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = ctx->Texture.CurrentUnit;
 
-   if (ctx->Texture.CurrentUnit >= ctx->Const.MaxCombinedTextureImageUnits) {
+   if (unit >= ctx->Const.MaxCombinedTextureImageUnits) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGetTexLevelParameteriv(current unit)");
+                  "glGetTexLevelParameteriv(texture unit = %u)", unit);
       return;
    }
 
