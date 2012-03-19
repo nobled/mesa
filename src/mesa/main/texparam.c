@@ -586,7 +586,7 @@ set_tex_parameterf(struct gl_context *ctx,
 }
 
 
-static GLboolean
+static void
 set_tex_parameterf_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
                    GLenum pname, GLfloat param)
@@ -639,12 +639,10 @@ set_tex_parameterf_wrapper(struct gl_context *ctx,
    if (ctx->Driver.TexParameter && need_update) {
       ctx->Driver.TexParameter(ctx, target, texObj, pname, &param);
    }
-
-   return need_update;
 }
 
 
-static GLboolean
+static void
 set_tex_parameterfv_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
                    GLenum pname, GLfloat *params)
@@ -712,12 +710,10 @@ set_tex_parameterfv_wrapper(struct gl_context *ctx,
    if (ctx->Driver.TexParameter && need_update) {
       ctx->Driver.TexParameter(ctx, target, texObj, pname, params);
    }
-
-   return need_update;
 }
 
 
-static GLboolean
+static void
 set_tex_parameteri_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
                    GLenum pname, GLint param)
@@ -753,12 +749,10 @@ set_tex_parameteri_wrapper(struct gl_context *ctx,
       GLfloat fparam = (GLfloat) param;
       ctx->Driver.TexParameter(ctx, target, texObj, pname, &fparam);
    }
-
-   return need_update;
 }
 
 
-static GLboolean
+static void
 set_tex_parameteriv_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
                    GLenum pname, GLint *params)
@@ -807,8 +801,6 @@ set_tex_parameteriv_wrapper(struct gl_context *ctx,
       }
       ctx->Driver.TexParameter(ctx, target, texObj, pname, fparams);
    }
-
-   return need_update;
 }
 
 
@@ -824,7 +816,7 @@ _mesa_TexParameterf(GLenum target, GLenum pname, GLfloat param)
    if (!texObj)
       return;
 
-   need_update = set_tex_parameterf_wrapper(ctx, texObj, pname, param);
+   set_tex_parameterf_wrapper(ctx, texObj, pname, param);
 }
 
 
@@ -840,7 +832,7 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
    if (!texObj)
       return;
 
-   need_update = set_tex_parameterfv_wrapper(ctx, texObj, pname, params);
+   set_tex_parameterfv_wrapper(ctx, texObj, pname, params);
 }
 
 
@@ -856,7 +848,7 @@ _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
    if (!texObj)
       return;
 
-   need_update = set_tex_parameteri_wrapper(ctx, texObj, pname, param);
+   set_tex_parameteri_wrapper(ctx, texObj, pname, param);
 }
 
 
@@ -872,7 +864,7 @@ _mesa_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
    if (!texObj)
       return;
 
-   need_update = set_tex_parameteriv_wrapper(ctx, texObj, pname, params);
+   set_tex_parameteriv_wrapper(ctx, texObj, pname, params);
 }
 
 
