@@ -65,9 +65,9 @@ _mesa_get_matrix_stack(struct gl_context *ctx, GLenum mode, const char *caller)
 #if 0
       if (ctx->Texture.CurrentUnit >= ctx->Const.MaxTextureCoordUnits) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "%s(invalid tex unit %d)", caller,
+                     "%s(invalid tex unit %u)", caller,
                      ctx->Texture.CurrentUnit);
-         return;
+         return NULL;
       }
 #endif
       ASSERT(ctx->Texture.CurrentUnit < Elements(ctx->TextureMatrixStack));
@@ -100,7 +100,7 @@ _mesa_get_matrix_stack(struct gl_context *ctx, GLenum mode, const char *caller)
          const GLuint m = mode - GL_MATRIX0_ARB;
          if (m > ctx->Const.MaxProgramMatrices) {
             _mesa_error(ctx, GL_INVALID_ENUM,
-                        "%s(GL_MATRIX%d_ARB)", caller, m);
+                        "%s(GL_MATRIX%u_ARB)", caller, m);
             return NULL;
          }
          return &ctx->ProgramMatrixStack[m];
