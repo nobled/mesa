@@ -640,7 +640,7 @@ struct dd_function_table {
    void (*TexEnv)(struct gl_context *ctx, GLenum target, GLenum pname,
                   const GLfloat *param);
    /** Set texture parameters */
-   void (*TexParameter)(struct gl_context *ctx, GLenum target,
+   void (*TexParameter)(struct gl_context *ctx, GLuint texunit, GLenum target,
                         struct gl_texture_object *texObj,
                         GLenum pname, const GLfloat *params);
    /** Set the viewport */

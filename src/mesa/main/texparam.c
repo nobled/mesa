@@ -790,19 +790,20 @@ set_tex_parameteriv_wrapper(struct gl_context *ctx,
 void GLAPIENTRY
 _mesa_TexParameterf(GLenum target, GLenum pname, GLfloat param)
 {
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = ctx->Texture.CurrentUnit;
    GLboolean need_update;
    struct gl_texture_object *texObj;
-   GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_FALSE);
+   texObj = get_texobj(ctx, unit, target, GL_FALSE);
    if (!texObj)
       return;
 
    need_update = set_tex_parameterf_wrapper(ctx, texObj, pname, param);
 
    if (ctx->Driver.TexParameter && need_update) {
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, &param);
+      ctx->Driver.TexParameter(ctx, unit, target, texObj, pname, &param);
    }
 }
 
@@ -810,19 +811,20 @@ _mesa_TexParameterf(GLenum target, GLenum pname, GLfloat param)
 void GLAPIENTRY
 _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 {
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = ctx->Texture.CurrentUnit;
    GLboolean need_update;
    struct gl_texture_object *texObj;
-   GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_FALSE);
+   texObj = get_texobj(ctx, unit, target, GL_FALSE);
    if (!texObj)
       return;
 
    need_update = set_tex_parameterfv_wrapper(ctx, texObj, pname, params);
 
    if (ctx->Driver.TexParameter && need_update) {
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, params);
+      ctx->Driver.TexParameter(ctx, unit, target, texObj, pname, params);
    }
 }
 
@@ -830,12 +832,13 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 void GLAPIENTRY
 _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
 {
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = ctx->Texture.CurrentUnit;
    GLboolean need_update;
    struct gl_texture_object *texObj;
-   GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_FALSE);
+   texObj = get_texobj(ctx, unit, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -843,7 +846,7 @@ _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
 
    if (ctx->Driver.TexParameter && need_update) {
       GLfloat fparam = (GLfloat) param;
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, &fparam);
+      ctx->Driver.TexParameter(ctx, unit, target, texObj, pname, &fparam);
    }
 }
 
@@ -851,12 +854,13 @@ _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
 void GLAPIENTRY
 _mesa_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
 {
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = ctx->Texture.CurrentUnit;
    GLboolean need_update;
    struct gl_texture_object *texObj;
-   GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   texObj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_FALSE);
+   texObj = get_texobj(ctx, unit, target, GL_FALSE);
    if (!texObj)
       return;
 
@@ -871,7 +875,7 @@ _mesa_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
          fparams[2] = INT_TO_FLOAT(params[2]);
          fparams[3] = INT_TO_FLOAT(params[3]);
       }
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, fparams);
+      ctx->Driver.TexParameter(ctx, unit, target, texObj, pname, fparams);
    }
 }
 

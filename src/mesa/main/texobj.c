@@ -161,7 +161,7 @@ _mesa_initialize_texture_object( struct gl_texture_object *obj,
  * target it's getting bound to (GL_TEXTURE_1D/2D/etc).
  */
 static void
-finish_texture_init(struct gl_context *ctx, GLenum target,
+finish_texture_init(struct gl_context *ctx, GLuint texunit, GLenum target,
                     struct gl_texture_object *obj)
 {
    assert(obj->Target == 0);
@@ -176,10 +176,14 @@ finish_texture_init(struct gl_context *ctx, GLenum target,
       if (ctx->Driver.TexParameter) {
          static const GLfloat fparam_wrap[1] = {(GLfloat) GL_CLAMP_TO_EDGE};
          static const GLfloat fparam_filter[1] = {(GLfloat) GL_LINEAR};
-         ctx->Driver.TexParameter(ctx, target, obj, GL_TEXTURE_WRAP_S, fparam_wrap);
-         ctx->Driver.TexParameter(ctx, target, obj, GL_TEXTURE_WRAP_T, fparam_wrap);
-         ctx->Driver.TexParameter(ctx, target, obj, GL_TEXTURE_WRAP_R, fparam_wrap);
-         ctx->Driver.TexParameter(ctx, target, obj, GL_TEXTURE_MIN_FILTER, fparam_filter);
+         ctx->Driver.TexParameter(ctx, texunit, target, obj,
+                                  GL_TEXTURE_WRAP_S, fparam_wrap);
+         ctx->Driver.TexParameter(ctx, texunit, target, obj,
+                                  GL_TEXTURE_WRAP_T, fparam_wrap);
+         ctx->Driver.TexParameter(ctx, texunit, target, obj,
+                                  GL_TEXTURE_WRAP_R, fparam_wrap);
+         ctx->Driver.TexParameter(ctx, texunit, target, obj,
+                                  GL_TEXTURE_MIN_FILTER, fparam_filter);
       }
    }
 }
@@ -1087,7 +1091,7 @@ _mesa_BindTexture( GLenum target, GLuint texName )
             return;
          }
          if (newTexObj->Target == 0) {
-            finish_texture_init(ctx, target, newTexObj);
+            finish_texture_init(ctx, unit, target, newTexObj);
          }
       }
       else {

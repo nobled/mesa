@@ -404,7 +404,7 @@ nouveau_tex_env(struct gl_context *ctx, GLenum target, GLenum pname,
 }
 
 static void
-nouveau_tex_parameter(struct gl_context *ctx, GLenum target,
+nouveau_tex_parameter(struct gl_context *ctx, GLuint texunit, GLenum target,
 		      struct gl_texture_object *t, GLenum pname,
 		      const GLfloat *params)
 {
@@ -417,14 +417,14 @@ nouveau_tex_parameter(struct gl_context *ctx, GLenum target,
 	case GL_TEXTURE_MAX_LOD:
 	case GL_TEXTURE_MAX_ANISOTROPY_EXT:
 	case GL_TEXTURE_LOD_BIAS:
-		context_dirty_i(ctx, TEX_OBJ, ctx->Texture.CurrentUnit);
+		context_dirty_i(ctx, TEX_OBJ, texunit);
 		break;
 
 	case GL_TEXTURE_MIN_FILTER:
 	case GL_TEXTURE_BASE_LEVEL:
 	case GL_TEXTURE_MAX_LEVEL:
 		nouveau_texture_reallocate(ctx, t);
-		context_dirty_i(ctx, TEX_OBJ, ctx->Texture.CurrentUnit);
+		context_dirty_i(ctx, TEX_OBJ, texunit);
 		break;
 	}
 }
