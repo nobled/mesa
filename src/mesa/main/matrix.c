@@ -47,7 +47,7 @@
 
 
 static struct gl_matrix_stack *
-get_matrix_stack(struct gl_context *ctx, GLenum mode, const char *caller)
+_mesa_get_matrix_stack(struct gl_context *ctx, GLenum mode, const char *caller)
 {
    switch (mode) {
    case GL_MODELVIEW:
@@ -224,7 +224,7 @@ _mesa_MatrixMode( GLenum mode )
       return;
    FLUSH_VERTICES(ctx, _NEW_TRANSFORM);
 
-   stack = get_matrix_stack(ctx, mode, "glMatrixMode");
+   stack = _mesa_get_matrix_stack(ctx, mode, "glMatrixMode");
    if (!stack)
       return; /* error */
 
