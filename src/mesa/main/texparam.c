@@ -637,7 +637,7 @@ set_tex_parameterf_wrapper(struct gl_context *ctx,
    }
 
    if (ctx->Driver.TexParameter && need_update) {
-      ctx->Driver.TexParameter(ctx, texObj->Target, texObj, pname, &param);
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, &param);
    }
 }
 
@@ -645,7 +645,7 @@ set_tex_parameterf_wrapper(struct gl_context *ctx,
 static void
 set_tex_parameterfv_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
-                   GLenum pname, const GLfloat *params)
+                   GLenum pname, GLfloat *params)
 {
    GLboolean need_update;
 
@@ -708,7 +708,7 @@ set_tex_parameterfv_wrapper(struct gl_context *ctx,
    }
 
    if (ctx->Driver.TexParameter && need_update) {
-      ctx->Driver.TexParameter(ctx, texObj->Target, texObj, pname, params);
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, params);
    }
 }
 
@@ -747,7 +747,7 @@ set_tex_parameteri_wrapper(struct gl_context *ctx,
 
    if (ctx->Driver.TexParameter && need_update) {
       GLfloat fparam = (GLfloat) param;
-      ctx->Driver.TexParameter(ctx, texObj->Target, texObj, pname, &fparam);
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, &fparam);
    }
 }
 
@@ -755,7 +755,7 @@ set_tex_parameteri_wrapper(struct gl_context *ctx,
 static void
 set_tex_parameteriv_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
-                   GLenum pname, const GLint *params)
+                   GLenum pname, GLint *params)
 {
    GLboolean need_update;
 
@@ -799,7 +799,7 @@ set_tex_parameteriv_wrapper(struct gl_context *ctx,
          fparams[2] = INT_TO_FLOAT(params[2]);
          fparams[3] = INT_TO_FLOAT(params[3]);
       }
-      ctx->Driver.TexParameter(ctx, texObj->Target, texObj, pname, fparams);
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, fparams);
    }
 }
 
