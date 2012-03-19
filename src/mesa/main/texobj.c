@@ -1222,6 +1222,86 @@ target_enum_to_index(struct gl_context *ctx, GLenum target)
 
 
 /**
+ * Look up and either initialize or allocate a named texture.
+ *
+ * \param ctx context struct.
+ * \param name texture name.
+ * \param target texture target.
+ * \param texunit texture unit in which the texture is being bound.
+ * \param caller the name of the current GL entrypoint.
+ *
+ * If name is zero, return the texture which is the context's default texture
+ * for the given target.
+ *
+ * If name is nonzero, look up a named texture from the hash, and if not found,
+ * create a new texture. Whether it was found or just created, if it has never
+ * been bound to a target, initialize it with the given target. If it has
+ * been bound before, and if its target does not match the given target argument,
+ * generate a GL error and return NULL.
+ *
+ * target and texunit must be validated by the caller beforehand; no error
+ * checking is done on their values.
+ */
+struct gl_texture_object *
+_mesa_get_and_init_texture(struct gl_context *ctx, GLuint name, GLenum target,
+                           GLuint texunit, const char *caller)
+{
+   struct gl_texture_object *newTexObj = NULL;
+
+   /*
+    * Get pointer to new texture object (newTexObj)
+    */
+   if (name == 0) {
+      /* Use a default texture object */
+      gl_texture_index targetIndex = target_enum_to_index(ctx, target);
+
+      assert(targetIndex >= 0 && targetIndex < NUM_TEXTURE_TARGETS
+             && "The caller must validate the target enum beforehand!");
+
+      newTexObj = ctx->Shared->DefaultTex[targetIndex];
+   }
+   else {
+      /* non-default texture object */
+      newTexObj = _mesa_lookup_texture(ctx, name);
+      if (newTexObj) {
+         /* error checking */
+         if (newTexObj->Target != 0 && newTexObj->Target != target) {
+            /* the named texture object's target doesn't match the given target */
+            _mesa_error( ctx, GL_INVALID_OPERATION,
+                         "%s(target mismatch)", caller );
+            return NULL;
+         }
+         if (newTexObj->Target == 0) {
+            finish_texture_init(ctx, target, newTexObj);
+         }
+      }
+      else {
+         if (ctx->API == API_OPENGL_CORE) {
+            _mesa_error(ctx, GL_INVALID_OPERATION, "%s(non-gen name)", caller);
+            return NULL;
+         }
+
+         /* if this is a new texture id, allocate a texture object now */
+         newTexObj = ctx->Driver.NewTextureObject(ctx, name, target);
+         if (!newTexObj) {
+            _mesa_error(ctx, GL_OUT_OF_MEMORY, "%s", caller);
+            return NULL;
+         }
+
+         /* and insert it into hash table */
+         _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+         _mesa_HashInsert(ctx->Shared->TexObjects, name, newTexObj);
+         _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+      }
+      newTexObj->Target = target;
+   }
+
+   assert(valid_texture_object(newTexObj));
+
+   return newTexObj;
+}
+
+/**
  * Bind a named texture to a texturing target.
  * 
  * \param target texture target.
@@ -1258,50 +1338,10 @@ _mesa_BindTexture( GLenum target, GLuint texName )
    }
    assert(targetIndex < NUM_TEXTURE_TARGETS);
 
-   /*
-    * Get pointer to new texture object (newTexObj)
-    */
-   if (texName == 0) {
-      /* Use a default texture object */
-      newTexObj = ctx->Shared->DefaultTex[targetIndex];
-   }
-   else {
-      /* non-default texture object */
-      newTexObj = _mesa_lookup_texture(ctx, texName);
-      if (newTexObj) {
-         /* error checking */
-         if (newTexObj->Target != 0 && newTexObj->Target != target) {
-            /* the named texture object's target doesn't match the given target */
-            _mesa_error( ctx, GL_INVALID_OPERATION,
-                         "glBindTexture(target mismatch)" );
-            return;
-         }
-         if (newTexObj->Target == 0) {
-            finish_texture_init(ctx, target, newTexObj);
-         }
-      }
-      else {
-         if (ctx->API == API_OPENGL_CORE) {
-            _mesa_error(ctx, GL_INVALID_OPERATION, "glBindTexture(non-gen name)");
-            return;
-         }
-
-         /* if this is a new texture id, allocate a texture object now */
-         newTexObj = ctx->Driver.NewTextureObject(ctx, texName, target);
-         if (!newTexObj) {
-            _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindTexture");
-            return;
-         }
-
-         /* and insert it into hash table */
-         _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-         _mesa_HashInsert(ctx->Shared->TexObjects, texName, newTexObj);
-         _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
-      }
-      newTexObj->Target = target;
-   }
-
-   assert(valid_texture_object(newTexObj));
+   newTexObj = _mesa_get_and_init_texture(ctx, texName, target, unit,
+                                          "glBindTexture");
+   if (!newTexObj)
+      return; /* error */
 
    /* Check if this texture is only used by this context and is already bound.
     * If so, just return.
