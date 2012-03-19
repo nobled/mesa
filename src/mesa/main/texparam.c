@@ -636,10 +636,6 @@ set_tex_parameterf_wrapper(struct gl_context *ctx,
       }
    }
 
-   if (ctx->Driver.TexParameter && need_update) {
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, &param);
-   }
-
    return need_update;
 }
 
@@ -647,7 +643,7 @@ set_tex_parameterf_wrapper(struct gl_context *ctx,
 static GLboolean
 set_tex_parameterfv_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
-                   GLenum pname, GLfloat *params)
+                   GLenum pname, const GLfloat *params)
 {
    GLboolean need_update;
 
@@ -709,10 +705,6 @@ set_tex_parameterfv_wrapper(struct gl_context *ctx,
       need_update = set_tex_parameterf(ctx, texObj, pname, params);
    }
 
-   if (ctx->Driver.TexParameter && need_update) {
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, params);
-   }
-
    return need_update;
 }
 
@@ -749,11 +741,6 @@ set_tex_parameteri_wrapper(struct gl_context *ctx,
       }
    }
 
-   if (ctx->Driver.TexParameter && need_update) {
-      GLfloat fparam = (GLfloat) param;
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, &fparam);
-   }
-
    return need_update;
 }
 
@@ -761,7 +748,7 @@ set_tex_parameteri_wrapper(struct gl_context *ctx,
 static GLboolean
 set_tex_parameteriv_wrapper(struct gl_context *ctx,
                    struct gl_texture_object *texObj,
-                   GLenum pname, GLint *params)
+                   GLenum pname, const GLint *params)
 {
    GLboolean need_update;
 
@@ -796,18 +783,6 @@ set_tex_parameteriv_wrapper(struct gl_context *ctx,
       need_update = set_tex_parameteri(ctx, texObj, pname, params);
    }
 
-   if (ctx->Driver.TexParameter && need_update) {
-      GLfloat fparams[4];
-      fparams[0] = INT_TO_FLOAT(params[0]);
-      if (pname == GL_TEXTURE_BORDER_COLOR ||
-          pname == GL_TEXTURE_CROP_RECT_OES) {
-         fparams[1] = INT_TO_FLOAT(params[1]);
-         fparams[2] = INT_TO_FLOAT(params[2]);
-         fparams[3] = INT_TO_FLOAT(params[3]);
-      }
-      ctx->Driver.TexParameter(ctx, target, texObj, pname, fparams);
-   }
-
    return need_update;
 }
 
@@ -825,6 +800,10 @@ _mesa_TexParameterf(GLenum target, GLenum pname, GLfloat param)
       return;
 
    need_update = set_tex_parameterf_wrapper(ctx, texObj, pname, param);
+
+   if (ctx->Driver.TexParameter && need_update) {
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, &param);
+   }
 }
 
 
@@ -841,6 +820,10 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
       return;
 
    need_update = set_tex_parameterfv_wrapper(ctx, texObj, pname, params);
+
+   if (ctx->Driver.TexParameter && need_update) {
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, params);
+   }
 }
 
 
@@ -857,6 +840,11 @@ _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
       return;
 
    need_update = set_tex_parameteri_wrapper(ctx, texObj, pname, param);
+
+   if (ctx->Driver.TexParameter && need_update) {
+      GLfloat fparam = (GLfloat) param;
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, &fparam);
+   }
 }
 
 
@@ -873,6 +861,18 @@ _mesa_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
       return;
 
    need_update = set_tex_parameteriv_wrapper(ctx, texObj, pname, params);
+
+   if (ctx->Driver.TexParameter && need_update) {
+      GLfloat fparams[4];
+      fparams[0] = INT_TO_FLOAT(params[0]);
+      if (pname == GL_TEXTURE_BORDER_COLOR ||
+          pname == GL_TEXTURE_CROP_RECT_OES) {
+         fparams[1] = INT_TO_FLOAT(params[1]);
+         fparams[2] = INT_TO_FLOAT(params[2]);
+         fparams[3] = INT_TO_FLOAT(params[3]);
+      }
+      ctx->Driver.TexParameter(ctx, target, texObj, pname, fparams);
+   }
 }
 
 
