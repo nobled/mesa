@@ -97,6 +97,71 @@ extern void GLAPIENTRY
 _mesa_MultTransposeMatrixdARB( const GLdouble *m );
 
 
+/* GL_EXT_direct_state_access entrypoints */
+extern void GLAPIENTRY
+_mesa_MatrixLoadfEXT( GLenum mode, const GLfloat *m );
+
+extern void GLAPIENTRY
+_mesa_MatrixLoaddEXT( GLenum mode, const GLdouble *m );
+
+extern void GLAPIENTRY
+_mesa_MatrixMultfEXT( GLenum mode, const GLfloat *m );
+
+extern void GLAPIENTRY
+_mesa_MatrixMultdEXT( GLenum mode, const GLdouble *m );
+
+extern void GLAPIENTRY
+_mesa_MatrixLoadIdentityEXT( GLenum mode );
+
+extern void GLAPIENTRY
+_mesa_MatrixRotatefEXT( GLenum mode, GLfloat angle,
+                        GLfloat x, GLfloat y, GLfloat z );
+
+extern void GLAPIENTRY
+_mesa_MatrixRotatedEXT( GLenum mode, GLdouble angle,
+                        GLdouble x, GLdouble y, GLdouble z );
+
+extern void GLAPIENTRY
+_mesa_MatrixScalefEXT( GLenum mode, GLfloat x, GLfloat y, GLfloat z );
+
+extern void GLAPIENTRY
+_mesa_MatrixScaledEXT( GLenum mode, GLdouble x, GLdouble y, GLdouble z );
+
+extern void GLAPIENTRY
+_mesa_MatrixTranslatefEXT( GLenum mode, GLfloat x, GLfloat y, GLfloat z );
+
+extern void GLAPIENTRY
+_mesa_MatrixTranslatedEXT( GLenum mode, GLdouble x, GLdouble y, GLdouble z );
+
+extern void GLAPIENTRY
+_mesa_MatrixFrustumEXT( GLenum mode, GLdouble left, GLdouble right,
+                        GLdouble bottom, GLdouble top,
+                        GLdouble zNear, GLdouble zFar );
+
+extern void GLAPIENTRY
+_mesa_MatrixOrthoEXT( GLenum mode, GLdouble left, GLdouble right,
+                      GLdouble bottom, GLdouble top,
+                      GLdouble zNear, GLdouble zFar );
+
+extern void GLAPIENTRY
+_mesa_MatrixPopEXT( GLenum mode );
+
+extern void GLAPIENTRY
+_mesa_MatrixPushEXT( GLenum mode );
+
+extern void GLAPIENTRY
+_mesa_MatrixLoadTransposefEXT (GLenum mode, const GLfloat *m);
+
+extern void GLAPIENTRY
+_mesa_MatrixLoadTransposedEXT (GLenum mode, const GLdouble *m);
+
+extern void GLAPIENTRY
+_mesa_MatrixMultTransposefEXT (GLenum mode, const GLfloat *m);
+
+extern void GLAPIENTRY
+_mesa_MatrixMultTransposedEXT (GLenum mode, const GLdouble *m);
+
+
 extern void 
 _mesa_init_matrix( struct gl_context * ctx );
 
