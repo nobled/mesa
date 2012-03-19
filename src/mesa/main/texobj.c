@@ -1240,13 +1240,16 @@ void GLAPIENTRY
 _mesa_BindTexture( GLenum target, GLuint texName )
 {
    GET_CURRENT_CONTEXT(ctx);
-   struct gl_texture_unit *texUnit = _mesa_get_current_tex_unit(ctx);
+   const GLuint unit = ctx->Texture.CurrentUnit;
+   struct gl_texture_unit *texUnit;
    struct gl_texture_object *newTexObj = NULL;
    GLint targetIndex;
 
+   texUnit = _mesa_get_current_tex_unit(ctx);
+
    if (MESA_VERBOSE & (VERBOSE_API|VERBOSE_TEXTURE))
-      _mesa_debug(ctx, "glBindTexture %s %d\n",
-                  _mesa_lookup_enum_by_nr(target), (GLint) texName);
+      _mesa_debug(ctx, "glBindTexture(texunit %u, target %s, texture %u\n",
+                  unit, _mesa_lookup_enum_by_nr(target), texName);
 
    targetIndex = target_enum_to_index(ctx, target);
    if (targetIndex < 0) {
