@@ -807,7 +807,6 @@ set_tex_parameteriv_wrapper(struct gl_context *ctx,
 void GLAPIENTRY
 _mesa_TexParameterf(GLenum target, GLenum pname, GLfloat param)
 {
-   GLboolean need_update;
    struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -823,7 +822,6 @@ _mesa_TexParameterf(GLenum target, GLenum pname, GLfloat param)
 void GLAPIENTRY
 _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 {
-   GLboolean need_update;
    struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -839,7 +837,6 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 void GLAPIENTRY
 _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
 {
-   GLboolean need_update;
    struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -855,7 +852,6 @@ _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
 void GLAPIENTRY
 _mesa_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
 {
-   GLboolean need_update;
    struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
