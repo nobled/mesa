@@ -51,7 +51,7 @@ _mesa_new_texture_object( struct gl_context *ctx, GLuint name, GLenum target );
 
 extern struct gl_texture_object *
 _mesa_get_and_init_texture(struct gl_context *ctx, GLuint name,
-                           GLenum target, GLuint texunit, const char *caller);
+                           GLenum target, const char *caller);
 
 extern void
 _mesa_initialize_texture_object( struct gl_context *ctx,

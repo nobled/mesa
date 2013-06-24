@@ -1227,7 +1227,6 @@ target_enum_to_index(struct gl_context *ctx, GLenum target)
  * \param ctx context struct.
  * \param name texture name.
  * \param target texture target.
- * \param texunit texture unit in which the texture is being bound.
  * \param caller the name of the current GL entrypoint.
  *
  * If name is zero, return the texture which is the context's default texture
@@ -1244,7 +1243,7 @@ target_enum_to_index(struct gl_context *ctx, GLenum target)
  */
 struct gl_texture_object *
 _mesa_get_and_init_texture(struct gl_context *ctx, GLuint name, GLenum target,
-                           GLuint texunit, const char *caller)
+                           const char *caller)
 {
    struct gl_texture_object *newTexObj = NULL;
 
@@ -1338,7 +1337,7 @@ _mesa_BindTexture( GLenum target, GLuint texName )
    }
    assert(targetIndex < NUM_TEXTURE_TARGETS);
 
-   newTexObj = _mesa_get_and_init_texture(ctx, texName, target, unit,
+   newTexObj = _mesa_get_and_init_texture(ctx, texName, target,
                                           "glBindTexture");
    if (!newTexObj)
       return; /* error */
