@@ -36,6 +36,13 @@
 #include "mtypes.h"
 
 
+static inline struct gl_texture_unit *
+_mesa_get_tex_unit(struct gl_context *ctx, GLuint unit)
+{
+   ASSERT(unit < Elements(ctx->Texture.Unit));
+   return &(ctx->Texture.Unit[unit]);
+}
+
 /**
  * Return pointer to current texture unit.
  * This the texture unit set by glActiveTexture(), not glClientActiveTexture().
@@ -43,8 +50,7 @@
 static inline struct gl_texture_unit *
 _mesa_get_current_tex_unit(struct gl_context *ctx)
 {
-   ASSERT(ctx->Texture.CurrentUnit < Elements(ctx->Texture.Unit));
-   return &(ctx->Texture.Unit[ctx->Texture.CurrentUnit]);
+   return _mesa_get_tex_unit(ctx, ctx->Texture.CurrentUnit);
 }
 
 
