@@ -1881,9 +1881,8 @@ legal_texsubimage_target_err(struct gl_context *ctx, GLuint dims, GLenum target,
  * of GL_ARB_texture_storage).
  */
 static GLboolean
-mutable_tex_object(struct gl_context *ctx, GLenum target)
+mutable_tex_object(struct gl_context *ctx, struct gl_texture_object *texObj)
 {
-   struct gl_texture_object *texObj = _mesa_get_current_tex_object(ctx, target);
    return !texObj->Immutable;
 }
 
@@ -1926,8 +1925,8 @@ compressed_tex_size(GLsizei width, GLsizei height, GLsizei depth,
  * interaction with proxy textures.
  */
 static GLboolean
-texture_error_check( struct gl_context *ctx,
-                     GLuint dimensions, GLenum target,
+texture_error_check( struct gl_context *ctx, GLuint dimensions,
+                     struct gl_texture_object *texObj, GLenum target,
                      GLint level, GLint internalFormat,
                      GLenum format, GLenum type,
                      GLint width, GLint height,
@@ -2146,7 +2145,7 @@ texture_error_check( struct gl_context *ctx,
       return GL_TRUE;
    }
 
-   if (!mutable_tex_object(ctx, target)) {
+   if (!mutable_tex_object(ctx, texObj)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
                   "glTexImage%dD(immutable texture)", dimensions);
       return GL_TRUE;
@@ -2163,8 +2162,9 @@ texture_error_check( struct gl_context *ctx,
  * here.
  * \return GL_TRUE if a error is found, GL_FALSE otherwise
  */
-static GLenum
+static GLboolean
 compressed_texture_error_check(struct gl_context *ctx, GLint dimensions,
+                               struct gl_texture_object *texObj,
                                GLenum target, GLint level,
                                GLenum internalFormat, GLsizei width,
                                GLsizei height, GLsizei depth, GLint border,
@@ -2276,7 +2276,7 @@ compressed_texture_error_check(struct gl_context *ctx, GLint dimensions,
       goto error;
    }
 
-   if (!mutable_tex_object(ctx, target)) {
+   if (!mutable_tex_object(ctx, texObj)) {
       reason = "immutable texture";
       error = GL_INVALID_OPERATION;
       goto error;
@@ -2429,6 +2429,7 @@ texsubimage_error_check(struct gl_context *ctx, GLuint dimensions,
  */
 static GLboolean
 copytexture_error_check( struct gl_context *ctx, GLuint dimensions,
+                         struct gl_texture_object *texObj,
                          GLenum target, GLint level, GLint internalFormat,
                          GLint width, GLint height, GLint border )
 {
@@ -2628,7 +2629,7 @@ copytexture_error_check( struct gl_context *ctx, GLuint dimensions,
       }
    }
 
-   if (!mutable_tex_object(ctx, target)) {
+   if (!mutable_tex_object(ctx, texObj)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
                   "glCopyTexImage%dD(immutable texture)", dimensions);
       return GL_TRUE;
@@ -3041,14 +3042,14 @@ teximage(struct gl_context *ctx, GLboolean compressed, GLuint dims,
 
    /* general error checking */
    if (compressed) {
-      if (compressed_texture_error_check(ctx, dims, target, level,
+      if (compressed_texture_error_check(ctx, dims, texObj, target, level,
                                          internalFormat,
                                          width, height, depth,
                                          border, imageSize))
          return;
    }
    else {
-      if (texture_error_check(ctx, dims, target, level, internalFormat,
+      if (texture_error_check(ctx, dims, texObj, target, level, internalFormat,
                               format, type, width, height, depth, border))
          return;
    }
@@ -3530,7 +3531,7 @@ copyteximage(struct gl_context *ctx, GLuint dims,
    if (ctx->NewState & NEW_COPY_TEX_STATE)
       _mesa_update_state(ctx);
 
-   if (copytexture_error_check(ctx, dims, target, level, internalFormat,
+   if (copytexture_error_check(ctx, dims, texObj, target, level, internalFormat,
                                width, height, border))
       return;
 
