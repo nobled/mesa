@@ -2304,6 +2304,7 @@ error:
  * \param ctx GL context.
  * \param dimensions texture image dimensions (must be 1, 2 or 3).
  * \param target texture target given by the user (already validated)
+ * \param texObj texture object selected
  * \param level image level given by the user.
  * \param xoffset sub-image x offset given by the user.
  * \param yoffset sub-image y offset given by the user.
@@ -2322,12 +2323,12 @@ error:
  */
 static GLboolean
 texsubimage_error_check(struct gl_context *ctx, GLuint dimensions,
+                        struct gl_texture_object *texObj,
                         GLenum target, GLint level,
                         GLint xoffset, GLint yoffset, GLint zoffset,
                         GLint width, GLint height, GLint depth,
                         GLenum format, GLenum type)
 {
-   struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
    GLenum err;
 
@@ -2368,14 +2369,6 @@ texsubimage_error_check(struct gl_context *ctx, GLuint dimensions,
                   "glTexSubImage%dD(incompatible format = %s, type = %s)",
                   dimensions, _mesa_lookup_enum_by_nr(format),
                   _mesa_lookup_enum_by_nr(type));
-      return GL_TRUE;
-   }
-
-   /* Get dest texture object / image pointers */
-   texObj = _mesa_get_current_tex_object(ctx, target);
-   if (!texObj) {
-      /* must be out of memory */
-      _mesa_error(ctx, GL_OUT_OF_MEMORY, "glTexSubImage%dD()", dimensions);
       return GL_TRUE;
    }
 
@@ -3344,12 +3337,12 @@ _mesa_EGLImageTargetTexture2DOES (GLenum target, GLeglImageOES image)
  * Implement all the glTexSubImage1/2/3D() functions.
  */
 static void
-texsubimage(struct gl_context *ctx, GLuint dims, GLenum target, GLint level,
+texsubimage(struct gl_context *ctx, GLuint dims,
+            struct gl_texture_object *texObj, GLenum target, GLint level,
             GLint xoffset, GLint yoffset, GLint zoffset,
             GLsizei width, GLsizei height, GLsizei depth,
             GLenum format, GLenum type, const GLvoid *pixels )
 {
-   struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
 
    FLUSH_VERTICES(ctx, 0);
@@ -3362,23 +3355,14 @@ texsubimage(struct gl_context *ctx, GLuint dims, GLenum target, GLint level,
                   _mesa_lookup_enum_by_nr(format),
                   _mesa_lookup_enum_by_nr(type), pixels);
 
-   /* check target (proxies not allowed) */
-   if (!legal_texsubimage_target(ctx, dims, target)) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glTexSubImage%uD(target=%s)",
-                  dims, _mesa_lookup_enum_by_nr(target));
-      return;
-   }
-
    if (ctx->NewState & _NEW_PIXEL)
       _mesa_update_state(ctx);
 
-   if (texsubimage_error_check(ctx, dims, target, level,
+   if (texsubimage_error_check(ctx, dims, texObj, target, level,
                                xoffset, yoffset, zoffset,
                                width, height, depth, format, type)) {
       return;   /* error was detected */
    }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
 
    _mesa_lock_texture(ctx, texObj);
    {
@@ -3412,6 +3396,26 @@ texsubimage(struct gl_context *ctx, GLuint dims, GLenum target, GLint level,
    _mesa_unlock_texture(ctx, texObj);
 }
 
+static void
+texsubimage_curr(const char *func, GLuint dims, GLenum target, GLint level,
+            GLint xoffset, GLint yoffset, GLint zoffset,
+            GLsizei width, GLsizei height, GLsizei depth,
+            GLenum format, GLenum type, const GLvoid *pixels )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   /* check target (proxies not allowed) */
+   if (!legal_texsubimage_target_err(ctx, dims, target, func))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+
+   texsubimage(ctx, dims, texObj, target, level,
+               xoffset, yoffset, zoffset,
+               width, height, depth,
+               format, type, pixels);
+}
 
 void GLAPIENTRY
 _mesa_TexSubImage1D( GLenum target, GLint level,
@@ -3419,8 +3423,7 @@ _mesa_TexSubImage1D( GLenum target, GLint level,
                      GLenum format, GLenum type,
                      const GLvoid *pixels )
 {
-   GET_CURRENT_CONTEXT(ctx);
-   texsubimage(ctx, 1, target, level,
+   texsubimage_curr("glTexSubImage1D", 1, target, level,
                xoffset, 0, 0,
                width, 1, 1,
                format, type, pixels);
@@ -3434,8 +3437,7 @@ _mesa_TexSubImage2D( GLenum target, GLint level,
                      GLenum format, GLenum type,
                      const GLvoid *pixels )
 {
-   GET_CURRENT_CONTEXT(ctx);
-   texsubimage(ctx, 2, target, level,
+   texsubimage_curr("glTexSubImage2D", 2, target, level,
                xoffset, yoffset, 0,
                width, height, 1,
                format, type, pixels);
@@ -3450,8 +3452,7 @@ _mesa_TexSubImage3D( GLenum target, GLint level,
                      GLenum format, GLenum type,
                      const GLvoid *pixels )
 {
-   GET_CURRENT_CONTEXT(ctx);
-   texsubimage(ctx, 3, target, level,
+   texsubimage_curr("glTexSubImage3D", 3, target, level,
                xoffset, yoffset, zoffset,
                width, height, depth,
                format, type, pixels);
