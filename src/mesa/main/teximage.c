@@ -2639,11 +2639,11 @@ copytexture_error_check( struct gl_context *ctx, GLuint dimensions,
  */
 static GLboolean
 copytexsubimage_error_check(struct gl_context *ctx, GLuint dimensions,
+                            struct gl_texture_object *texObj,
                             GLenum target, GLint level,
                             GLint xoffset, GLint yoffset, GLint zoffset,
                             GLint width, GLint height)
 {
-   struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
 
    /* Check that the source buffer is complete */
@@ -2665,24 +2665,10 @@ copytexsubimage_error_check(struct gl_context *ctx, GLuint dimensions,
       }
    }
 
-   /* check target (proxies not allowed) */
-   if (!legal_texsubimage_target(ctx, dimensions, target)) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexSubImage%uD(target=%s)",
-                  dimensions, _mesa_lookup_enum_by_nr(target));
-      return GL_TRUE;
-   }
-
    /* Check level */
    if (level < 0 || level >= _mesa_max_texture_levels(ctx, target)) {
       _mesa_error(ctx, GL_INVALID_VALUE,
                   "glCopyTexSubImage%dD(level=%d)", dimensions, level);
-      return GL_TRUE;
-   }
-
-   /* Get dest texture object / image pointers */
-   texObj = _mesa_get_current_tex_object(ctx, target);
-   if (!texObj) {
-      _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyTexSubImage%dD()", dimensions);
       return GL_TRUE;
    }
 
@@ -3649,11 +3635,11 @@ _mesa_CopyTexImage2D( GLenum target, GLint level, GLenum internalFormat,
  * Implementation for glCopyTexSubImage1/2/3D() functions.
  */
 static void
-copytexsubimage(struct gl_context *ctx, GLuint dims, GLenum target, GLint level,
+copytexsubimage(struct gl_context *ctx, GLuint dims,
+                struct gl_texture_object *texObj, GLenum target, GLint level,
                 GLint xoffset, GLint yoffset, GLint zoffset,
                 GLint x, GLint y, GLsizei width, GLsizei height)
 {
-   struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
 
    FLUSH_VERTICES(ctx, 0);
@@ -3667,12 +3653,10 @@ copytexsubimage(struct gl_context *ctx, GLuint dims, GLenum target, GLint level,
    if (ctx->NewState & NEW_COPY_TEX_STATE)
       _mesa_update_state(ctx);
 
-   if (copytexsubimage_error_check(ctx, dims, target, level,
+   if (copytexsubimage_error_check(ctx, dims, texObj, target, level,
                                    xoffset, yoffset, zoffset, width, height)) {
       return;
    }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
 
    _mesa_lock_texture(ctx, texObj);
    {
@@ -3709,13 +3693,37 @@ copytexsubimage(struct gl_context *ctx, GLuint dims, GLenum target, GLint level,
    _mesa_unlock_texture(ctx, texObj);
 }
 
+static void
+copytexsubimage_curr(const char *func, GLuint dims, GLenum target, GLint level,
+                GLint xoffset, GLint yoffset, GLint zoffset,
+                GLint x, GLint y, GLsizei width, GLsizei height)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   /* check target (proxies not allowed) */
+   if (!legal_texsubimage_target_err(ctx, dims, target, func))
+      return;
+
+   /* Get dest texture object / image pointers */
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   if (!texObj) {
+      _mesa_error(ctx, GL_OUT_OF_MEMORY, "%s()", func);
+      return;
+   }
+
+   copytexsubimage(ctx, dims, texObj, target, level,
+                   xoffset, yoffset, zoffset,
+                   x, y, width, height);
+}
 
 void GLAPIENTRY
 _mesa_CopyTexSubImage1D( GLenum target, GLint level,
                          GLint xoffset, GLint x, GLint y, GLsizei width )
 {
-   GET_CURRENT_CONTEXT(ctx);
-   copytexsubimage(ctx, 1, target, level, xoffset, 0, 0, x, y, width, 1);
+
+   copytexsubimage_curr("glCopyTexSubImage1D", 1, target, level,
+                        xoffset, 0, 0, x, y, width, 1);
 }
 
 
@@ -3725,8 +3733,8 @@ _mesa_CopyTexSubImage2D( GLenum target, GLint level,
                          GLint xoffset, GLint yoffset,
                          GLint x, GLint y, GLsizei width, GLsizei height )
 {
-   GET_CURRENT_CONTEXT(ctx);
-   copytexsubimage(ctx, 2, target, level, xoffset, yoffset, 0, x, y,
+   copytexsubimage_curr("glCopyTexSubImage2D", 2, target, level,
+                   xoffset, yoffset, 0, x, y,
                    width, height);
 }
 
@@ -3737,8 +3745,8 @@ _mesa_CopyTexSubImage3D( GLenum target, GLint level,
                          GLint xoffset, GLint yoffset, GLint zoffset,
                          GLint x, GLint y, GLsizei width, GLsizei height )
 {
-   GET_CURRENT_CONTEXT(ctx);
-   copytexsubimage(ctx, 3, target, level, xoffset, yoffset, zoffset,
+   copytexsubimage_curr("glCopyTexSubImage3D", 3, target, level,
+                   xoffset, yoffset, zoffset,
                    x, y, width, height);
 }
 
