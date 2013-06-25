@@ -3758,20 +3758,10 @@ _mesa_CopyTexSubImage3D( GLenum target, GLint level,
 /**********************************************************************/
 
 
-/**
- * Error checking for glCompressedTexSubImage[123]D().
- * \return error code or GL_NO_ERROR.
- */
-static GLenum
-compressed_subtexture_error_check(struct gl_context *ctx, GLint dims,
-                                  GLenum target, GLint level,
-                                  GLint xoffset, GLint yoffset, GLint zoffset,
-                                  GLsizei width, GLsizei height, GLsizei depth,
-                                  GLenum format, GLsizei imageSize)
+static GLboolean
+compressed_subtexture_target_ok(struct gl_context *ctx, GLint dims,
+                                GLenum target, const char *func)
 {
-   struct gl_texture_object *texObj;
-   struct gl_texture_image *texImage;
-   GLint expectedSize;
    GLboolean targetOK;
 
    switch (dims) {
@@ -3801,11 +3791,28 @@ compressed_subtexture_error_check(struct gl_context *ctx, GLint dims,
       break;
    }
 
-   if (!targetOK) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glCompressedTexImage%uD(target)",
-                  dims);
-      return GL_TRUE;
-   }
+   if (!targetOK)
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target=%s)",
+                  func, _mesa_lookup_enum_by_nr(target));
+
+   return targetOK;
+}
+
+
+/**
+ * Error checking for glCompressedTexSubImage[123]D().
+ * \return GL_TRUE on error, GL_FALSE on success.
+ */
+static GLboolean
+compressed_subtexture_error_check(struct gl_context *ctx, GLint dims,
+                                  struct gl_texture_object *texObj,
+                                  GLenum target, GLint level,
+                                  GLint xoffset, GLint yoffset, GLint zoffset,
+                                  GLsizei width, GLsizei height, GLsizei depth,
+                                  GLenum format, GLsizei imageSize)
+{
+   struct gl_texture_image *texImage;
+   GLint expectedSize;
 
    /* this will catch any invalid compressed format token */
    if (!_mesa_is_compressed_format(ctx, format)) {
@@ -3824,13 +3831,6 @@ compressed_subtexture_error_check(struct gl_context *ctx, GLint dims,
    if (expectedSize != imageSize) {
       _mesa_error(ctx, GL_INVALID_VALUE, "glCompressedTexImage%uD(size=%d)",
                   dims, imageSize);
-      return GL_TRUE;
-   }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
-   if (!texObj) {
-      _mesa_error(ctx, GL_OUT_OF_MEMORY,
-                  "glCompressedTexSubImage%uD()", dims);
       return GL_TRUE;
    }
 
@@ -3913,24 +3913,21 @@ _mesa_CompressedTexImage3D(GLenum target, GLint level,
  * Common helper for glCompressedTexSubImage1/2/3D().
  */
 static void
-compressed_tex_sub_image(GLuint dims, GLenum target, GLint level,
+compressed_tex_sub_image(struct gl_context *ctx, GLuint dims,
+                         struct gl_texture_object *texObj,
+                         GLenum target, GLint level,
                          GLint xoffset, GLint yoffset, GLint zoffset,
                          GLsizei width, GLsizei height, GLsizei depth,
                          GLenum format, GLsizei imageSize, const GLvoid *data)
 {
-   struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
-   GET_CURRENT_CONTEXT(ctx);
-   FLUSH_VERTICES(ctx, 0);
 
-   if (compressed_subtexture_error_check(ctx, dims, target, level,
+   if (compressed_subtexture_error_check(ctx, dims, texObj, target, level,
                                          xoffset, yoffset, zoffset,
                                          width, height, depth,
                                          format, imageSize)) {
       return;
    }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
 
    _mesa_lock_texture(ctx, texObj);
    {
@@ -3951,13 +3948,39 @@ compressed_tex_sub_image(GLuint dims, GLenum target, GLint level,
    _mesa_unlock_texture(ctx, texObj);
 }
 
+static void
+compressed_tex_sub_image_curr(const char *func, GLuint dims,
+                         GLenum target, GLint level,
+                         GLint xoffset, GLint yoffset, GLint zoffset,
+                         GLsizei width, GLsizei height, GLsizei depth,
+                         GLenum format, GLsizei imageSize, const GLvoid *data)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!compressed_subtexture_target_ok(ctx, dims, target, func))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   if (!texObj) {
+      _mesa_error(ctx, GL_OUT_OF_MEMORY,
+                  "%s()", func);
+      return;
+   }
+
+   compressed_tex_sub_image(ctx, dims, texObj, target, level,
+                            xoffset, yoffset, zoffset,
+                            width, height, depth, format, imageSize, data);
+}
 
 void GLAPIENTRY
 _mesa_CompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset,
                                  GLsizei width, GLenum format,
                                  GLsizei imageSize, const GLvoid *data)
 {
-   compressed_tex_sub_image(1, target, level, xoffset, 0, 0, width, 1, 1,
+   compressed_tex_sub_image_curr("glCompressedTexSubImage1D", 1,
+                            target, level, xoffset, 0, 0, width, 1, 1,
                             format, imageSize, data);
 }
 
@@ -3968,7 +3991,8 @@ _mesa_CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset,
                                  GLenum format, GLsizei imageSize,
                                  const GLvoid *data)
 {
-   compressed_tex_sub_image(2, target, level, xoffset, yoffset, 0,
+   compressed_tex_sub_image_curr("glCompressedTexSubImage2D", 2,
+                            target, level, xoffset, yoffset, 0,
                             width, height, 1, format, imageSize, data);
 }
 
@@ -3979,7 +4003,8 @@ _mesa_CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset,
                                  GLsizei height, GLsizei depth, GLenum format,
                                  GLsizei imageSize, const GLvoid *data)
 {
-   compressed_tex_sub_image(3, target, level, xoffset, yoffset, zoffset,
+   compressed_tex_sub_image_curr("glCompressedTexSubImage3D", 3,
+                            target, level, xoffset, yoffset, zoffset,
                             width, height, depth, format, imageSize, data);
 }
 
