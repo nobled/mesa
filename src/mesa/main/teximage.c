@@ -4346,27 +4346,21 @@ check_multisample_target(GLuint dims, GLenum target)
 
 
 static void
-teximagemultisample(GLuint dims, GLenum target, GLsizei samples,
+teximagemultisample(struct gl_context *ctx, GLuint dims,
+                    struct gl_texture_object *texObj,
+                    GLenum target, GLsizei samples,
                     GLint internalformat, GLsizei width, GLsizei height,
                     GLsizei depth, GLboolean fixedsamplelocations,
                     GLboolean immutable, const char *func)
 {
-   struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
    GLboolean sizeOK, dimensionsOK;
    gl_format texFormat;
    GLenum sample_count_error;
 
-   GET_CURRENT_CONTEXT(ctx);
-
    if (!(ctx->Extensions.ARB_texture_multisample
       && _mesa_is_desktop_gl(ctx))) {
       _mesa_error(ctx, GL_INVALID_OPERATION, "%s(unsupported)", func);
-      return;
-   }
-
-   if (!check_multisample_target(dims, target)) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target)", func);
       return;
    }
 
@@ -4394,8 +4388,6 @@ teximagemultisample(GLuint dims, GLenum target, GLsizei samples,
       _mesa_error(ctx, sample_count_error, "%s(samples)", func);
       return;
    }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
 
    if (immutable && (!texObj || (texObj->Name == 0))) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -4479,12 +4471,33 @@ teximagemultisample(GLuint dims, GLenum target, GLsizei samples,
 }
 
 
+static void
+teximagemultisample_curr(GLuint dims, GLenum target, GLsizei samples,
+                    GLint internalformat, GLsizei width, GLsizei height,
+                    GLsizei depth, GLboolean fixedsamplelocations,
+                    GLboolean immutable, const char *func)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   if (!check_multisample_target(dims, target)) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target)", func);
+      return;
+   }
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+
+   teximagemultisample(ctx, dims, texObj, target, samples, internalformat,
+                       width, height, depth, fixedsamplelocations, immutable,
+                       func);
+}
+
 void GLAPIENTRY
 _mesa_TexImage2DMultisample(GLenum target, GLsizei samples,
                             GLint internalformat, GLsizei width,
                             GLsizei height, GLboolean fixedsamplelocations)
 {
-   teximagemultisample(2, target, samples, internalformat,
+   teximagemultisample_curr(2, target, samples, internalformat,
                        width, height, 1, fixedsamplelocations, GL_FALSE,
                        "glTexImage2DMultisample");
 }
@@ -4496,7 +4509,7 @@ _mesa_TexImage3DMultisample(GLenum target, GLsizei samples,
                             GLsizei height, GLsizei depth,
                             GLboolean fixedsamplelocations)
 {
-   teximagemultisample(3, target, samples, internalformat,
+   teximagemultisample_curr(3, target, samples, internalformat,
                        width, height, depth, fixedsamplelocations, GL_FALSE,
                        "glTexImage3DMultisample");
 }
@@ -4507,7 +4520,7 @@ _mesa_TexStorage2DMultisample(GLenum target, GLsizei samples,
                               GLenum internalformat, GLsizei width,
                               GLsizei height, GLboolean fixedsamplelocations)
 {
-   teximagemultisample(2, target, samples, internalformat,
+   teximagemultisample_curr(2, target, samples, internalformat,
                        width, height, 1, fixedsamplelocations, GL_TRUE,
                        "glTexStorage2DMultisample");
 }
@@ -4519,7 +4532,7 @@ _mesa_TexStorage3DMultisample(GLenum target, GLsizei samples,
                               GLsizei height, GLsizei depth,
                               GLboolean fixedsamplelocations)
 {
-   teximagemultisample(3, target, samples, internalformat,
+   teximagemultisample_curr(3, target, samples, internalformat,
                        width, height, depth, fixedsamplelocations, GL_TRUE,
                        "glTexStorage3DMultisample");
 }
