@@ -1872,6 +1872,16 @@ legal_texsubimage_target(struct gl_context *ctx, GLuint dims, GLenum target)
    }
 }
 
+static GLboolean
+legal_texsubimage_target_err(struct gl_context *ctx, GLuint dims, GLenum target,
+                             const char *func)
+{
+   GLboolean legal = legal_texsubimage_target(ctx, dims, target);
+   if (!legal)
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target=%s)",
+                  func, _mesa_lookup_enum_by_nr(target));
+   return legal;
+}
 
 /**
  * Helper function to determine if a texture object is mutable (in terms
@@ -2433,13 +2443,6 @@ copytexture_error_check( struct gl_context *ctx, GLuint dimensions,
    GLint rb_base_format;
    struct gl_renderbuffer *rb;
    GLenum rb_internal_format;
-
-   /* check target */
-   if (!legal_texsubimage_target(ctx, dimensions, target)) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexImage%uD(target=%s)",
-                  dimensions, _mesa_lookup_enum_by_nr(target));
-      return GL_TRUE;
-   }
 
    /* level check */
    if (level < 0 || level >= _mesa_max_texture_levels(ctx, target)) {
@@ -3514,10 +3517,10 @@ copytexsubimage_by_slice(struct gl_context *ctx,
  */
 static void
 copyteximage(struct gl_context *ctx, GLuint dims,
+             struct gl_texture_object *texObj,
              GLenum target, GLint level, GLenum internalFormat,
              GLint x, GLint y, GLsizei width, GLsizei height, GLint border )
 {
-   struct gl_texture_object *texObj;
    struct gl_texture_image *texImage;
    const GLuint face = _mesa_tex_target_to_face(target);
    gl_format texFormat;
@@ -3544,9 +3547,6 @@ copyteximage(struct gl_context *ctx, GLuint dims,
                   "glCopyTexImage%uD(invalid width or height)", dims);
       return;
    }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
-   assert(texObj);
 
    texFormat = _mesa_choose_texture_format(ctx, texObj, target, level,
                                            internalFormat, GL_NONE, GL_NONE);
@@ -3620,7 +3620,17 @@ _mesa_CopyTexImage1D( GLenum target, GLint level,
                       GLsizei width, GLint border )
 {
    GET_CURRENT_CONTEXT(ctx);
-   copyteximage(ctx, 1, target, level, internalFormat, x, y, width, 1, border);
+   struct gl_texture_object *texObj;
+
+   /* check target */
+   if (!legal_texsubimage_target_err(ctx, 1, target, "glCopyTexImage1D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   copyteximage(ctx, 1, texObj, target, level, internalFormat,
+                x, y, width, 1, border);
 }
 
 
@@ -3631,7 +3641,16 @@ _mesa_CopyTexImage2D( GLenum target, GLint level, GLenum internalFormat,
                       GLint border )
 {
    GET_CURRENT_CONTEXT(ctx);
-   copyteximage(ctx, 2, target, level, internalFormat,
+   struct gl_texture_object *texObj;
+
+   /* check target */
+   if (!legal_texsubimage_target_err(ctx, 2, target, "glCopyTexImage2D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   copyteximage(ctx, 2, texObj, target, level, internalFormat,
                 x, y, width, height, border);
 }
 
