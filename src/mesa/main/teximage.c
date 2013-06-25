@@ -1798,6 +1798,17 @@ legal_teximage_target(struct gl_context *ctx, GLuint dims, GLenum target)
    }
 }
 
+static GLboolean
+legal_teximage_target_err(struct gl_context *ctx, GLuint dims, GLenum target,
+                          const char *func)
+{
+  GLboolean legal = legal_teximage_target(ctx, dims, target);
+  if (!legal)
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target=%s)",
+                  func, _mesa_lookup_enum_by_nr(target));
+  return legal;
+}
+
 
 /**
  * Check if the given texture target value is legal for a
@@ -2990,6 +3001,7 @@ strip_texture_border(GLenum target,
  */
 static void
 teximage(struct gl_context *ctx, GLboolean compressed, GLuint dims,
+         struct gl_texture_object *texObj,
          GLenum target, GLint level, GLint internalFormat,
          GLsizei width, GLsizei height, GLsizei depth,
          GLint border, GLenum format, GLenum type,
@@ -2998,7 +3010,6 @@ teximage(struct gl_context *ctx, GLboolean compressed, GLuint dims,
    const char *func = compressed ? "glCompressedTexImage" : "glTexImage";
    struct gl_pixelstore_attrib unpack_no_border;
    const struct gl_pixelstore_attrib *unpack = &ctx->Unpack;
-   struct gl_texture_object *texObj;
    gl_format texFormat;
    GLboolean dimensionsOK, sizeOK;
 
@@ -3024,13 +3035,6 @@ teximage(struct gl_context *ctx, GLboolean compressed, GLuint dims,
    }
 
    internalFormat = override_internal_format(internalFormat, width, height);
-
-   /* target error checking */
-   if (!legal_teximage_target(ctx, dims, target)) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "%s%uD(target=%s)",
-                  func, dims, _mesa_lookup_enum_by_nr(target));
-      return;
-   }
 
    /* general error checking */
    if (compressed) {
@@ -3067,9 +3071,6 @@ teximage(struct gl_context *ctx, GLboolean compressed, GLuint dims,
          return;
       }
    }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
-   assert(texObj);
 
    if (compressed) {
       /* For glCompressedTexImage() the driver has no choice about the
@@ -3189,8 +3190,20 @@ _mesa_TexImage1D( GLenum target, GLint level, GLint internalFormat,
                   GLsizei width, GLint border, GLenum format,
                   GLenum type, const GLvoid *pixels )
 {
+   const GLuint dims = 1;
+   const GLboolean compressed = GL_FALSE;
    GET_CURRENT_CONTEXT(ctx);
-   teximage(ctx, GL_FALSE, 1, target, level, internalFormat, width, 1, 1,
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, "TexImage1D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
+            width, 1, 1,
             border, format, type, 0, pixels);
 }
 
@@ -3201,8 +3214,20 @@ _mesa_TexImage2D( GLenum target, GLint level, GLint internalFormat,
                   GLenum format, GLenum type,
                   const GLvoid *pixels )
 {
+   const GLuint dims = 2;
+   const GLboolean compressed = GL_FALSE;
    GET_CURRENT_CONTEXT(ctx);
-   teximage(ctx, GL_FALSE, 2, target, level, internalFormat, width, height, 1,
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, "TexImage2D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
+            width, height, 1,
             border, format, type, 0, pixels);
 }
 
@@ -3217,8 +3242,19 @@ _mesa_TexImage3D( GLenum target, GLint level, GLint internalFormat,
                   GLint border, GLenum format, GLenum type,
                   const GLvoid *pixels )
 {
+   const GLuint dims = 3;
+   const GLboolean compressed = GL_FALSE;
    GET_CURRENT_CONTEXT(ctx);
-   teximage(ctx, GL_FALSE, 3, target, level, internalFormat,
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, "TexImage3D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
             width, height, depth,
             border, format, type, 0, pixels);
 }
@@ -3811,8 +3847,19 @@ _mesa_CompressedTexImage1D(GLenum target, GLint level,
                               GLint border, GLsizei imageSize,
                               const GLvoid *data)
 {
+   const GLuint dims = 1;
+   const GLboolean compressed = GL_TRUE;
    GET_CURRENT_CONTEXT(ctx);
-   teximage(ctx, GL_TRUE, 1, target, level, internalFormat,
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, "CompressedTexImage1D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
             width, 1, 1, border, GL_NONE, GL_NONE, imageSize, data);
 }
 
@@ -3823,8 +3870,19 @@ _mesa_CompressedTexImage2D(GLenum target, GLint level,
                               GLsizei height, GLint border, GLsizei imageSize,
                               const GLvoid *data)
 {
+   const GLuint dims = 2;
+   const GLboolean compressed = GL_TRUE;
    GET_CURRENT_CONTEXT(ctx);
-   teximage(ctx, GL_TRUE, 2, target, level, internalFormat,
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, "CompressedTexImage2D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
             width, height, 1, border, GL_NONE, GL_NONE, imageSize, data);
 }
 
@@ -3835,8 +3893,19 @@ _mesa_CompressedTexImage3D(GLenum target, GLint level,
                               GLsizei height, GLsizei depth, GLint border,
                               GLsizei imageSize, const GLvoid *data)
 {
+   const GLuint dims = 3;
+   const GLboolean compressed = GL_TRUE;
    GET_CURRENT_CONTEXT(ctx);
-   teximage(ctx, GL_TRUE, 3, target, level, internalFormat,
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, "CompressedTexImage3D"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+   assert(texObj);
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
             width, height, depth, border, GL_NONE, GL_NONE, imageSize, data);
 }
 
