@@ -372,6 +372,25 @@ _mesa_CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset,
                                  GLsizei height, GLsizei depth, GLenum format,
                                  GLsizei imageSize, const GLvoid *data);
 
+void GLAPIENTRY
+_mesa_CompressedMultiTexSubImage1DEXT(GLenum texunit, GLenum target,
+                                 GLint level, GLint xoffset, GLsizei width,
+                                 GLenum format, GLsizei imageSize,
+                                 const GLvoid *data);
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexSubImage2DEXT(GLenum texunit, GLenum target,
+                                 GLint level, GLint xoffset, GLint yoffset,
+                                 GLsizei width, GLsizei height, GLenum format,
+                                 GLsizei imageSize, const GLvoid *data);
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexSubImage3DEXT(GLenum texunit, GLenum target,
+                                 GLint level, GLint xoffset, GLint yoffset,
+                                 GLint zoffset, GLsizei width, GLsizei height,
+                                 GLsizei depth, GLenum format,
+                                 GLsizei imageSize, const GLvoid *data);
+
 
 extern void GLAPIENTRY
 _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer);

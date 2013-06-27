@@ -4289,6 +4289,34 @@ compressed_tex_sub_image_curr(const char *func, GLuint dims,
                             width, height, depth, format, imageSize, data);
 }
 
+static void
+compressed_tex_sub_image_multi(const char *func, GLuint dims,
+                         GLenum unit_enum, GLenum target, GLint level,
+                         GLint xoffset, GLint yoffset, GLint zoffset,
+                         GLsizei width, GLsizei height, GLsizei depth,
+                         GLenum format, GLsizei imageSize, const GLvoid *data)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = unit_enum - GL_TEXTURE0;
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!compressed_subtexture_target_ok(ctx, dims, target, func))
+      return;
+
+   texUnit = _mesa_get_tex_unit_err(ctx, unit, func);
+   if (!texUnit)
+     return; /* GL_INVALID_OPERATION */
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   compressed_tex_sub_image(ctx, dims, texObj, target, level,
+                            xoffset, yoffset, zoffset,
+                            width, height, depth, format, imageSize, data);
+}
+
 void GLAPIENTRY
 _mesa_CompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset,
                                  GLsizei width, GLenum format,
@@ -4322,6 +4350,43 @@ _mesa_CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset,
                             target, level, xoffset, yoffset, zoffset,
                             width, height, depth, format, imageSize, data);
 }
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexSubImage1DEXT(GLenum texunit, GLenum target,
+                                 GLint level, GLint xoffset, GLsizei width,
+                                 GLenum format, GLsizei imageSize,
+                                 const GLvoid *data)
+{
+   compressed_tex_sub_image_multi("glCompressedMultiTexSubImage1DEXT", 1,
+                            texunit, target, level, xoffset, 0, 0,
+                            width, 1, 1, format, imageSize, data);
+}
+
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexSubImage2DEXT(GLenum texunit, GLenum target,
+                                 GLint level, GLint xoffset, GLint yoffset,
+                                 GLsizei width, GLsizei height, GLenum format,
+                                 GLsizei imageSize, const GLvoid *data)
+{
+   compressed_tex_sub_image_multi("glCompressedMultiTexSubImage2DEXT", 2,
+                            texunit, target, level, xoffset, yoffset, 0,
+                            width, height, 1, format, imageSize, data);
+}
+
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexSubImage3DEXT(GLenum texunit, GLenum target,
+                                 GLint level, GLint xoffset, GLint yoffset,
+                                 GLint zoffset, GLsizei width, GLsizei height,
+                                 GLsizei depth, GLenum format,
+                                 GLsizei imageSize, const GLvoid *data)
+{
+   compressed_tex_sub_image_multi("glCompressedMultiTexSubImage3DEXT", 3,
+                            texunit, target, level, xoffset, yoffset, zoffset,
+                            width, height, depth, format, imageSize, data);
+}
+
 
 static gl_format
 get_texbuffer_format(const struct gl_context *ctx, GLenum internalFormat)
