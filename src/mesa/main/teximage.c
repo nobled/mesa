@@ -3974,6 +3974,47 @@ _mesa_CopyMultiTexImage2DEXT( GLenum texunit, GLenum target, GLint level,
                       internalFormat, x, y, width, height, border);
 }
 
+static void
+copyteximage_name( const char *func, GLuint dims, GLuint texName,
+                    GLenum target, GLint level, GLenum internalFormat,
+                    GLint x, GLint y, GLsizei width, GLsizei height,
+                    GLint border )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   /* check target */
+   if (!legal_texsubimage_target_err(ctx, dims, target, func))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texName, target, func);
+   if (!texObj)
+     return; /* error */
+
+   copyteximage(ctx, dims, texObj, target, level, internalFormat,
+                x, y, width, 1, border);
+}
+
+void GLAPIENTRY
+_mesa_CopyTextureImage1DEXT( GLuint texture, GLenum target, GLint level,
+                      GLenum internalFormat,
+                      GLint x, GLint y,
+                      GLsizei width, GLint border )
+{
+   copyteximage_name("glCopyTextureImage1DEXT", 1, texture, target, level,
+                      internalFormat, x, y, width, 1, border);
+}
+
+void GLAPIENTRY
+_mesa_CopyTextureImage2DEXT( GLuint texture, GLenum target, GLint level,
+                      GLenum internalFormat,
+                      GLint x, GLint y, GLsizei width, GLsizei height,
+                      GLint border )
+{
+   copyteximage_name("glCopyTextureImage2DEXT", 2, texture, target, level,
+                      internalFormat, x, y, width, height, border);
+}
+
 
 /**
  * Implementation for glCopyTexSubImage1/2/3D() functions.
