@@ -3830,6 +3830,33 @@ copytexsubimage(struct gl_context *ctx, GLuint dims,
 }
 
 static void
+copytexsubimage_multi(const char *func, GLuint dims, GLenum unit_enum,
+                GLenum target, GLint level,
+                GLint xoffset, GLint yoffset, GLint zoffset,
+                GLint x, GLint y, GLsizei width, GLsizei height)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = unit_enum - GL_TEXTURE0;
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+
+   if (!check_texunit(ctx, func, unit))
+      return;
+
+   /* check target (proxies not allowed) */
+   if (!legal_texsubimage_target_err(ctx, dims, target, func))
+      return;
+
+   texUnit = _mesa_get_tex_unit(ctx, unit);
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   copytexsubimage(ctx, dims, texObj, target, level,
+                   xoffset, yoffset, zoffset,
+                   x, y, width, height);
+}
+
+static void
 copytexsubimage_curr(const char *func, GLuint dims, GLenum target, GLint level,
                 GLint xoffset, GLint yoffset, GLint zoffset,
                 GLint x, GLint y, GLsizei width, GLsizei height)
@@ -3883,6 +3910,39 @@ _mesa_CopyTexSubImage3D( GLenum target, GLint level,
 {
    copytexsubimage_curr("glCopyTexSubImage3D", 3, target, level,
                    xoffset, yoffset, zoffset,
+                   x, y, width, height);
+}
+
+
+
+void GLAPIENTRY
+_mesa_CopyMultiTexSubImage1DEXT( GLenum texunit, GLenum target, GLint level,
+                         GLint xoffset, GLint x, GLint y, GLsizei width )
+{
+
+   copytexsubimage_multi("glCopyMultiTexSubImage1DEXT", 1, texunit,
+                        target, level, xoffset, 0, 0, x, y, width, 1);
+}
+
+
+void GLAPIENTRY
+_mesa_CopyMultiTexSubImage2DEXT( GLenum texunit, GLenum target, GLint level,
+                         GLint xoffset, GLint yoffset,
+                         GLint x, GLint y, GLsizei width, GLsizei height )
+{
+   copytexsubimage_multi("glCopyMultiTexSubImage2DEXT", 2, texunit,
+                   target, level, xoffset, yoffset, 0, x, y,
+                   width, height);
+}
+
+
+void GLAPIENTRY
+_mesa_CopyMultiTexSubImage3DEXT( GLenum texunit, GLenum target, GLint level,
+                         GLint xoffset, GLint yoffset, GLint zoffset,
+                         GLint x, GLint y, GLsizei width, GLsizei height )
+{
+   copytexsubimage_multi("glCopyMultiTexSubImage3DEXT", 3, texunit,
+                   target, level, xoffset, yoffset, zoffset,
                    x, y, width, height);
 }
 
