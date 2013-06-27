@@ -4178,6 +4178,52 @@ _mesa_CompressedTexImage3D(GLenum target, GLint level,
 }
 
 
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexImage1DEXT(GLenum texunit, GLenum target, GLint level,
+                              GLenum internalFormat, GLsizei width,
+                              GLint border, GLsizei imageSize,
+                              const GLvoid *data)
+{
+   const GLuint dims = 1;
+   const GLboolean compressed = GL_TRUE;
+
+   teximage_multi("CompressedMultiTexImage1DEXT", compressed, dims,
+            texunit, target, level, internalFormat,
+            width, 1, 1, border, GL_NONE, GL_NONE, imageSize, data);
+}
+
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexImage2DEXT(GLenum texunit, GLenum target, GLint level,
+                              GLenum internalFormat, GLsizei width,
+                              GLsizei height, GLint border, GLsizei imageSize,
+                              const GLvoid *data)
+{
+   const GLuint dims = 2;
+   const GLboolean compressed = GL_TRUE;
+
+   teximage_multi("CompressedMultiTexImage2DEXT", compressed, dims,
+            texunit, target, level, internalFormat,
+            width, height, 1, border, GL_NONE, GL_NONE, imageSize, data);
+}
+
+
+void GLAPIENTRY
+_mesa_CompressedMultiTexImage3DEXT(GLenum texunit, GLenum target, GLint level,
+                              GLenum internalFormat, GLsizei width,
+                              GLsizei height, GLsizei depth, GLint border,
+                              GLsizei imageSize, const GLvoid *data)
+{
+   const GLuint dims = 3;
+   const GLboolean compressed = GL_TRUE;
+
+   teximage_multi("CompressedMultiTexImage3DEXT", compressed, dims,
+            texunit, target, level, internalFormat,
+            width, height, depth, border, GL_NONE, GL_NONE, imageSize, data);
+}
+
+
 /**
  * Common helper for glCompressedTexSubImage1/2/3D().
  */
