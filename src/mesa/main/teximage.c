@@ -5242,3 +5242,52 @@ _mesa_TexStorage3DMultisample(GLenum target, GLsizei samples,
                        width, height, depth, fixedsamplelocations, GL_TRUE,
                        "glTexStorage3DMultisample");
 }
+
+static void
+teximagemultisample_name(GLuint dims, GLuint texName, GLenum target,
+                    GLsizei samples, GLint internalformat,
+                    GLsizei width, GLsizei height,
+                    GLsizei depth, GLboolean fixedsamplelocations,
+                    GLboolean immutable, const char *func)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   if (!check_multisample_target(dims, target)) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target)", func);
+      return;
+   }
+
+   texObj = _mesa_get_and_init_texture(ctx, texName, target, func);
+   if (!texObj)
+     return; /* error */
+
+   teximagemultisample(ctx, dims, texObj, target, samples, internalformat,
+                       width, height, depth, fixedsamplelocations, immutable,
+                       func);
+}
+
+/* GL_EXT_direct_state_access, but from the
+   GL_ARB_texture_storage_multisample spec */
+void GLAPIENTRY
+_mesa_TextureStorage2DMultisampleEXT(GLuint texture, GLenum target,
+                              GLsizei samples, GLenum internalformat,
+                              GLsizei width, GLsizei height,
+                              GLboolean fixedsamplelocations)
+{
+   teximagemultisample_name(2, texture, target, samples, internalformat,
+                       width, height, 1, fixedsamplelocations, GL_TRUE,
+                       "glTextureStorage2DMultisampleEXT");
+}
+
+
+void GLAPIENTRY
+_mesa_TextureStorage3DMultisampleEXT(GLuint texture, GLenum target,
+                              GLsizei samples, GLenum internalformat,
+                              GLsizei width, GLsizei height, GLsizei depth,
+                              GLboolean fixedsamplelocations)
+{
+   teximagemultisample_name(3, texture, target, samples, internalformat,
+                       width, height, depth, fixedsamplelocations, GL_TRUE,
+                       "glTexStorage3DMultisampleEXT");
+}
