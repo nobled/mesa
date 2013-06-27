@@ -3382,6 +3382,47 @@ texsubimage(struct gl_context *ctx, GLuint dims,
    _mesa_unlock_texture(ctx, texObj);
 }
 
+static GLboolean
+check_texunit(struct gl_context *ctx, const char *func, GLuint unit)
+{
+   const GLuint unit_max = _mesa_max_tex_unit(ctx);
+   GLboolean valid = (unit < unit_max);
+
+   if (!valid)
+      _mesa_error(ctx, GL_INVALID_OPERATION, "%s(unit=%s)", func,
+                  _mesa_lookup_enum_by_nr(GL_TEXTURE0+unit));
+   return valid;
+}
+
+static void
+texsubimage_multi(const char *func, GLuint dims, GLenum unit_enum,
+            GLenum target, GLint level,
+            GLint xoffset, GLint yoffset, GLint zoffset,
+            GLsizei width, GLsizei height, GLsizei depth,
+            GLenum format, GLenum type, const GLvoid *pixels )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = unit_enum - GL_TEXTURE0;
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+
+   /* check target (proxies not allowed) */
+   if (!legal_texsubimage_target_err(ctx, dims, target, func))
+      return;
+
+   if (!check_texunit(ctx, func, unit))
+      return;
+
+   texUnit = _mesa_get_tex_unit(ctx, unit);
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   texsubimage(ctx, dims, texObj, target, level,
+               xoffset, yoffset, zoffset,
+               width, height, depth,
+               format, type, pixels);
+}
+
 static void
 texsubimage_curr(const char *func, GLuint dims, GLenum target, GLint level,
             GLint xoffset, GLint yoffset, GLint zoffset,
@@ -3439,6 +3480,49 @@ _mesa_TexSubImage3D( GLenum target, GLint level,
                      const GLvoid *pixels )
 {
    texsubimage_curr("glTexSubImage3D", 3, target, level,
+               xoffset, yoffset, zoffset,
+               width, height, depth,
+               format, type, pixels);
+}
+
+
+
+void GLAPIENTRY
+_mesa_MultiTexSubImage1DEXT( GLenum texunit, GLenum target, GLint level,
+                     GLint xoffset, GLsizei width,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels )
+{
+   texsubimage_multi("glMultiTexSubImage1DEXT", 1, texunit, target, level,
+               xoffset, 0, 0,
+               width, 1, 1,
+               format, type, pixels);
+}
+
+
+void GLAPIENTRY
+_mesa_MultiTexSubImage2DEXT( GLenum texunit, GLenum target, GLint level,
+                     GLint xoffset, GLint yoffset,
+                     GLsizei width, GLsizei height,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels )
+{
+   texsubimage_multi("glMultiTexSubImage2DEXT", 2, texunit, target, level,
+               xoffset, yoffset, 0,
+               width, height, 1,
+               format, type, pixels);
+}
+
+
+
+void GLAPIENTRY
+_mesa_MultiTexSubImage3DEXT( GLenum texunit, GLenum target, GLint level,
+                     GLint xoffset, GLint yoffset, GLint zoffset,
+                     GLsizei width, GLsizei height, GLsizei depth,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels )
+{
+   texsubimage_multi("glMultiTexSubImage3DEXT", 3, texunit, target, level,
                xoffset, yoffset, zoffset,
                width, height, depth,
                format, type, pixels);

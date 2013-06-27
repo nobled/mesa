@@ -221,6 +221,28 @@ _mesa_TexSubImage3D( GLenum target, GLint level,
                      const GLvoid *pixels );
 
 
+void GLAPIENTRY
+_mesa_MultiTexSubImage1DEXT( GLenum texunit, GLenum target, GLint level,
+                     GLint xoffset, GLsizei width,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels );
+
+void GLAPIENTRY
+_mesa_MultiTexSubImage2DEXT( GLenum texunit, GLenum target, GLint level,
+                     GLint xoffset, GLint yoffset,
+                     GLsizei width, GLsizei height,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels );
+
+void GLAPIENTRY
+_mesa_MultiTexSubImage3DEXT( GLenum texunit, GLenum target, GLint level,
+                     GLint xoffset, GLint yoffset, GLint zoffset,
+                     GLsizei width, GLsizei height, GLsizei depth,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels );
+
+
+
 extern void GLAPIENTRY
 _mesa_CopyTexImage1D( GLenum target, GLint level, GLenum internalformat,
                       GLint x, GLint y, GLsizei width, GLint border );
