@@ -3243,7 +3243,6 @@ _mesa_TexImage3D( GLenum target, GLint level, GLint internalFormat,
             border, format, type, 0, pixels);
 }
 
-
 void GLAPIENTRY
 _mesa_TexImage3DEXT( GLenum target, GLint level, GLenum internalFormat,
                      GLsizei width, GLsizei height, GLsizei depth,
@@ -3252,6 +3251,80 @@ _mesa_TexImage3DEXT( GLenum target, GLint level, GLenum internalFormat,
 {
    _mesa_TexImage3D(target, level, (GLint) internalFormat, width, height,
                     depth, border, format, type, pixels);
+}
+
+
+
+static void
+teximage_multi(const char *func, GLboolean compressed, GLuint dims,
+         GLenum unit_enum, GLenum target, GLint level, GLint internalFormat,
+         GLsizei width, GLsizei height, GLsizei depth,
+         GLint border, GLenum format, GLenum type,
+         GLsizei imageSize, const GLvoid *pixels)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = unit_enum - GL_TEXTURE0;
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, func))
+      return;
+
+   texUnit = _mesa_get_tex_unit_err(ctx, unit, func);
+   if (!texUnit)
+     return; /* GL_INVALID_OPERATION */
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
+            width, height, depth,
+            border, format, type, imageSize, pixels);
+}
+
+void GLAPIENTRY
+_mesa_MultiTexImage1DEXT( GLenum texunit, GLenum target, GLint level,
+                  GLint internalFormat,
+                  GLsizei width, GLint border, GLenum format,
+                  GLenum type, const GLvoid *pixels )
+{
+   const GLuint dims = 1;
+   const GLboolean compressed = GL_FALSE;
+
+   teximage_multi("glMultiTexImage3DEXT", compressed, dims, texunit,
+            target, level, internalFormat, width, 1, 1,
+            border, format, type, 0, pixels);
+}
+
+
+void GLAPIENTRY
+_mesa_MultiTexImage2DEXT( GLenum texunit, GLenum target, GLint level,
+                  GLint internalFormat,
+                  GLsizei width, GLsizei height, GLint border,
+                  GLenum format, GLenum type,
+                  const GLvoid *pixels )
+{
+   const GLuint dims = 2;
+   const GLboolean compressed = GL_FALSE;
+
+   teximage_multi("glMultiTexImage2DEXT", compressed, dims, texunit,
+            target, level, internalFormat, width, height, 1,
+            border, format, type, 0, pixels);
+}
+
+void GLAPIENTRY
+_mesa_MultiTexImage3DEXT( GLenum texunit, GLenum target, GLint level,
+                  GLint internalFormat,
+                  GLsizei width, GLsizei height, GLsizei depth,
+                  GLint border, GLenum format, GLenum type,
+                  const GLvoid *pixels )
+{
+   const GLuint dims = 3;
+   const GLboolean compressed = GL_FALSE;
+
+   teximage_multi("glMultiTexImage3DEXT", compressed, dims, texunit,
+            target, level, internalFormat, width, height, depth,
+            border, format, type, 0, pixels);
 }
 
 
