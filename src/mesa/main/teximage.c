@@ -3327,6 +3327,74 @@ _mesa_MultiTexImage3DEXT( GLenum texunit, GLenum target, GLint level,
             border, format, type, 0, pixels);
 }
 
+static void
+teximage_name(const char *func, GLboolean compressed, GLuint dims,
+         GLuint texName, GLenum target, GLint level, GLint internalFormat,
+         GLsizei width, GLsizei height, GLsizei depth,
+         GLint border, GLenum format, GLenum type,
+         GLsizei imageSize, const GLvoid *pixels)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   /* target error checking */
+   if (!legal_teximage_target_err(ctx, dims, target, func))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texName, target, func);
+   if (!texObj)
+     return; /* error */
+
+   teximage(ctx, compressed, dims, texObj, target, level, internalFormat,
+            width, height, depth,
+            border, format, type, imageSize, pixels);
+}
+
+void GLAPIENTRY
+_mesa_TextureImage1DEXT( GLuint texture, GLenum target, GLint level,
+                  GLint internalFormat,
+                  GLsizei width, GLint border, GLenum format,
+                  GLenum type, const GLvoid *pixels )
+{
+   const GLuint dims = 1;
+   const GLboolean compressed = GL_FALSE;
+
+   teximage_name("glTextureImage3DEXT", compressed, dims, texture,
+            target, level, internalFormat, width, 1, 1,
+            border, format, type, 0, pixels);
+}
+
+
+void GLAPIENTRY
+_mesa_TextureImage2DEXT( GLuint texture, GLenum target, GLint level,
+                  GLint internalFormat,
+                  GLsizei width, GLsizei height, GLint border,
+                  GLenum format, GLenum type,
+                  const GLvoid *pixels )
+{
+   const GLuint dims = 2;
+   const GLboolean compressed = GL_FALSE;
+
+   teximage_name("glTextureImage2DEXT", compressed, dims, texture,
+            target, level, internalFormat, width, height, 1,
+            border, format, type, 0, pixels);
+}
+
+void GLAPIENTRY
+_mesa_TextureImage3DEXT( GLuint texture, GLenum target, GLint level,
+                  GLint internalFormat,
+                  GLsizei width, GLsizei height, GLsizei depth,
+                  GLint border, GLenum format, GLenum type,
+                  const GLvoid *pixels )
+{
+   const GLuint dims = 3;
+   const GLboolean compressed = GL_FALSE;
+
+   teximage_name("glTextureImage3DEXT", compressed, dims, texture,
+            target, level, internalFormat, width, height, depth,
+            border, format, type, 0, pixels);
+}
+
 
 void GLAPIENTRY
 _mesa_EGLImageTargetTexture2DOES (GLenum target, GLeglImageOES image)
