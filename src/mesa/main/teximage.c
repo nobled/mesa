@@ -4918,19 +4918,14 @@ validate_texbuffer_format(const struct gl_context *ctx, GLenum internalFormat)
 
 
 static void
-texbufferrange(struct gl_context *ctx, GLenum target, GLenum internalFormat,
+texbufferrange(struct gl_context *ctx, GLenum internalFormat,
                struct gl_buffer_object *bufObj,
+               struct gl_texture_object *texObj,
                GLintptr offset, GLsizeiptr size)
 {
-   struct gl_texture_object *texObj;
    gl_format format;
 
    FLUSH_VERTICES(ctx, 0);
-
-   if (target != GL_TEXTURE_BUFFER_ARB) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
-      return;
-   }
 
    format = validate_texbuffer_format(ctx, internalFormat);
    if (format == MESA_FORMAT_NONE) {
@@ -4938,8 +4933,6 @@ texbufferrange(struct gl_context *ctx, GLenum target, GLenum internalFormat,
                   internalFormat);
       return;
    }
-
-   texObj = _mesa_get_current_tex_object(ctx, target);
 
    _mesa_lock_texture(ctx, texObj);
    {
@@ -4958,7 +4951,7 @@ void GLAPIENTRY
 _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
 {
    struct gl_buffer_object *bufObj;
-
+   struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
 
    /* NOTE: ARB_texture_buffer_object has interactions with
@@ -4976,7 +4969,14 @@ _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
       return;
    }
 
-   texbufferrange(ctx, target, internalFormat, bufObj, 0, buffer ? -1 : 0);
+   if (target != GL_TEXTURE_BUFFER_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
+      return;
+   }
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+
+   texbufferrange(ctx, internalFormat, bufObj, texObj, 0, buffer ? -1 : 0);
 }
 
 
@@ -4986,7 +4986,7 @@ _mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
                      GLintptr offset, GLsizeiptr size)
 {
    struct gl_buffer_object *bufObj;
-
+   struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
 
    if (!(ctx->API == API_OPENGL_CORE &&
@@ -5017,7 +5017,14 @@ _mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
       size = 0;
    }
 
-   texbufferrange(ctx, target, internalFormat, bufObj, offset, size);
+   if (target != GL_TEXTURE_BUFFER_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
+      return;
+   }
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+
+   texbufferrange(ctx, internalFormat, bufObj, texObj, offset, size);
 }
 
 
