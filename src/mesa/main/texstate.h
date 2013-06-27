@@ -33,6 +33,7 @@
 
 
 #include "compiler.h"
+#include "macros.h"
 #include "mtypes.h"
 
 
@@ -51,6 +52,14 @@ static inline struct gl_texture_unit *
 _mesa_get_current_tex_unit(struct gl_context *ctx)
 {
    return _mesa_get_tex_unit(ctx, ctx->Texture.CurrentUnit);
+}
+
+static inline GLuint
+_mesa_max_tex_unit(struct gl_context *ctx)
+{
+   /* See OpenGL spec for glActiveTexture: */
+   return MAX2(ctx->Const.MaxCombinedTextureImageUnits,
+               ctx->Const.MaxTextureCoordUnits);
 }
 
 
