@@ -3678,6 +3678,31 @@ copyteximage(struct gl_context *ctx, GLuint dims,
 }
 
 
+static void
+copyteximage_multi( const char *func, GLuint dims, GLenum unit_enum,
+                    GLenum target, GLint level, GLenum internalFormat,
+                    GLint x, GLint y, GLsizei width, GLsizei height,
+                    GLint border )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = unit_enum - GL_TEXTURE0;
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+
+   /* check target */
+   if (!legal_texsubimage_target_err(ctx, dims, target, func))
+      return;
+
+   if (!check_texunit(ctx, func, unit))
+      return;
+
+   texUnit = _mesa_get_tex_unit(ctx, unit);
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   copyteximage(ctx, dims, texObj, target, level, internalFormat,
+                x, y, width, 1, border);
+}
 
 void GLAPIENTRY
 _mesa_CopyTexImage1D( GLenum target, GLint level,
@@ -3720,6 +3745,26 @@ _mesa_CopyTexImage2D( GLenum target, GLint level, GLenum internalFormat,
                 x, y, width, height, border);
 }
 
+
+void GLAPIENTRY
+_mesa_CopyMultiTexImage1DEXT( GLenum texunit, GLenum target, GLint level,
+                      GLenum internalFormat,
+                      GLint x, GLint y,
+                      GLsizei width, GLint border )
+{
+   copyteximage_multi("glCopyMultiTexImage1DEXT", 1, texunit, target, level,
+                      internalFormat, x, y, width, 1, border);
+}
+
+void GLAPIENTRY
+_mesa_CopyMultiTexImage2DEXT( GLenum texunit, GLenum target, GLint level,
+                      GLenum internalFormat,
+                      GLint x, GLint y, GLsizei width, GLsizei height,
+                      GLint border )
+{
+   copyteximage_multi("glCopyMultiTexImage2DEXT", 2, texunit, target, level,
+                      internalFormat, x, y, width, height, border);
+}
 
 
 /**
