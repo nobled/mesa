@@ -4454,6 +4454,51 @@ _mesa_CompressedMultiTexImage3DEXT(GLenum texunit, GLenum target, GLint level,
 }
 
 
+void GLAPIENTRY
+_mesa_CompressedTextureImage1DEXT(GLuint texture, GLenum target, GLint level,
+                              GLenum internalFormat, GLsizei width,
+                              GLint border, GLsizei imageSize,
+                              const GLvoid *data)
+{
+   const GLuint dims = 1;
+   const GLboolean compressed = GL_TRUE;
+
+   teximage_name("CompressedTextureImage1DEXT", compressed, dims,
+            texture, target, level, internalFormat,
+            width, 1, 1, border, GL_NONE, GL_NONE, imageSize, data);
+}
+
+
+void GLAPIENTRY
+_mesa_CompressedTextureImage2DEXT(GLuint texture, GLenum target, GLint level,
+                              GLenum internalFormat, GLsizei width,
+                              GLsizei height, GLint border, GLsizei imageSize,
+                              const GLvoid *data)
+{
+   const GLuint dims = 2;
+   const GLboolean compressed = GL_TRUE;
+
+   teximage_name("CompressedTextureImage2DEXT", compressed, dims,
+            texture, target, level, internalFormat,
+            width, height, 1, border, GL_NONE, GL_NONE, imageSize, data);
+}
+
+
+void GLAPIENTRY
+_mesa_CompressedTextureImage3DEXT(GLuint texture, GLenum target, GLint level,
+                              GLenum internalFormat, GLsizei width,
+                              GLsizei height, GLsizei depth, GLint border,
+                              GLsizei imageSize, const GLvoid *data)
+{
+   const GLuint dims = 3;
+   const GLboolean compressed = GL_TRUE;
+
+   teximage_name("CompressedTextureImage3DEXT", compressed, dims,
+            texture, target, level, internalFormat,
+            width, height, depth, border, GL_NONE, GL_NONE, imageSize, data);
+}
+
+
 /**
  * Common helper for glCompressedTexSubImage1/2/3D().
  */
