@@ -33,6 +33,7 @@
 
 
 #include "compiler.h"
+#include "enums.h"
 #include "macros.h"
 #include "mtypes.h"
 
@@ -60,6 +61,17 @@ _mesa_max_tex_unit(struct gl_context *ctx)
    /* See OpenGL spec for glActiveTexture: */
    return MAX2(ctx->Const.MaxCombinedTextureImageUnits,
                ctx->Const.MaxTextureCoordUnits);
+}
+
+static inline struct gl_texture_unit *
+_mesa_get_tex_unit_err(struct gl_context *ctx, GLuint unit, const char *func)
+{
+   if (unit < _mesa_max_tex_unit(ctx))
+      return _mesa_get_tex_unit(ctx, unit);
+
+   _mesa_error(ctx, GL_INVALID_OPERATION, "%s(unit=%s)", func,
+               _mesa_lookup_enum_by_nr(GL_TEXTURE0+unit));
+   return NULL;
 }
 
 
