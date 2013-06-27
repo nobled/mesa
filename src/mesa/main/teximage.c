@@ -3671,6 +3671,73 @@ _mesa_MultiTexSubImage3DEXT( GLenum texunit, GLenum target, GLint level,
 
 
 
+static void
+texsubimage_name(const char *func, GLuint dims, GLuint texName,
+            GLenum target, GLint level,
+            GLint xoffset, GLint yoffset, GLint zoffset,
+            GLsizei width, GLsizei height, GLsizei depth,
+            GLenum format, GLenum type, const GLvoid *pixels )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   /* check target (proxies not allowed) */
+   if (!legal_texsubimage_target_err(ctx, dims, target, func))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texName, target, func);
+   if (!texObj)
+     return; /* error */
+
+   texsubimage(ctx, dims, texObj, target, level,
+               xoffset, yoffset, zoffset,
+               width, height, depth,
+               format, type, pixels);
+}
+
+void GLAPIENTRY
+_mesa_TextureSubImage1DEXT( GLuint texture, GLenum target, GLint level,
+                     GLint xoffset, GLsizei width,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels )
+{
+   texsubimage_name("glTextureSubImage1DEXT", 1, texture, target, level,
+               xoffset, 0, 0,
+               width, 1, 1,
+               format, type, pixels);
+}
+
+
+void GLAPIENTRY
+_mesa_TextureSubImage2DEXT( GLuint texture, GLenum target, GLint level,
+                     GLint xoffset, GLint yoffset,
+                     GLsizei width, GLsizei height,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels )
+{
+   texsubimage_name("glTextureSubImage2DEXT", 2, texture, target, level,
+               xoffset, yoffset, 0,
+               width, height, 1,
+               format, type, pixels);
+}
+
+
+
+void GLAPIENTRY
+_mesa_TextureSubImage3DEXT( GLuint texture, GLenum target, GLint level,
+                     GLint xoffset, GLint yoffset, GLint zoffset,
+                     GLsizei width, GLsizei height, GLsizei depth,
+                     GLenum format, GLenum type,
+                     const GLvoid *pixels )
+{
+   texsubimage_name("glTextureSubImage3DEXT", 3, texture, target, level,
+               xoffset, yoffset, zoffset,
+               width, height, depth,
+               format, type, pixels);
+}
+
+
+
 /**
  * For glCopyTexSubImage, return the source renderbuffer to copy texel data
  * from.  This depends on whether the texture contains color or depth values.
