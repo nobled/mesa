@@ -481,21 +481,34 @@ _mesa_TexStorage3D(GLenum target, GLsizei levels, GLenum internalformat,
 }
 
 
+static void
+texstorage_name(const char *func, GLuint dims, GLuint texture,
+           GLenum target, GLsizei levels,
+           GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth)
+{
+   struct gl_texture_object *texObj;
 
-/*
- * Note: we don't support GL_EXT_direct_state_access and the spec says
- * we don't need the following functions.  However, glew checks for the
- * presence of all six functions and will say that GL_ARB_texture_storage
- * is not supported if these functions are missing.
- */
+   GET_CURRENT_CONTEXT(ctx);
 
+   /* target check */
+   if (!legal_texobj_target_err(ctx, dims, target, func))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target, func);
+   if (!texObj)
+      return;
+
+   texstorage(ctx, texObj, dims, target, levels, internalformat,
+              width, height, depth, func);
+}
 
 void GLAPIENTRY
 _mesa_TextureStorage1DEXT(GLuint texture, GLenum target, GLsizei levels,
                           GLenum internalformat,
                           GLsizei width)
 {
-   /* no-op */
+   texstorage_name("glTextureStorage1DEXT", 1, texture, target, levels,
+                   internalformat, width, 1, 1);
 }
 
 
@@ -504,9 +517,9 @@ _mesa_TextureStorage2DEXT(GLuint texture, GLenum target, GLsizei levels,
                           GLenum internalformat,
                           GLsizei width, GLsizei height)
 {
-   /* no-op */
+   texstorage_name("glTextureStorage2DEXT", 2, texture, target, levels,
+                   internalformat, width, height, 1);
 }
-
 
 
 void GLAPIENTRY
@@ -514,5 +527,6 @@ _mesa_TextureStorage3DEXT(GLuint texture, GLenum target, GLsizei levels,
                           GLenum internalformat,
                           GLsizei width, GLsizei height, GLsizei depth)
 {
-   /* no-op */
+   texstorage_name("glTextureStorage3DEXT", 3, texture, target, levels,
+                   internalformat, width, height, depth);
 }
