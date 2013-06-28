@@ -4919,13 +4919,32 @@ validate_texbuffer_format(const struct gl_context *ctx, GLenum internalFormat)
 
 static void
 texbufferrange(struct gl_context *ctx, GLenum internalFormat,
-               struct gl_buffer_object *bufObj,
+               GLuint buffer,
                struct gl_texture_object *texObj,
                GLintptr offset, GLsizeiptr size)
 {
+   struct gl_buffer_object *bufObj;
    gl_format format;
 
    FLUSH_VERTICES(ctx, 0);
+
+   bufObj = _mesa_lookup_bufferobj(ctx, buffer);
+   if (!bufObj && buffer) {
+      _mesa_error(ctx, GL_INVALID_OPERATION, "glTexBuffer(buffer %u)", buffer);
+      return;
+   }
+
+   if (offset < 0 ||
+       (bufObj && (offset + size) > bufObj->Size)) {
+      _mesa_error(ctx, GL_INVALID_VALUE, "glTexBufferRange");
+      return;
+   }
+
+   if (offset && offset % ctx->Const.TextureBufferOffsetAlignment) {
+      _mesa_error(ctx, GL_INVALID_VALUE,
+                  "glTexBufferRange(invalid offset alignment)");
+      return;
+   }
 
    format = validate_texbuffer_format(ctx, internalFormat);
    if (format == MESA_FORMAT_NONE) {
@@ -4950,7 +4969,6 @@ texbufferrange(struct gl_context *ctx, GLenum internalFormat,
 void GLAPIENTRY
 _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
 {
-   struct gl_buffer_object *bufObj;
    struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
 
@@ -4963,12 +4981,6 @@ _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
       return;
    }
 
-   bufObj = _mesa_lookup_bufferobj(ctx, buffer);
-   if (!bufObj && buffer) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "glTexBuffer(buffer %u)", buffer);
-      return;
-   }
-
    if (target != GL_TEXTURE_BUFFER_ARB) {
       _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
       return;
@@ -4976,7 +4988,7 @@ _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
 
    texObj = _mesa_get_current_tex_object(ctx, target);
 
-   texbufferrange(ctx, internalFormat, bufObj, texObj, 0, buffer ? -1 : 0);
+   texbufferrange(ctx, internalFormat, buffer, texObj, 0, buffer ? -1 : 0);
 }
 
 
@@ -4985,7 +4997,6 @@ void GLAPIENTRY
 _mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
                      GLintptr offset, GLsizeiptr size)
 {
-   struct gl_buffer_object *bufObj;
    struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
 
@@ -4995,24 +5006,10 @@ _mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
       return;
    }
 
-   bufObj = _mesa_lookup_bufferobj(ctx, buffer);
-   if (bufObj) {
-      if (offset < 0 ||
-          size <= 0 ||
-          (offset + size) > bufObj->Size) {
-         _mesa_error(ctx, GL_INVALID_VALUE, "glTexBufferRange");
-         return;
-      }
-      if (offset % ctx->Const.TextureBufferOffsetAlignment) {
-         _mesa_error(ctx, GL_INVALID_VALUE,
-                     "glTexBufferRange(invalid offset alignment)");
-         return;
-      }
-   } else if (buffer) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "glTexBufferRange(buffer %u)",
-                  buffer);
+   if (buffer && size <= 0) {
+      _mesa_error(ctx, GL_INVALID_VALUE, "glTexBufferRange");
       return;
-   } else {
+   } else if (buffer == 0) {
       offset = 0;
       size = 0;
    }
@@ -5024,7 +5021,7 @@ _mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
 
    texObj = _mesa_get_current_tex_object(ctx, target);
 
-   texbufferrange(ctx, internalFormat, bufObj, texObj, offset, size);
+   texbufferrange(ctx, internalFormat, buffer, texObj, offset, size);
 }
 
 
