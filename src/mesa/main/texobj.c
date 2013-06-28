@@ -1347,7 +1347,8 @@ bind_texture(struct gl_context *ctx, struct gl_texture_unit *texUnit,
    _mesa_reference_texobj(&texUnit->CurrentTex[targetIndex], newTexObj);
    ASSERT(texUnit->CurrentTex[targetIndex]);
 
-   /* Pass BindTexture call to device driver */
+   /* Pass BindTexture call to device driver
+      XXX: used by no in-tree drivers anymore. */
    if (ctx->Driver.BindTexture)
       ctx->Driver.BindTexture(ctx, target, newTexObj);
 }
