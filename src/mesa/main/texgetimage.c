@@ -43,6 +43,8 @@
 #include "texcompress.h"
 #include "texgetimage.h"
 #include "teximage.h"
+#include "texobj.h"
+#include "texstate.h"
 
 
 
@@ -952,6 +954,50 @@ _mesa_GetTexImage( GLenum target, GLint level, GLenum format,
    _mesa_GetnTexImageARB(target, level, format, type, INT_MAX, pixels);
 }
 
+void GLAPIENTRY
+_mesa_GetTextureImageEXT( GLuint texture, GLenum target, GLint level,
+                   GLenum format, GLenum type, GLvoid *pixels )
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!legal_getteximage_target_err(ctx, target, "glGetTextureImageEXT"))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glGetCompressedTextureImageEXT");
+   if (!texObj)
+     return; /* error */
+
+   getteximage(ctx, texObj, target, level, format, type, INT_MAX, pixels);
+}
+
+void GLAPIENTRY
+_mesa_GetMultiTexImageEXT( GLenum texunit, GLenum target, GLint level,
+                   GLenum format, GLenum type, GLvoid *pixels )
+{
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+   const GLuint unit = texunit - GL_TEXTURE0;
+   GET_CURRENT_CONTEXT(ctx);
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!legal_getteximage_target_err(ctx, target, "glGetMultiTexImageEXT"))
+      return;
+
+   texUnit = _mesa_get_tex_unit_err(ctx, unit,
+                                    "glGetCompressedMultiTexImageEXT");
+   if (!texUnit)
+     return; /* GL_INVALID_OPERATION */
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   getteximage(ctx, texObj, target, level, format, type, INT_MAX, pixels);
+}
+
 
 /**
  * Do error checking for a glGetCompressedTexImage() call.
@@ -1083,4 +1129,50 @@ void GLAPIENTRY
 _mesa_GetCompressedTexImage(GLenum target, GLint level, GLvoid *img)
 {
    _mesa_GetnCompressedTexImageARB(target, level, INT_MAX, img);
+}
+
+void GLAPIENTRY
+_mesa_GetCompressedTextureImageEXT(GLuint texture, GLenum target,
+                                   GLint level, GLvoid *img)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!legal_getteximage_target_err(ctx, target,
+                                     "glGetCompressedTextureImageEXT"))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glGetCompressedTextureImageEXT");
+   if (!texObj)
+     return; /* error */
+
+   getcompressed(ctx, texObj, target, level, INT_MAX, img);
+}
+
+void GLAPIENTRY
+_mesa_GetCompressedMultiTexImageEXT(GLenum texunit, GLenum target,
+                                    GLint level, GLvoid *img)
+{
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+   const GLuint unit = texunit - GL_TEXTURE0;
+   GET_CURRENT_CONTEXT(ctx);
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!legal_getteximage_target_err(ctx, target,
+                                     "glGetCompressedMultiTexImageEXT"))
+      return;
+
+   texUnit = _mesa_get_tex_unit_err(ctx, unit,
+                                    "glGetCompressedMultiTexImageEXT");
+   if (!texUnit)
+     return; /* GL_INVALID_OPERATION */
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   getcompressed(ctx, texObj, target, level, INT_MAX, img);
 }
