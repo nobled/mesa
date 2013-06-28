@@ -4965,13 +4965,10 @@ texbufferrange(struct gl_context *ctx, GLenum internalFormat,
 }
 
 
-/** GL_ARB_texture_buffer_object */
-void GLAPIENTRY
-_mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
+static void texbuffer(struct gl_context *ctx, GLenum internalFormat,
+               GLuint buffer,
+               struct gl_texture_object *texObj)
 {
-   struct gl_texture_object *texObj;
-   GET_CURRENT_CONTEXT(ctx);
-
    /* NOTE: ARB_texture_buffer_object has interactions with
     * the compatibility profile that are not implemented.
     */
@@ -4981,6 +4978,16 @@ _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
       return;
    }
 
+   texbufferrange(ctx, internalFormat, buffer, texObj, 0, buffer ? -1 : 0);
+}
+
+/** GL_ARB_texture_buffer_object */
+void GLAPIENTRY
+_mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
    if (target != GL_TEXTURE_BUFFER_ARB) {
       _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
       return;
@@ -4988,18 +4995,58 @@ _mesa_TexBuffer(GLenum target, GLenum internalFormat, GLuint buffer)
 
    texObj = _mesa_get_current_tex_object(ctx, target);
 
-   texbufferrange(ctx, internalFormat, buffer, texObj, 0, buffer ? -1 : 0);
+   texbuffer(ctx, internalFormat, buffer, texObj);
 }
 
-
-/** GL_ARB_texture_buffer_range */
 void GLAPIENTRY
-_mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
-                     GLintptr offset, GLsizeiptr size)
+_mesa_TextureBufferEXT(GLuint texture, GLenum target, GLenum internalFormat,
+                       GLuint buffer)
 {
    struct gl_texture_object *texObj;
    GET_CURRENT_CONTEXT(ctx);
 
+   if (target != GL_TEXTURE_BUFFER_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
+      return;
+   }
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glTextureBufferEXT");
+   if (!texObj)
+      return;
+
+   texbuffer(ctx, internalFormat, buffer, texObj);
+}
+
+void GLAPIENTRY
+_mesa_MultiTexBufferEXT(GLenum texunit, GLenum target, GLenum internalFormat,
+                        GLuint buffer)
+{
+   const GLuint unit = texunit - GL_TEXTURE0;
+   struct gl_texture_unit *texUnit;
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   if (target != GL_TEXTURE_BUFFER_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
+      return;
+   }
+
+   texUnit = _mesa_get_tex_unit_err(ctx, unit, "glMultiTexBufferEXT");
+   if (!texUnit)
+     return; /* GL_INVALID_OPERATION */
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   texbuffer(ctx, internalFormat, buffer, texObj);
+}
+
+
+static void texbufferrange_texture(struct gl_context *ctx, GLenum internalFormat,
+               GLuint buffer,
+               struct gl_texture_object *texObj,
+               GLintptr offset, GLsizeiptr size)
+{
    if (!(ctx->API == API_OPENGL_CORE &&
          ctx->Extensions.ARB_texture_buffer_range)) {
       _mesa_error(ctx, GL_INVALID_OPERATION, "glTexBufferRange");
@@ -5014,6 +5061,17 @@ _mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
       size = 0;
    }
 
+   texbufferrange(ctx, internalFormat, buffer, texObj, offset, size);
+}
+
+/** GL_ARB_texture_buffer_range */
+void GLAPIENTRY
+_mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
+                     GLintptr offset, GLsizeiptr size)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
    if (target != GL_TEXTURE_BUFFER_ARB) {
       _mesa_error(ctx, GL_INVALID_ENUM, "glTexBuffer(target)");
       return;
@@ -5021,7 +5079,28 @@ _mesa_TexBufferRange(GLenum target, GLenum internalFormat, GLuint buffer,
 
    texObj = _mesa_get_current_tex_object(ctx, target);
 
-   texbufferrange(ctx, internalFormat, buffer, texObj, offset, size);
+   texbufferrange_texture(ctx, internalFormat, buffer, texObj, offset, size);
+}
+
+void GLAPIENTRY
+_mesa_TextureBufferRangeEXT(GLuint texture, GLenum target,
+                     GLenum internalFormat, GLuint buffer,
+                     GLintptr offset, GLsizeiptr size)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   if (target != GL_TEXTURE_BUFFER_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glTextureBufferRangeEXT(target)");
+      return;
+   }
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glTextureBufferRangeEXT");
+   if (!texObj)
+      return;
+
+   texbufferrange_texture(ctx, internalFormat, buffer, texObj, offset, size);
 }
 
 
