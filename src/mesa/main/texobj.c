@@ -1300,35 +1300,16 @@ _mesa_get_and_init_texture(struct gl_context *ctx, GLuint name, GLenum target,
    return newTexObj;
 }
 
-/**
- * Bind a named texture to a texturing target.
- * 
- * \param target texture target.
- * \param texName texture name.
- * 
- * \sa glBindTexture().
- *
- * Determines the old texture object bound and returns immediately if rebinding
- * the same texture.  Get the current texture which is either a default texture
- * if name is null, a named texture from the hash, or a new texture if the
- * given texture name is new. Increments its reference count, binds it, and
- * calls dd_function_table::BindTexture. Decrements the old texture reference
- * count and deletes it if it reaches zero.
- */
-void GLAPIENTRY
-_mesa_BindTexture( GLenum target, GLuint texName )
+static void
+bind_texture(struct gl_context *ctx, struct gl_texture_unit *texUnit,
+               GLenum target, GLuint texName)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   const GLuint unit = ctx->Texture.CurrentUnit;
-   struct gl_texture_unit *texUnit;
    struct gl_texture_object *newTexObj = NULL;
    GLint targetIndex;
 
-   texUnit = _mesa_get_current_tex_unit(ctx);
-
    if (MESA_VERBOSE & (VERBOSE_API|VERBOSE_TEXTURE))
-      _mesa_debug(ctx, "glBindTexture(texunit %u, target %s, texture %u\n",
-                  unit, _mesa_lookup_enum_by_nr(target), texName);
+      _mesa_debug(ctx, "glBindTexture(texunit %p, target %s, texture %u\n",
+                  texUnit, _mesa_lookup_enum_by_nr(target), texName);
 
    targetIndex = target_enum_to_index(ctx, target);
    if (targetIndex < 0) {
@@ -1369,6 +1350,46 @@ _mesa_BindTexture( GLenum target, GLuint texName )
    /* Pass BindTexture call to device driver */
    if (ctx->Driver.BindTexture)
       ctx->Driver.BindTexture(ctx, target, newTexObj);
+}
+
+/**
+ * Bind a named texture to a texturing target.
+ * 
+ * \param target texture target.
+ * \param texName texture name.
+ * 
+ * \sa glBindTexture().
+ *
+ * Determines the old texture object bound and returns immediately if rebinding
+ * the same texture.  Get the current texture which is either a default texture
+ * if name is null, a named texture from the hash, or a new texture if the
+ * given texture name is new. Increments its reference count, binds it, and
+ * calls dd_function_table::BindTexture. Decrements the old texture reference
+ * count and deletes it if it reaches zero.
+ */
+void GLAPIENTRY
+_mesa_BindTexture( GLenum target, GLuint texture )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_unit *texUnit;
+
+   texUnit = _mesa_get_current_tex_unit(ctx);
+
+   bind_texture(ctx, texUnit, target, texture);
+}
+
+void GLAPIENTRY
+_mesa_BindMultiTextureEXT( GLenum texunit, GLenum target, GLuint texture )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLuint unit = texunit - GL_TEXTURE0;
+   struct gl_texture_unit *texUnit;
+
+   texUnit = _mesa_get_tex_unit_err(ctx, unit, "glBindMultiTextureEXT");
+   if (!texUnit)
+     return; /* GL_INVALID_OPERATION */
+
+   bind_texture(ctx, texUnit, target, texture);
 }
 
 
