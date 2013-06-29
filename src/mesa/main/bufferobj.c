@@ -1278,48 +1278,12 @@ _mesa_UnmapBuffer(GLenum target)
 void GLAPIENTRY
 _mesa_GetBufferParameteriv(GLenum target, GLenum pname, GLint *params)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
+   GLint64 p = -1;
 
-   bufObj = get_buffer(ctx, "glGetBufferParameterivARB", target);
-   if (!bufObj)
-      return;
+   _mesa_GetBufferParameteri64v(target, pname, &p);
 
-   switch (pname) {
-   case GL_BUFFER_SIZE_ARB:
-      *params = (GLint) bufObj->Size;
-      return;
-   case GL_BUFFER_USAGE_ARB:
-      *params = bufObj->Usage;
-      return;
-   case GL_BUFFER_ACCESS_ARB:
-      *params = simplified_access_mode(ctx, bufObj->AccessFlags);
-      return;
-   case GL_BUFFER_MAPPED_ARB:
-      *params = _mesa_bufferobj_mapped(bufObj);
-      return;
-   case GL_BUFFER_ACCESS_FLAGS:
-      if (!ctx->Extensions.ARB_map_buffer_range)
-         goto invalid_pname;
-      *params = bufObj->AccessFlags;
-      return;
-   case GL_BUFFER_MAP_OFFSET:
-      if (!ctx->Extensions.ARB_map_buffer_range)
-         goto invalid_pname;
-      *params = (GLint) bufObj->Offset;
-      return;
-   case GL_BUFFER_MAP_LENGTH:
-      if (!ctx->Extensions.ARB_map_buffer_range)
-         goto invalid_pname;
-      *params = (GLint) bufObj->Length;
-      return;
-   default:
-      ; /* fall-through */
-   }
-
-invalid_pname:
-   _mesa_error(ctx, GL_INVALID_ENUM, "glGetBufferParameterivARB(pname=%s)",
-               _mesa_lookup_enum_by_nr(pname));
+   if (p != -1)
+      *params = (GLint)p;
 }
 
 
