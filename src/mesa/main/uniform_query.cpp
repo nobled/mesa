@@ -170,10 +170,7 @@ validate_uniform_parameters(struct gl_context *ctx,
 			    const char *caller,
 			    bool negative_one_is_not_valid)
 {
-   if (!shProg || !shProg->LinkStatus) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "%s(program not linked)", caller);
-      return false;
-   }
+   assert(shProg && shProg->LinkStatus);
 
    if (location == -1) {
       /* For glGetUniform, page 264 (page 278 of the PDF) of the OpenGL 2.1
@@ -275,9 +272,12 @@ _mesa_get_uniform(struct gl_context *ctx, GLuint program, GLint location,
 		  GLvoid *paramsOut)
 {
    struct gl_shader_program *shProg =
-      _mesa_lookup_shader_program_err(ctx, program, "glGetUniformfv");
+      _mesa_lookup_linked_program(ctx, program, "glGetUniformfv");
    struct gl_uniform_storage *uni;
    unsigned loc, offset;
+
+   if (!shProg)
+      return;
 
    if (!validate_uniform_parameters(ctx, shProg, location, 1,
 				    &loc, &offset, "glGetUniform", true))

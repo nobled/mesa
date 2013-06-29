@@ -1446,12 +1446,11 @@ _mesa_ShaderSource(GLhandleARB shaderObj, GLsizei count,
    free(offsets);
 }
 
-
 void GLAPIENTRY
 _mesa_UseProgram(GLhandleARB program)
 {
    GET_CURRENT_CONTEXT(ctx);
-   struct gl_shader_program *shProg;
+   struct gl_shader_program *shProg = NULL;
 
    if (_mesa_is_xfb_active_and_unpaused(ctx)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -1459,25 +1458,14 @@ _mesa_UseProgram(GLhandleARB program)
       return;
    }
 
-   if (program) {
-      shProg = _mesa_lookup_shader_program_err(ctx, program, "glUseProgram");
-      if (!shProg) {
-         return;
-      }
-      if (!shProg->LinkStatus) {
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glUseProgram(program %u not linked)", program);
-         return;
-      }
+   if (program)
+      shProg = _mesa_lookup_linked_program(ctx, program, "glUseProgram");
+   if (program && !shProg)
+      return;
 
-      /* debug code */
-      if (ctx->Shader.Flags & GLSL_USE_PROG) {
-         print_shader_info(shProg);
-      }
-   }
-   else {
-      shProg = NULL;
-   }
+   /* debug code */
+   if (shProg && ctx->Shader.Flags & GLSL_USE_PROG)
+      print_shader_info(shProg);
 
    _mesa_use_program(ctx, shProg);
 }
@@ -1580,16 +1568,9 @@ _mesa_GetProgramBinary(GLuint program, GLsizei bufSize, GLsizei *length,
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
 
-   shProg = _mesa_lookup_shader_program_err(ctx, program, "glGetProgramBinary");
+   shProg = _mesa_lookup_linked_program(ctx, program, "glGetProgramBinary");
    if (!shProg)
       return;
-
-   if (!shProg->LinkStatus) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGetProgramBinary(program %u not linked)",
-                  shProg->Name);
-      return;
-   }
 
    if (bufSize < 0){
       _mesa_error(ctx, GL_INVALID_VALUE, "glGetProgramBinary(bufSize < 0)");
@@ -1771,16 +1752,10 @@ _mesa_UseShaderProgramEXT(GLenum type, GLuint program)
    }
 
    if (program) {
-      shProg = _mesa_lookup_shader_program_err(ctx, program,
+      shProg = _mesa_lookup_linked_program(ctx, program,
 					       "glUseShaderProgramEXT");
       if (shProg == NULL)
 	 return;
-
-      if (!shProg->LinkStatus) {
-	 _mesa_error(ctx, GL_INVALID_OPERATION,
-		     "glUseShaderProgramEXT(program not linked)");
-	 return;
-      }
    }
 
    _mesa_use_shader_program(ctx, type, shProg);

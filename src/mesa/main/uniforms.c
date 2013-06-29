@@ -508,21 +508,15 @@ _mesa_GetUniformLocation(GLhandleARB programObj, const GLcharARB *name)
 
    GET_CURRENT_CONTEXT(ctx);
 
-   shProg = _mesa_lookup_shader_program_err(ctx, programObj,
-					    "glGetUniformLocation");
-   if (!shProg)
-      return -1;
-
    /* Page 80 (page 94 of the PDF) of the OpenGL 2.1 spec says:
     *
     *     "If program has not been successfully linked, the error
     *     INVALID_OPERATION is generated."
     */
-   if (shProg->LinkStatus == GL_FALSE) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-		  "glGetUniformLocation(program not linked)");
+   shProg = _mesa_lookup_linked_program(ctx, programObj,
+					    "glGetUniformLocation");
+   if (!shProg)
       return -1;
-   }
 
    index = _mesa_get_uniform_location(ctx, shProg, name, &offset);
    if (index == GL_INVALID_INDEX)
