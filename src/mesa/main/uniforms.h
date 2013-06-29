@@ -111,6 +111,92 @@ _mesa_UniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose,
 void GLAPIENTRY
 _mesa_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose,
                          const GLfloat *value);
+
+
+void GLAPIENTRY
+_mesa_ProgramUniform1fEXT(GLuint, GLint, GLfloat);
+void GLAPIENTRY
+_mesa_ProgramUniform2fEXT(GLuint, GLint, GLfloat, GLfloat);
+void GLAPIENTRY
+_mesa_ProgramUniform3fEXT(GLuint, GLint, GLfloat, GLfloat, GLfloat);
+void GLAPIENTRY
+_mesa_ProgramUniform4fEXT(GLuint, GLint, GLfloat, GLfloat, GLfloat, GLfloat);
+void GLAPIENTRY
+_mesa_ProgramUniform1iEXT(GLuint, GLint, GLint);
+void GLAPIENTRY
+_mesa_ProgramUniform2iEXT(GLuint, GLint, GLint, GLint);
+void GLAPIENTRY
+_mesa_ProgramUniform3iEXT(GLuint, GLint, GLint, GLint, GLint);
+void GLAPIENTRY
+_mesa_ProgramUniform4iEXT(GLuint, GLint, GLint, GLint, GLint, GLint);
+void GLAPIENTRY
+_mesa_ProgramUniform1fvEXT(GLuint, GLint, GLsizei, const GLfloat *);
+void GLAPIENTRY
+_mesa_ProgramUniform2fvEXT(GLuint, GLint, GLsizei, const GLfloat *);
+void GLAPIENTRY
+_mesa_ProgramUniform3fvEXT(GLuint, GLint, GLsizei, const GLfloat *);
+void GLAPIENTRY
+_mesa_ProgramUniform4fvEXT(GLuint, GLint, GLsizei, const GLfloat *);
+void GLAPIENTRY
+_mesa_ProgramUniform1ivEXT(GLuint, GLint, GLsizei, const GLint *);
+void GLAPIENTRY
+_mesa_ProgramUniform2ivEXT(GLuint, GLint, GLsizei, const GLint *);
+void GLAPIENTRY
+_mesa_ProgramUniform3ivEXT(GLuint, GLint, GLsizei, const GLint *);
+void GLAPIENTRY
+_mesa_ProgramUniform4ivEXT(GLuint, GLint, GLsizei, const GLint *);
+void GLAPIENTRY
+_mesa_ProgramUniform1uiEXT(GLuint, GLint location, GLuint v0);
+void GLAPIENTRY
+_mesa_ProgramUniform2uiEXT(GLuint, GLint location, GLuint v0, GLuint v1);
+void GLAPIENTRY
+_mesa_ProgramUniform3uiEXT(GLuint, GLint location, GLuint v0, GLuint v1,
+                           GLuint v2);
+void GLAPIENTRY
+_mesa_ProgramUniform4uiEXT(GLuint, GLint location, GLuint v0, GLuint v1,
+                           GLuint v2, GLuint v3);
+void GLAPIENTRY
+_mesa_ProgramUniform1uivEXT(GLuint, GLint location, GLsizei count,
+                           const GLuint *value);
+void GLAPIENTRY
+_mesa_ProgramUniform2uivEXT(GLuint, GLint location, GLsizei count,
+                           const GLuint *value);
+void GLAPIENTRY
+_mesa_ProgramUniform3uivEXT(GLuint, GLint location, GLsizei count,
+                           const GLuint *value);
+void GLAPIENTRY
+_mesa_ProgramUniform4uivEXT(GLuint, GLint location, GLsizei count,
+                           const GLuint *value);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix2fvEXT(GLuint, GLint, GLsizei, GLboolean,
+                           const GLfloat *);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix3fvEXT(GLuint, GLint, GLsizei, GLboolean,
+                           const GLfloat *);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix4fvEXT(GLuint, GLint, GLsizei, GLboolean,
+                           const GLfloat *);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix2x3fvEXT(GLuint, GLint location, GLsizei count,
+                         GLboolean transpose, const GLfloat *value);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix3x2fvEXT(GLuint, GLint location, GLsizei count,
+                         GLboolean transpose, const GLfloat *value);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix2x4fvEXT(GLuint, GLint location, GLsizei count,
+                         GLboolean transpose, const GLfloat *value);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix4x2fvEXT(GLuint, GLint location, GLsizei count,
+                         GLboolean transpose, const GLfloat *value);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix3x4fvEXT(GLuint, GLint location, GLsizei count,
+                         GLboolean transpose, const GLfloat *value);
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix4x3fvEXT(GLuint, GLint location, GLsizei count,
+                         GLboolean transpose, const GLfloat *value);
+
+
+
 void GLAPIENTRY
 _mesa_GetnUniformfvARB(GLhandleARB, GLint, GLsizei, GLfloat *);
 void GLAPIENTRY
