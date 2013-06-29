@@ -136,15 +136,9 @@ _mesa_GetAttribLocation(GLhandleARB program, const GLcharARB * name)
 {
    GET_CURRENT_CONTEXT(ctx);
    struct gl_shader_program *const shProg =
-      _mesa_lookup_shader_program_err(ctx, program, "glGetAttribLocation");
+      _mesa_lookup_linked_program(ctx, program, "glGetAttribLocation");
 
    if (!shProg) {
-      return -1;
-   }
-
-   if (!shProg->LinkStatus) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGetAttribLocation(program not linked)");
       return -1;
    }
 
@@ -294,15 +288,9 @@ _mesa_GetFragDataIndex(GLuint program, const GLchar *name)
 {
    GET_CURRENT_CONTEXT(ctx);
    struct gl_shader_program *const shProg =
-      _mesa_lookup_shader_program_err(ctx, program, "glGetFragDataIndex");
+      _mesa_lookup_linked_program(ctx, program, "glGetFragDataIndex");
 
    if (!shProg) {
-      return -1;
-   }
-
-   if (!shProg->LinkStatus) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGetFragDataIndex(program not linked)");
       return -1;
    }
 
@@ -350,15 +338,9 @@ _mesa_GetFragDataLocation(GLuint program, const GLchar *name)
 {
    GET_CURRENT_CONTEXT(ctx);
    struct gl_shader_program *const shProg =
-      _mesa_lookup_shader_program_err(ctx, program, "glGetFragDataLocation");
+      _mesa_lookup_linked_program(ctx, program, "glGetFragDataLocation");
 
    if (!shProg) {
-      return -1;
-   }
-
-   if (!shProg->LinkStatus) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGetFragDataLocation(program not linked)");
       return -1;
    }
 

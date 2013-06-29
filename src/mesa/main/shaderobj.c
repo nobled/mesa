@@ -420,6 +420,29 @@ _mesa_lookup_shader_program_err(struct gl_context *ctx, GLuint name,
 }
 
 
+/**
+ * As above, but record an error if program is not linked.
+ */
+struct gl_shader_program *
+_mesa_lookup_linked_program(struct gl_context *ctx, GLuint name,
+                            const char *caller)
+{
+   struct gl_shader_program *shProg;
+
+   shProg = _mesa_lookup_shader_program_err(ctx, name, caller);
+   if (!shProg)
+      return NULL;
+
+   if (!shProg->LinkStatus) {
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "%s(program %u not linked)", caller, name);
+      return NULL;
+   }
+
+   return shProg;
+}
+
+
 void
 _mesa_init_shader_object_functions(struct dd_function_table *driver)
 {
