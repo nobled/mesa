@@ -428,10 +428,10 @@ _mesa_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose,
 }
 
 
-/* GL_EXT_direct_state_access versions */
+/* GL 4.1 / GL_ARB_separate_shader_objects / GL_EXT_direct_state_access */
 
 void GLAPIENTRY
-_mesa_ProgramUniform1fEXT(GLuint program, GLint location, GLfloat v0)
+_mesa_ProgramUniform1f(GLuint program, GLint location, GLfloat v0)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -444,7 +444,7 @@ _mesa_ProgramUniform1fEXT(GLuint program, GLint location, GLfloat v0)
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform2fEXT(GLuint program, GLint location, GLfloat v0, GLfloat v1)
+_mesa_ProgramUniform2f(GLuint program, GLint location, GLfloat v0, GLfloat v1)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -460,7 +460,7 @@ _mesa_ProgramUniform2fEXT(GLuint program, GLint location, GLfloat v0, GLfloat v1
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform3fEXT(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+_mesa_ProgramUniform3f(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -477,7 +477,7 @@ _mesa_ProgramUniform3fEXT(GLuint program, GLint location, GLfloat v0, GLfloat v1
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform4fEXT(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2,
+_mesa_ProgramUniform4f(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2,
                    GLfloat v3)
 {
    struct gl_shader_program *shProg;
@@ -496,7 +496,7 @@ _mesa_ProgramUniform4fEXT(GLuint program, GLint location, GLfloat v0, GLfloat v1
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform1iEXT(GLuint program, GLint location, GLint v0)
+_mesa_ProgramUniform1i(GLuint program, GLint location, GLint v0)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -509,7 +509,7 @@ _mesa_ProgramUniform1iEXT(GLuint program, GLint location, GLint v0)
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform2iEXT(GLuint program, GLint location, GLint v0, GLint v1)
+_mesa_ProgramUniform2i(GLuint program, GLint location, GLint v0, GLint v1)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -525,7 +525,7 @@ _mesa_ProgramUniform2iEXT(GLuint program, GLint location, GLint v0, GLint v1)
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform3iEXT(GLuint program, GLint location, GLint v0, GLint v1, GLint v2)
+_mesa_ProgramUniform3i(GLuint program, GLint location, GLint v0, GLint v1, GLint v2)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -542,7 +542,7 @@ _mesa_ProgramUniform3iEXT(GLuint program, GLint location, GLint v0, GLint v1, GL
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform4iEXT(GLuint program, GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
+_mesa_ProgramUniform4i(GLuint program, GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -560,7 +560,7 @@ _mesa_ProgramUniform4iEXT(GLuint program, GLint location, GLint v0, GLint v1, GL
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform1fvEXT(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+_mesa_ProgramUniform1fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -573,7 +573,7 @@ _mesa_ProgramUniform1fvEXT(GLuint program, GLint location, GLsizei count, const 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform2fvEXT(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+_mesa_ProgramUniform2fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -586,7 +586,7 @@ _mesa_ProgramUniform2fvEXT(GLuint program, GLint location, GLsizei count, const 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform3fvEXT(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+_mesa_ProgramUniform3fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -599,7 +599,7 @@ _mesa_ProgramUniform3fvEXT(GLuint program, GLint location, GLsizei count, const 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform4fvEXT(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+_mesa_ProgramUniform4fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -612,7 +612,7 @@ _mesa_ProgramUniform4fvEXT(GLuint program, GLint location, GLsizei count, const 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform1ivEXT(GLuint program, GLint location, GLsizei count, const GLint * value)
+_mesa_ProgramUniform1iv(GLuint program, GLint location, GLsizei count, const GLint * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -625,7 +625,7 @@ _mesa_ProgramUniform1ivEXT(GLuint program, GLint location, GLsizei count, const 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform2ivEXT(GLuint program, GLint location, GLsizei count, const GLint * value)
+_mesa_ProgramUniform2iv(GLuint program, GLint location, GLsizei count, const GLint * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -638,7 +638,7 @@ _mesa_ProgramUniform2ivEXT(GLuint program, GLint location, GLsizei count, const 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform3ivEXT(GLuint program, GLint location, GLsizei count, const GLint * value)
+_mesa_ProgramUniform3iv(GLuint program, GLint location, GLsizei count, const GLint * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -651,7 +651,7 @@ _mesa_ProgramUniform3ivEXT(GLuint program, GLint location, GLsizei count, const 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform4ivEXT(GLuint program, GLint location, GLsizei count, const GLint * value)
+_mesa_ProgramUniform4iv(GLuint program, GLint location, GLsizei count, const GLint * value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -666,7 +666,7 @@ _mesa_ProgramUniform4ivEXT(GLuint program, GLint location, GLsizei count, const 
 
 /** OpenGL 3.0 GLuint-valued functions **/
 void GLAPIENTRY
-_mesa_ProgramUniform1uiEXT(GLuint program, GLint location, GLuint v0)
+_mesa_ProgramUniform1ui(GLuint program, GLint location, GLuint v0)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -679,7 +679,7 @@ _mesa_ProgramUniform1uiEXT(GLuint program, GLint location, GLuint v0)
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform2uiEXT(GLuint program, GLint location, GLuint v0, GLuint v1)
+_mesa_ProgramUniform2ui(GLuint program, GLint location, GLuint v0, GLuint v1)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -695,7 +695,7 @@ _mesa_ProgramUniform2uiEXT(GLuint program, GLint location, GLuint v0, GLuint v1)
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform3uiEXT(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2)
+_mesa_ProgramUniform3ui(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -712,7 +712,7 @@ _mesa_ProgramUniform3uiEXT(GLuint program, GLint location, GLuint v0, GLuint v1,
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform4uiEXT(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
+_mesa_ProgramUniform4ui(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -730,7 +730,7 @@ _mesa_ProgramUniform4uiEXT(GLuint program, GLint location, GLuint v0, GLuint v1,
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform1uivEXT(GLuint program, GLint location, GLsizei count, const GLuint *value)
+_mesa_ProgramUniform1uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -743,7 +743,7 @@ _mesa_ProgramUniform1uivEXT(GLuint program, GLint location, GLsizei count, const
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform2uivEXT(GLuint program, GLint location, GLsizei count, const GLuint *value)
+_mesa_ProgramUniform2uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -756,7 +756,7 @@ _mesa_ProgramUniform2uivEXT(GLuint program, GLint location, GLsizei count, const
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform3uivEXT(GLuint program, GLint location, GLsizei count, const GLuint *value)
+_mesa_ProgramUniform3uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -769,7 +769,7 @@ _mesa_ProgramUniform3uivEXT(GLuint program, GLint location, GLsizei count, const
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniform4uivEXT(GLuint program, GLint location, GLsizei count, const GLuint *value)
+_mesa_ProgramUniform4uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
 {
    struct gl_shader_program *shProg;
    GET_CURRENT_CONTEXT(ctx);
@@ -784,7 +784,7 @@ _mesa_ProgramUniform4uivEXT(GLuint program, GLint location, GLsizei count, const
 
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix2fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                           const GLfloat * value)
 {
    struct gl_shader_program *shProg;
@@ -799,7 +799,7 @@ _mesa_ProgramUniformMatrix2fvEXT(GLuint program, GLint location, GLsizei count, 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix3fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                           const GLfloat * value)
 {
    struct gl_shader_program *shProg;
@@ -814,7 +814,7 @@ _mesa_ProgramUniformMatrix3fvEXT(GLuint program, GLint location, GLsizei count, 
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix4fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                           const GLfloat * value)
 {
    struct gl_shader_program *shProg;
@@ -833,7 +833,7 @@ _mesa_ProgramUniformMatrix4fvEXT(GLuint program, GLint location, GLsizei count, 
  * Non-square UniformMatrix are OpenGL 2.1
  */
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix2x3fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix2x3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                          const GLfloat *value)
 {
    struct gl_shader_program *shProg;
@@ -848,7 +848,7 @@ _mesa_ProgramUniformMatrix2x3fvEXT(GLuint program, GLint location, GLsizei count
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix3x2fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix3x2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                          const GLfloat *value)
 {
    struct gl_shader_program *shProg;
@@ -863,7 +863,7 @@ _mesa_ProgramUniformMatrix3x2fvEXT(GLuint program, GLint location, GLsizei count
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix2x4fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix2x4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                          const GLfloat *value)
 {
    struct gl_shader_program *shProg;
@@ -878,7 +878,7 @@ _mesa_ProgramUniformMatrix2x4fvEXT(GLuint program, GLint location, GLsizei count
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix4x2fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix4x2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                          const GLfloat *value)
 {
    struct gl_shader_program *shProg;
@@ -893,7 +893,7 @@ _mesa_ProgramUniformMatrix4x2fvEXT(GLuint program, GLint location, GLsizei count
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix3x4fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix3x4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                          const GLfloat *value)
 {
    struct gl_shader_program *shProg;
@@ -908,7 +908,7 @@ _mesa_ProgramUniformMatrix3x4fvEXT(GLuint program, GLint location, GLsizei count
 }
 
 void GLAPIENTRY
-_mesa_ProgramUniformMatrix4x3fvEXT(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+_mesa_ProgramUniformMatrix4x3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
                          const GLfloat *value)
 {
    struct gl_shader_program *shProg;
