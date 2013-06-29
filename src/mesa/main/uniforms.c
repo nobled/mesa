@@ -428,6 +428,503 @@ _mesa_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose,
 }
 
 
+/* GL 4.1 / GL_ARB_separate_shader_objects / GL_EXT_direct_state_access */
+
+void GLAPIENTRY
+_mesa_ProgramUniform1f(GLuint program, GLint location, GLfloat v0)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, &v0, GL_FLOAT);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform2f(GLuint program, GLint location, GLfloat v0, GLfloat v1)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLfloat v[2];
+   v[0] = v0;
+   v[1] = v1;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_FLOAT_VEC2);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform3f(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLfloat v[3];
+   v[0] = v0;
+   v[1] = v1;
+   v[2] = v2;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_FLOAT_VEC3);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform4f(GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2,
+                   GLfloat v3)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLfloat v[4];
+   v[0] = v0;
+   v[1] = v1;
+   v[2] = v2;
+   v[3] = v3;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_FLOAT_VEC4);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform1i(GLuint program, GLint location, GLint v0)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, &v0, GL_INT);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform2i(GLuint program, GLint location, GLint v0, GLint v1)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLint v[2];
+   v[0] = v0;
+   v[1] = v1;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_INT_VEC2);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform3i(GLuint program, GLint location, GLint v0, GLint v1, GLint v2)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLint v[3];
+   v[0] = v0;
+   v[1] = v1;
+   v[2] = v2;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_INT_VEC3);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform4i(GLuint program, GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLint v[4];
+   v[0] = v0;
+   v[1] = v1;
+   v[2] = v2;
+   v[3] = v3;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_INT_VEC4);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform1fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_FLOAT);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform2fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_FLOAT_VEC2);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform3fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_FLOAT_VEC3);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform4fv(GLuint program, GLint location, GLsizei count, const GLfloat * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_FLOAT_VEC4);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform1iv(GLuint program, GLint location, GLsizei count, const GLint * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_INT);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform2iv(GLuint program, GLint location, GLsizei count, const GLint * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_INT_VEC2);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform3iv(GLuint program, GLint location, GLsizei count, const GLint * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_INT_VEC3);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform4iv(GLuint program, GLint location, GLsizei count, const GLint * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_INT_VEC4);
+}
+
+
+/** OpenGL 3.0 GLuint-valued functions **/
+void GLAPIENTRY
+_mesa_ProgramUniform1ui(GLuint program, GLint location, GLuint v0)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, &v0, GL_UNSIGNED_INT);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform2ui(GLuint program, GLint location, GLuint v0, GLuint v1)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLuint v[2];
+   v[0] = v0;
+   v[1] = v1;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_UNSIGNED_INT_VEC2);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform3ui(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLuint v[3];
+   v[0] = v0;
+   v[1] = v1;
+   v[2] = v2;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_UNSIGNED_INT_VEC3);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform4ui(GLuint program, GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   GLuint v[4];
+   v[0] = v0;
+   v[1] = v1;
+   v[2] = v2;
+   v[3] = v3;
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, 1, v, GL_UNSIGNED_INT_VEC4);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform1uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_UNSIGNED_INT);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform2uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_UNSIGNED_INT_VEC2);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform3uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_UNSIGNED_INT_VEC3);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniform4uiv(GLuint program, GLint location, GLsizei count, const GLuint *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform(ctx, shProg, location, count, value, GL_UNSIGNED_INT_VEC4);
+}
+
+
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                          const GLfloat * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			2, 2, location, count, transpose, value);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                          const GLfloat * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			3, 3, location, count, transpose, value);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                          const GLfloat * value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			4, 4, location, count, transpose, value);
+}
+
+
+/**
+ * Non-square UniformMatrix are OpenGL 2.1
+ */
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix2x3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                         const GLfloat *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			2, 3, location, count, transpose, value);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix3x2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                         const GLfloat *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			3, 2, location, count, transpose, value);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix2x4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                         const GLfloat *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			2, 4, location, count, transpose, value);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix4x2fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                         const GLfloat *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			4, 2, location, count, transpose, value);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix3x4fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                         const GLfloat *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			3, 4, location, count, transpose, value);
+}
+
+void GLAPIENTRY
+_mesa_ProgramUniformMatrix4x3fv(GLuint program, GLint location, GLsizei count, GLboolean transpose,
+                         const GLfloat *value)
+{
+   struct gl_shader_program *shProg;
+   GET_CURRENT_CONTEXT(ctx);
+   
+   shProg = _mesa_lookup_linked_program(ctx, program, "glProgramUniform");
+   if (!shProg)
+      return;
+
+   _mesa_uniform_matrix(ctx, shProg,
+			4, 3, location, count, transpose, value);
+}
+
+
+
+
 void GLAPIENTRY
 _mesa_GetnUniformfvARB(GLhandleARB program, GLint location,
                        GLsizei bufSize, GLfloat *params)
