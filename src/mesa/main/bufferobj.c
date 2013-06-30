@@ -179,7 +179,7 @@ simplified_access_mode(struct gl_context *ctx, GLbitfield access)
  * \c glBufferSubDataARB and \c glGetBufferSubDataARB.
  *
  * \param ctx     GL context.
- * \param target  Buffer object target on which to operate.
+ * \param bufObj  Buffer object on which to operate.
  * \param offset  Offset of the first byte of the subdata range.
  * \param size    Size, in bytes, of the subdata range.
  * \param caller  Name of calling function for recording errors.
@@ -191,12 +191,11 @@ simplified_access_mode(struct gl_context *ctx, GLbitfield access)
  * \sa glBufferSubDataARB, glGetBufferSubDataARB
  */
 static struct gl_buffer_object *
-buffer_object_subdata_range_good( struct gl_context * ctx, GLenum target, 
+buffer_object_subdata_range_good( struct gl_context * ctx,
+                                  struct gl_buffer_object *bufObj,
                                   GLintptrARB offset, GLsizeiptrARB size,
                                   const char *caller )
 {
-   struct gl_buffer_object *bufObj;
-
    if (size < 0) {
       _mesa_error(ctx, GL_INVALID_VALUE, "%s(size < 0)", caller);
       return NULL;
@@ -206,10 +205,6 @@ buffer_object_subdata_range_good( struct gl_context * ctx, GLenum target,
       _mesa_error(ctx, GL_INVALID_VALUE, "%s(offset < 0)", caller);
       return NULL;
    }
-
-   bufObj = get_buffer(ctx, caller, target);
-   if (!bufObj)
-      return NULL;
 
    if (offset + size > bufObj->Size) {
       _mesa_error(ctx, GL_INVALID_VALUE,
@@ -1081,7 +1076,11 @@ _mesa_BufferSubData(GLenum target, GLintptrARB offset,
    GET_CURRENT_CONTEXT(ctx);
    struct gl_buffer_object *bufObj;
 
-   bufObj = buffer_object_subdata_range_good( ctx, target, offset, size,
+   bufObj = get_buffer(ctx, "glBufferSubDataARB", target);
+   if (!bufObj)
+      return;
+
+   bufObj = buffer_object_subdata_range_good( ctx, bufObj, offset, size,
                                               "glBufferSubDataARB" );
    if (!bufObj) {
       /* error already recorded */
@@ -1105,7 +1104,11 @@ _mesa_GetBufferSubData(GLenum target, GLintptrARB offset,
    GET_CURRENT_CONTEXT(ctx);
    struct gl_buffer_object *bufObj;
 
-   bufObj = buffer_object_subdata_range_good( ctx, target, offset, size,
+   bufObj = get_buffer(ctx, "glGetBufferSubDataARB", target);
+   if (!bufObj)
+      return;
+
+   bufObj = buffer_object_subdata_range_good( ctx, bufObj, offset, size,
                                               "glGetBufferSubDataARB" );
    if (!bufObj) {
       /* error already recorded */
