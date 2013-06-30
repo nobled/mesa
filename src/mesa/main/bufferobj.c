@@ -990,26 +990,10 @@ _mesa_IsBuffer(GLuint id)
    return bufObj && bufObj != &DummyBufferObject;
 }
 
-
-void GLAPIENTRY
-_mesa_BufferData(GLenum target, GLsizeiptrARB size,
-                    const GLvoid * data, GLenum usage)
+static bool
+usage_is_valid(struct gl_context *ctx, GLenum usage)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
    bool valid_usage;
-
-   if (MESA_VERBOSE & VERBOSE_API)
-      _mesa_debug(ctx, "glBufferData(%s, %ld, %p, %s)\n",
-                  _mesa_lookup_enum_by_nr(target),
-                  (long int) size, data,
-                  _mesa_lookup_enum_by_nr(usage));
-
-   if (size < 0) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glBufferDataARB(size < 0)");
-      return;
-   }
-
    switch (usage) {
    case GL_STREAM_DRAW_ARB:
       valid_usage = (ctx->API != API_OPENGLES);
@@ -1034,7 +1018,28 @@ _mesa_BufferData(GLenum target, GLsizeiptrARB size,
       break;
    }
 
-   if (!valid_usage) {
+  return valid_usage;
+}
+
+void GLAPIENTRY
+_mesa_BufferData(GLenum target, GLsizeiptrARB size,
+                    const GLvoid * data, GLenum usage)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   if (MESA_VERBOSE & VERBOSE_API)
+      _mesa_debug(ctx, "glBufferData(%s, %ld, %p, %s)\n",
+                  _mesa_lookup_enum_by_nr(target),
+                  (long int) size, data,
+                  _mesa_lookup_enum_by_nr(usage));
+
+   if (size < 0) {
+      _mesa_error(ctx, GL_INVALID_VALUE, "glBufferDataARB(size < 0)");
+      return;
+   }
+
+   if (!usage_is_valid(ctx, usage)) {
       _mesa_error(ctx, GL_INVALID_ENUM, "glBufferData(usage)");
       return;
    }
