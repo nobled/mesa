@@ -1125,6 +1125,33 @@ _mesa_GetBufferSubData(GLenum target, GLintptrARB offset,
    ctx->Driver.GetBufferSubData( ctx, offset, size, data, bufObj );
 }
 
+static GLbitfield
+get_access_flags(struct gl_context *ctx, GLenum access, const char *func)
+{
+   GLbitfield accessFlags = 0;
+
+   switch (access) {
+   case GL_READ_ONLY_ARB:
+      if (_mesa_is_desktop_gl(ctx))
+         accessFlags = GL_MAP_READ_BIT;
+      break;
+   case GL_WRITE_ONLY_ARB:
+      accessFlags = GL_MAP_WRITE_BIT;
+      break;
+   case GL_READ_WRITE_ARB:
+      if (_mesa_is_desktop_gl(ctx))
+         accessFlags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
+      break;
+   default:
+      break;
+   }
+
+   if (accessFlags == 0)
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(access=%s)", func,
+                                        _mesa_lookup_enum_by_nr(access));
+
+   return accessFlags;
+}
 
 void * GLAPIENTRY
 _mesa_MapBuffer(GLenum target, GLenum access)
@@ -1133,32 +1160,12 @@ _mesa_MapBuffer(GLenum target, GLenum access)
    struct gl_buffer_object * bufObj;
    GLbitfield accessFlags;
    void *map;
-   bool valid_access;
 
    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, NULL);
 
-   switch (access) {
-   case GL_READ_ONLY_ARB:
-      accessFlags = GL_MAP_READ_BIT;
-      valid_access = _mesa_is_desktop_gl(ctx);
-      break;
-   case GL_WRITE_ONLY_ARB:
-      accessFlags = GL_MAP_WRITE_BIT;
-      valid_access = true;
-      break;
-   case GL_READ_WRITE_ARB:
-      accessFlags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
-      valid_access = _mesa_is_desktop_gl(ctx);
-      break;
-   default:
-      valid_access = false;
-      break;
-   }
-
-   if (!valid_access) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glMapBufferARB(access)");
+   accessFlags = get_access_flags(ctx, access, "glMapBuffer");
+   if (!accessFlags)
       return NULL;
-   }
 
    bufObj = get_buffer(ctx, "glMapBufferARB", target);
    if (!bufObj)
