@@ -1613,15 +1613,11 @@ _mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
 }
 
 
-/**
- * See GL_ARB_map_buffer_range spec
- */
-void GLAPIENTRY
-_mesa_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
-{
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
 
+static void
+flush_mapped_buffer(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+                    GLintptr offset, GLsizeiptr length, const char *func)
+{
    if (!ctx->Extensions.ARB_map_buffer_range) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
                   "glFlushMappedBufferRange(extension not supported)");
@@ -1639,10 +1635,6 @@ _mesa_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
                   "glFlushMappedBufferRange(length = %ld)", (long)length);
       return;
    }
-
-   bufObj = get_buffer(ctx, "glFlushMappedBufferRange", target);
-   if (!bufObj)
-      return;
 
    if (!_mesa_bufferobj_mapped(bufObj)) {
       /* buffer is not mapped */
@@ -1668,6 +1660,22 @@ _mesa_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
 
    if (ctx->Driver.FlushMappedBufferRange)
       ctx->Driver.FlushMappedBufferRange(ctx, offset, length, bufObj);
+}
+
+/**
+ * See GL_ARB_map_buffer_range spec
+ */
+void GLAPIENTRY
+_mesa_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = get_buffer(ctx, "glFlushMappedBufferRange", target);
+   if (!bufObj)
+      return;
+
+   flush_mapped_buffer(ctx, bufObj, offset, length, "glFlushMappedBufferRange");
 }
 
 
