@@ -1318,21 +1318,10 @@ _mesa_GetBufferParameteriv(GLenum target, GLenum pname, GLint *params)
 }
 
 
-/**
- * New in GL 3.2
- * This is pretty much a duplicate of GetBufferParameteriv() but the
- * GL_BUFFER_SIZE_ARB attribute will be 64-bits on a 64-bit system.
- */
-void GLAPIENTRY
-_mesa_GetBufferParameteri64v(GLenum target, GLenum pname, GLint64 *params)
+static void
+get_buffer_param(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+                 GLenum pname, GLint64 *params, const char *func)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
-
-   bufObj = get_buffer(ctx, "glGetBufferParameteri64v", target);
-   if (!bufObj)
-      return;
-
    switch (pname) {
    case GL_BUFFER_SIZE_ARB:
       *params = bufObj->Size;
@@ -1366,8 +1355,26 @@ _mesa_GetBufferParameteri64v(GLenum target, GLenum pname, GLint64 *params)
    }
 
 invalid_pname:
-   _mesa_error(ctx, GL_INVALID_ENUM, "glGetBufferParameteri64v(pname=%s)",
+   _mesa_error(ctx, GL_INVALID_ENUM, "%s(pname=%s)", func,
                _mesa_lookup_enum_by_nr(pname));
+}
+
+/**
+ * New in GL 3.2
+ * This is pretty much a duplicate of GetBufferParameteriv() but the
+ * GL_BUFFER_SIZE_ARB attribute will be 64-bits on a 64-bit system.
+ */
+void GLAPIENTRY
+_mesa_GetBufferParameteri64v(GLenum target, GLenum pname, GLint64 *params)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = get_buffer(ctx, "glGetBufferParameteri64v", target);
+   if (!bufObj)
+      return;
+
+   get_buffer_param(ctx, bufObj, pname, params, "glGetBufferParameteri64v");
 }
 
 
