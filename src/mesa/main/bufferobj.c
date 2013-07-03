@@ -1378,22 +1378,29 @@ _mesa_GetBufferParameteri64v(GLenum target, GLenum pname, GLint64 *params)
 }
 
 
+static void
+get_buffer_pointer(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+                   GLenum pname, GLvoid **params, const char *func)
+{
+   if (pname != GL_BUFFER_MAP_POINTER_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(pname)", func);
+      return;
+   }
+
+   *params = bufObj->Pointer;
+}
+
 void GLAPIENTRY
 _mesa_GetBufferPointerv(GLenum target, GLenum pname, GLvoid **params)
 {
    GET_CURRENT_CONTEXT(ctx);
    struct gl_buffer_object * bufObj;
 
-   if (pname != GL_BUFFER_MAP_POINTER_ARB) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glGetBufferPointervARB(pname)");
-      return;
-   }
-
-   bufObj = get_buffer(ctx, "glGetBufferPointervARB", target);
+   bufObj = get_buffer(ctx, "glGetBufferPointerv", target);
    if (!bufObj)
       return;
 
-   *params = bufObj->Pointer;
+   get_buffer_pointer(ctx, bufObj, pname, params, "glGetBufferPointerv");
 }
 
 
