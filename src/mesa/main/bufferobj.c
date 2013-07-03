@@ -1236,20 +1236,15 @@ _mesa_MapBuffer(GLenum target, GLenum access)
 }
 
 
-GLboolean GLAPIENTRY
-_mesa_UnmapBuffer(GLenum target)
+static GLboolean
+unmap_buffer(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+             const char *func)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
    GLboolean status = GL_TRUE;
    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
 
-   bufObj = get_buffer(ctx, "glUnmapBufferARB", target);
-   if (!bufObj)
-      return GL_FALSE;
-
    if (!_mesa_bufferobj_mapped(bufObj)) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "glUnmapBufferARB");
+      _mesa_error(ctx, GL_INVALID_OPERATION, "%s", func);
       return GL_FALSE;
    }
 
@@ -1283,8 +1278,8 @@ _mesa_UnmapBuffer(GLenum target)
          }
       }
       if (unchanged) {
-         printf("glUnmapBufferARB(%u): %u of %ld unchanged, starting at %d\n",
-                      bufObj->Name, unchanged, bufObj->Size, pos);
+         printf("%s(%u): %u of %ld unchanged, starting at %d\n",
+                func, bufObj->Name, unchanged, bufObj->Size, pos);
       }
    }
 #endif
@@ -1296,6 +1291,19 @@ _mesa_UnmapBuffer(GLenum target)
    ASSERT(bufObj->Length == 0);
 
    return status;
+}
+
+GLboolean GLAPIENTRY
+_mesa_UnmapBuffer(GLenum target)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = get_buffer(ctx, "glUnmapBuffer", target);
+   if (!bufObj)
+      return GL_FALSE;
+
+   return unmap_buffer(ctx, bufObj, "glUnmapBuffer");
 }
 
 
