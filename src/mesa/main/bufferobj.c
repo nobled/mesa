@@ -1153,39 +1153,34 @@ get_access_flags(struct gl_context *ctx, GLenum access, const char *func)
    return accessFlags;
 }
 
-void * GLAPIENTRY
-_mesa_MapBuffer(GLenum target, GLenum access)
+static void *
+map_buffer(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+           GLenum access, const char *func)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object * bufObj;
    GLbitfield accessFlags;
    void *map;
 
    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, NULL);
 
-   accessFlags = get_access_flags(ctx, access, "glMapBuffer");
+   accessFlags = get_access_flags(ctx, access, func);
    if (!accessFlags)
       return NULL;
 
-   bufObj = get_buffer(ctx, "glMapBufferARB", target);
-   if (!bufObj)
-      return NULL;
-
    if (_mesa_bufferobj_mapped(bufObj)) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "glMapBufferARB(already mapped)");
+      _mesa_error(ctx, GL_INVALID_OPERATION, "%s(already mapped)", func);
       return NULL;
    }
 
    if (!bufObj->Size) {
       _mesa_error(ctx, GL_OUT_OF_MEMORY,
-                  "glMapBuffer(buffer size = 0)");
+                  "%s(buffer size = 0)", func);
       return NULL;
    }
 
    ASSERT(ctx->Driver.MapBufferRange);
    map = ctx->Driver.MapBufferRange(ctx, 0, bufObj->Size, accessFlags, bufObj);
    if (!map) {
-      _mesa_error(ctx, GL_OUT_OF_MEMORY, "glMapBufferARB(map failed)");
+      _mesa_error(ctx, GL_OUT_OF_MEMORY, "%s(map failed)", func);
       return NULL;
    }
    else {
@@ -1203,7 +1198,7 @@ _mesa_MapBuffer(GLenum target, GLenum access)
       bufObj->Written = GL_TRUE;
 
 #ifdef VBO_DEBUG
-   printf("glMapBufferARB(%u, sz %ld, access 0x%x)\n",
+   printf("%s(%u, sz %ld, access 0x%x)\n", func,
 	  bufObj->Name, bufObj->Size, access);
    if (access == GL_WRITE_ONLY_ARB) {
       GLuint i;
@@ -1225,6 +1220,19 @@ _mesa_MapBuffer(GLenum target, GLenum access)
 #endif
 
    return bufObj->Pointer;
+}
+
+void * GLAPIENTRY
+_mesa_MapBuffer(GLenum target, GLenum access)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object * bufObj;
+
+   bufObj = get_buffer(ctx, "glMapBuffer", target);
+   if (!bufObj)
+      return NULL;
+
+   return map_buffer(ctx, bufObj, access, "glMapBuffer");
 }
 
 
