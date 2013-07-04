@@ -1118,19 +1118,13 @@ _mesa_BufferSubData(GLenum target, GLintptrARB offset,
 }
 
 
-void GLAPIENTRY
-_mesa_GetBufferSubData(GLenum target, GLintptrARB offset,
-                          GLsizeiptrARB size, void * data)
+static void
+get_buffer_subdata(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+                   GLintptrARB offset, GLsizeiptrARB size, void * data,
+                   const char *func)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
-
-   bufObj = get_buffer(ctx, "glGetBufferSubDataARB", target);
-   if (!bufObj)
-      return;
-
    bufObj = buffer_object_subdata_range_good( ctx, bufObj, offset, size,
-                                              "glGetBufferSubDataARB" );
+                                              func );
    if (!bufObj) {
       /* error already recorded */
       return;
@@ -1139,6 +1133,21 @@ _mesa_GetBufferSubData(GLenum target, GLintptrARB offset,
    ASSERT(ctx->Driver.GetBufferSubData);
    ctx->Driver.GetBufferSubData( ctx, offset, size, data, bufObj );
 }
+
+void GLAPIENTRY
+_mesa_GetBufferSubData(GLenum target, GLintptrARB offset,
+                       GLsizeiptrARB size, void * data)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = get_buffer(ctx, "glGetBufferSubData", target);
+   if (!bufObj)
+      return;
+
+   get_buffer_subdata(ctx, bufObj, offset, size, data, "glGetBufferSubData");
+}
+
 
 static GLbitfield
 get_access_flags(struct gl_context *ctx, GLenum access, const char *func)
