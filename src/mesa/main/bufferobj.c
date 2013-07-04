@@ -1074,19 +1074,14 @@ _mesa_BufferData(GLenum target, GLsizeiptrARB size,
 }
 
 
-void GLAPIENTRY
-_mesa_BufferSubData(GLenum target, GLintptrARB offset,
-                       GLsizeiptrARB size, const GLvoid * data)
+
+static void
+buffer_subdata(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+               GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data,
+               const char *func)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
-
-   bufObj = get_buffer(ctx, "glBufferSubDataARB", target);
-   if (!bufObj)
-      return;
-
    bufObj = buffer_object_subdata_range_good( ctx, bufObj, offset, size,
-                                              "glBufferSubDataARB" );
+                                              func );
    if (!bufObj) {
       /* error already recorded */
       return;
@@ -1099,6 +1094,20 @@ _mesa_BufferSubData(GLenum target, GLintptrARB offset,
 
    ASSERT(ctx->Driver.BufferSubData);
    ctx->Driver.BufferSubData( ctx, offset, size, data, bufObj );
+}
+
+void GLAPIENTRY
+_mesa_BufferSubData(GLenum target, GLintptrARB offset,
+                    GLsizeiptrARB size, const GLvoid * data)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = get_buffer(ctx, "glBufferSubData", target);
+   if (!bufObj)
+      return;
+
+   buffer_subdata(ctx, bufObj, offset, size, data, "glBufferSubData");
 }
 
 
