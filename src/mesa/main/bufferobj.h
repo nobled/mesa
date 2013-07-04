@@ -151,4 +151,10 @@ void GLAPIENTRY
 _mesa_InvalidateBufferData(GLuint buffer);
 
 
+/* GL_EXT_direct_state_access */
+void GLAPIENTRY
+_mesa_NamedBufferDataEXT(GLuint buffer, GLsizeiptrARB size,
+                         const GLvoid *data, GLenum usage);
+
+
 #endif
