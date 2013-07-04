@@ -1143,6 +1143,21 @@ _mesa_BufferSubData(GLenum target, GLintptrARB offset,
 }
 
 
+void GLAPIENTRY
+_mesa_NamedBufferSubDataEXT(GLuint buffer, GLintptrARB offset,
+                            GLsizeiptrARB size, const GLvoid * data)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glNamedBufferSubDataEXT", buffer);
+   if (!bufObj)
+      return;
+
+   buffer_subdata(ctx, bufObj, offset, size, data, "glNamedBufferSubDataEXT");
+}
+
+
 static void
 get_buffer_subdata(struct gl_context *ctx, struct gl_buffer_object *bufObj,
                    GLintptrARB offset, GLsizeiptrARB size, void * data,
