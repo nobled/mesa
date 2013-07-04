@@ -1020,32 +1020,25 @@ usage_is_valid(struct gl_context *ctx, GLenum usage)
   return valid_usage;
 }
 
-void GLAPIENTRY
-_mesa_BufferData(GLenum target, GLsizeiptrARB size,
-                    const GLvoid * data, GLenum usage)
+static void
+buffer_data(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+            GLsizeiptrARB size, const GLvoid * data, GLenum usage,
+            const char *func, GLenum target)
 {
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
-
    if (MESA_VERBOSE & VERBOSE_API)
-      _mesa_debug(ctx, "glBufferData(%s, %ld, %p, %s)\n",
-                  _mesa_lookup_enum_by_nr(target),
+      _mesa_debug(ctx, "%s(size=%ld, data=%p, usage=%s)\n", func,
                   (long int) size, data,
                   _mesa_lookup_enum_by_nr(usage));
 
    if (size < 0) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glBufferDataARB(size < 0)");
+      _mesa_error(ctx, GL_INVALID_VALUE, "%s(size < 0)", func);
       return;
    }
 
    if (!usage_is_valid(ctx, usage)) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glBufferData(usage)");
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(usage)", func);
       return;
    }
-
-   bufObj = get_buffer(ctx, "glBufferDataARB", target);
-   if (!bufObj)
-      return;
 
    if (_mesa_bufferobj_mapped(bufObj)) {
       /* Unmap the existing buffer.  We'll replace it now.  Not an error. */
@@ -1059,8 +1052,8 @@ _mesa_BufferData(GLenum target, GLsizeiptrARB size,
    bufObj->Written = GL_TRUE;
 
 #ifdef VBO_DEBUG
-   printf("glBufferDataARB(%u, sz %ld, from %p, usage 0x%x)\n",
-                bufObj->Name, size, data, usage);
+   printf("%s(%u, sz %ld, from %p, usage 0x%x)\n",
+          func, bufObj->Name, size, data, usage);
 #endif
 
 #ifdef BOUNDS_CHECK
@@ -1069,8 +1062,22 @@ _mesa_BufferData(GLenum target, GLsizeiptrARB size,
 
    ASSERT(ctx->Driver.BufferData);
    if (!ctx->Driver.BufferData( ctx, target, size, data, usage, bufObj )) {
-      _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBufferDataARB()");
+      _mesa_error(ctx, GL_OUT_OF_MEMORY, "%s()", func);
    }
+}
+
+void GLAPIENTRY
+_mesa_BufferData(GLenum target, GLsizeiptrARB size,
+                 const GLvoid *data, GLenum usage)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = get_buffer(ctx, "glBufferData", target);
+   if (!bufObj)
+      return;
+
+   buffer_data(ctx, bufObj, size, data, usage, "glBufferData", target);
 }
 
 
