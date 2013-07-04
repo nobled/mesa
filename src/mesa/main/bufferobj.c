@@ -1484,34 +1484,30 @@ _mesa_CopyBufferSubData(GLenum readTarget, GLenum writeTarget,
 }
 
 
-/**
- * See GL_ARB_map_buffer_range spec
- */
-void * GLAPIENTRY
-_mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
-                     GLbitfield access)
-{
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_buffer_object *bufObj;
-   void *map;
 
+static void *
+map_buffer_range(struct gl_context *ctx, struct gl_buffer_object *bufObj,
+                 GLintptr offset, GLsizeiptr length, GLbitfield access,
+                 const char *func)
+{
+   void *map;
    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, NULL);
 
    if (!ctx->Extensions.ARB_map_buffer_range) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glMapBufferRange(extension not supported)");
+                  "%s(extension not supported)", func);
       return NULL;
    }
 
    if (offset < 0) {
       _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glMapBufferRange(offset = %ld)", (long)offset);
+                  "%s(offset = %ld)", func, (long)offset);
       return NULL;
    }
 
    if (length < 0) {
       _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glMapBufferRange(length = %ld)", (long)length);
+                  "%s(length = %ld)", func, (long)length);
       return NULL;
    }
 
@@ -1524,7 +1520,7 @@ _mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
     */
    if (_mesa_is_gles(ctx) && length == 0) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glMapBufferRange(length = 0)");
+                  "%s(length = 0)", func);
       return NULL;
    }
 
@@ -1535,13 +1531,13 @@ _mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
                   GL_MAP_FLUSH_EXPLICIT_BIT |
                   GL_MAP_UNSYNCHRONIZED_BIT)) {
       /* generate an error if any undefind bit is set */
-      _mesa_error(ctx, GL_INVALID_VALUE, "glMapBufferRange(access)");
+      _mesa_error(ctx, GL_INVALID_VALUE, "%s(access)", func);
       return NULL;
    }
 
    if ((access & (GL_MAP_READ_BIT | GL_MAP_WRITE_BIT)) == 0) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glMapBufferRange(access indicates neither read or write)");
+                  "%s(access indicates neither read or write)", func);
       return NULL;
    }
 
@@ -1550,36 +1546,32 @@ _mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
                   GL_MAP_INVALIDATE_BUFFER_BIT |
                   GL_MAP_UNSYNCHRONIZED_BIT))) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glMapBufferRange(invalid access flags)");
+                  "%s(invalid access flags)", func);
       return NULL;
    }
 
    if ((access & GL_MAP_FLUSH_EXPLICIT_BIT) &&
        ((access & GL_MAP_WRITE_BIT) == 0)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glMapBufferRange(invalid access flags)");
+                  "%s(invalid access flags)", func);
       return NULL;
    }
 
-   bufObj = get_buffer(ctx, "glMapBufferRange", target);
-   if (!bufObj)
-      return NULL;
-
    if (offset + length > bufObj->Size) {
       _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glMapBufferRange(offset + length > size)");
+                  "%s(offset + length > size)", func);
       return NULL;
    }
 
    if (_mesa_bufferobj_mapped(bufObj)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glMapBufferRange(buffer already mapped)");
+                  "%s(buffer already mapped)", func);
       return NULL;
    }
 
    if (!bufObj->Size) {
       _mesa_error(ctx, GL_OUT_OF_MEMORY,
-                  "glMapBufferRange(buffer size = 0)");
+                  "%s(buffer size = 0)", func);
       return NULL;
    }
 
@@ -1596,7 +1588,7 @@ _mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
    ASSERT(ctx->Driver.MapBufferRange);
    map = ctx->Driver.MapBufferRange(ctx, offset, length, access, bufObj);
    if (!map) {
-      _mesa_error(ctx, GL_OUT_OF_MEMORY, "glMapBufferARB(map failed)");
+      _mesa_error(ctx, GL_OUT_OF_MEMORY, "%s(map failed)", func);
    }
    else {
       /* The driver callback should have set all these fields.
@@ -1612,6 +1604,23 @@ _mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
    return map;
 }
 
+/**
+ * See GL_ARB_map_buffer_range spec
+ */
+void * GLAPIENTRY
+_mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
+                     GLbitfield access)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = get_buffer(ctx, "glMapBufferRange", target);
+   if (!bufObj)
+      return NULL;
+
+   return map_buffer_range(ctx, bufObj, offset, length, access,
+                           "glMapBufferRange");
+}
 
 
 static void
