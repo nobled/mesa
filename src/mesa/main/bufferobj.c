@@ -1079,6 +1079,33 @@ _mesa_BufferData(GLenum target, GLsizeiptrARB size,
 }
 
 
+static struct gl_buffer_object *
+dsa_lookup_buffer(struct gl_context *ctx, const char *func, GLuint buffer)
+{
+   struct gl_buffer_object *bufObj = _mesa_lookup_bufferobj(ctx, buffer);
+
+   if (buffer == 0)
+      _mesa_error(ctx, GL_INVALID_OPERATION, "%s(buffer=0)", func);
+   else if (!handle_bind_buffer_gen(ctx, func, buffer, &bufObj))
+      return NULL;
+
+   return bufObj;
+}
+
+void GLAPIENTRY
+_mesa_NamedBufferDataEXT(GLuint buffer, GLsizeiptrARB size,
+                         const GLvoid *data, GLenum usage)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glNamedBufferDataEXT", buffer);
+   if (!bufObj)
+      return;
+
+   buffer_data(ctx, bufObj, size, data, usage, "glNamedBufferDataEXT", 0);
+}
+
 
 static void
 buffer_subdata(struct gl_context *ctx, struct gl_buffer_object *bufObj,
