@@ -155,6 +155,9 @@ _mesa_InvalidateBufferData(GLuint buffer);
 void GLAPIENTRY
 _mesa_NamedBufferDataEXT(GLuint buffer, GLsizeiptrARB size,
                          const GLvoid *data, GLenum usage);
+void GLAPIENTRY
+_mesa_NamedBufferSubDataEXT(GLuint buffer, GLintptrARB offset,
+                            GLsizeiptrARB size, const GLvoid * data);
 
 
 #endif
