@@ -1620,38 +1620,38 @@ flush_mapped_buffer(struct gl_context *ctx, struct gl_buffer_object *bufObj,
 {
    if (!ctx->Extensions.ARB_map_buffer_range) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glFlushMappedBufferRange(extension not supported)");
+                  "%s(extension not supported)", func);
       return;
    }
 
    if (offset < 0) {
       _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glFlushMappedBufferRange(offset = %ld)", (long)offset);
+                  "%s(offset = %ld)", func, (long)offset);
       return;
    }
 
    if (length < 0) {
       _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glFlushMappedBufferRange(length = %ld)", (long)length);
+                  "%s(length = %ld)", func, (long)length);
       return;
    }
 
    if (!_mesa_bufferobj_mapped(bufObj)) {
       /* buffer is not mapped */
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glFlushMappedBufferRange(buffer is not mapped)");
+                  "%s(buffer is not mapped)", func);
       return;
    }
 
    if ((bufObj->AccessFlags & GL_MAP_FLUSH_EXPLICIT_BIT) == 0) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glFlushMappedBufferRange(GL_MAP_FLUSH_EXPLICIT_BIT not set)");
+                  "%s(GL_MAP_FLUSH_EXPLICIT_BIT not set)", func);
       return;
    }
 
    if (offset + length > bufObj->Length) {
       _mesa_error(ctx, GL_INVALID_VALUE,
-		  "glFlushMappedBufferRange(offset %ld + length %ld > mapped length %ld)",
+		  "%s(offset %ld + length %ld > mapped length %ld)", func,
 		  (long)offset, (long)length, (long)bufObj->Length);
       return;
    }
