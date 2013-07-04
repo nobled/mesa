@@ -2302,21 +2302,14 @@ reuse_framebuffer_texture_attachment(struct gl_framebuffer *fb,
  * get textarget=0 in that case.
  */
 static void
-framebuffer_texture(struct gl_context *ctx, const char *caller, GLenum target, 
+framebuffer_texture(struct gl_context *ctx, const char *caller,
+                    struct gl_framebuffer *fb,
                     GLenum attachment, GLenum textarget, GLuint texture,
                     GLint level, GLint zoffset, GLboolean layered)
 {
    struct gl_renderbuffer_attachment *att;
    struct gl_texture_object *texObj = NULL;
-   struct gl_framebuffer *fb;
    GLenum maxLevelsTarget;
-
-   fb = get_framebuffer_target(ctx, target);
-   if (!fb) {
-      _mesa_error(ctx, GL_INVALID_ENUM,
-                  "glFramebufferTexture%sEXT(target=0x%x)", caller, target);
-      return;
-   }
 
    /* check framebuffer binding */
    if (_mesa_is_winsys_fbo(fb)) {
@@ -2473,6 +2466,14 @@ _mesa_FramebufferTexture1D(GLenum target, GLenum attachment,
                               GLenum textarget, GLuint texture, GLint level)
 {
    GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = get_framebuffer_target(ctx, target);
+   if (!fb) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glFramebufferTexture1D(target=%s)",
+                                        _mesa_lookup_enum_by_nr(target));
+      return;
+   }
 
    if (texture != 0) {
       GLboolean error;
@@ -2496,7 +2497,7 @@ _mesa_FramebufferTexture1D(GLenum target, GLenum attachment,
       }
    }
 
-   framebuffer_texture(ctx, "1D", target, attachment, textarget, texture,
+   framebuffer_texture(ctx, "1D", fb, attachment, textarget, texture,
                        level, 0, GL_FALSE);
 }
 
@@ -2506,6 +2507,14 @@ _mesa_FramebufferTexture2D(GLenum target, GLenum attachment,
                               GLenum textarget, GLuint texture, GLint level)
 {
    GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = get_framebuffer_target(ctx, target);
+   if (!fb) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glFramebufferTexture2D(target=%s)",
+                                        _mesa_lookup_enum_by_nr(target));
+      return;
+   }
 
    if (texture != 0) {
       GLboolean error;
@@ -2547,7 +2556,7 @@ _mesa_FramebufferTexture2D(GLenum target, GLenum attachment,
       }
    }
 
-   framebuffer_texture(ctx, "2D", target, attachment, textarget, texture,
+   framebuffer_texture(ctx, "2D", fb, attachment, textarget, texture,
                        level, 0, GL_FALSE);
 }
 
@@ -2558,6 +2567,14 @@ _mesa_FramebufferTexture3D(GLenum target, GLenum attachment,
                               GLint level, GLint zoffset)
 {
    GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = get_framebuffer_target(ctx, target);
+   if (!fb) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glFramebufferTexture3D(target=%s)",
+                                        _mesa_lookup_enum_by_nr(target));
+      return;
+   }
 
    if ((texture != 0) && (textarget != GL_TEXTURE_3D)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -2565,7 +2582,7 @@ _mesa_FramebufferTexture3D(GLenum target, GLenum attachment,
       return;
    }
 
-   framebuffer_texture(ctx, "3D", target, attachment, textarget, texture,
+   framebuffer_texture(ctx, "3D", fb, attachment, textarget, texture,
                        level, zoffset, GL_FALSE);
 }
 
@@ -2575,8 +2592,16 @@ _mesa_FramebufferTextureLayer(GLenum target, GLenum attachment,
                                  GLuint texture, GLint level, GLint layer)
 {
    GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
 
-   framebuffer_texture(ctx, "Layer", target, attachment, 0, texture,
+   fb = get_framebuffer_target(ctx, target);
+   if (!fb) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glFramebufferTextureLayer(target=%s)",
+                                        _mesa_lookup_enum_by_nr(target));
+      return;
+   }
+
+   framebuffer_texture(ctx, "Layer", fb, attachment, 0, texture,
                        level, layer, GL_FALSE);
 }
 
@@ -2586,14 +2611,23 @@ _mesa_FramebufferTexture(GLenum target, GLenum attachment,
                          GLuint texture, GLint level)
 {
    GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
 
-   if (_mesa_has_geometry_shaders(ctx)) {
-      framebuffer_texture(ctx, "Layer", target, attachment, 0, texture,
-                          level, 0, GL_TRUE);
-   } else {
+   if (!_mesa_has_geometry_shaders(ctx)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
                   "unsupported function (glFramebufferTexture) called");
+      return;
    }
+
+   fb = get_framebuffer_target(ctx, target);
+   if (!fb) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glFramebufferTexture(target=%s)",
+                                        _mesa_lookup_enum_by_nr(target));
+      return;
+   }
+
+   framebuffer_texture(ctx, "glFramebufferTexture", fb, attachment,
+                       0, texture, level, 0, GL_TRUE);
 }
 
 
