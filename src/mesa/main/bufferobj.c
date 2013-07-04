@@ -1414,6 +1414,73 @@ _mesa_GetBufferPointerv(GLenum target, GLenum pname, GLvoid **params)
 }
 
 
+static void
+copy_buffer(struct gl_context *ctx, const char *func,
+            struct gl_buffer_object *src, struct gl_buffer_object *dst,
+            GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size)
+{
+   if (_mesa_bufferobj_mapped(src)) {
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "%s(readBuffer is mapped)", func);
+      return;
+   }
+
+   if (_mesa_bufferobj_mapped(dst)) {
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "%s(writeBuffer is mapped)", func);
+      return;
+   }
+
+   if (readOffset < 0) {
+      _mesa_error(ctx, GL_INVALID_VALUE,
+                  "%s(readOffset = %d)", func, (int) readOffset);
+      return;
+   }
+
+   if (writeOffset < 0) {
+      _mesa_error(ctx, GL_INVALID_VALUE,
+                  "%s(writeOffset = %d)", func, (int) writeOffset);
+      return;
+   }
+
+   if (size < 0) {
+      _mesa_error(ctx, GL_INVALID_VALUE,
+                  "%s(writeOffset = %d)", func, (int) size);
+      return;
+   }
+
+   if (readOffset + size > src->Size) {
+      _mesa_error(ctx, GL_INVALID_VALUE,
+                  "%s(readOffset + size = %d)", func,
+                  (int) (readOffset + size));
+      return;
+   }
+
+   if (writeOffset + size > dst->Size) {
+      _mesa_error(ctx, GL_INVALID_VALUE,
+                  "%s(writeOffset + size = %d)", func,
+                  (int) (writeOffset + size));
+      return;
+   }
+
+   if (src == dst) {
+      if (readOffset + size <= writeOffset) {
+         /* OK */
+      }
+      else if (writeOffset + size <= readOffset) {
+         /* OK */
+      }
+      else {
+         /* overlapping src/dst is illegal */
+         _mesa_error(ctx, GL_INVALID_VALUE,
+                     "%s(overlapping src/dst)", func);
+         return;
+      }
+   }
+
+   ctx->Driver.CopyBufferSubData(ctx, src, dst, readOffset, writeOffset, size);
+}
+
 void GLAPIENTRY
 _mesa_CopyBufferSubData(GLenum readTarget, GLenum writeTarget,
                         GLintptr readOffset, GLintptr writeOffset,
@@ -1430,68 +1497,9 @@ _mesa_CopyBufferSubData(GLenum readTarget, GLenum writeTarget,
    if (!dst)
       return;
 
-   if (_mesa_bufferobj_mapped(src)) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glCopyBufferSubData(readBuffer is mapped)");
-      return;
-   }
-
-   if (_mesa_bufferobj_mapped(dst)) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glCopyBufferSubData(writeBuffer is mapped)");
-      return;
-   }
-
-   if (readOffset < 0) {
-      _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glCopyBufferSubData(readOffset = %d)", (int) readOffset);
-      return;
-   }
-
-   if (writeOffset < 0) {
-      _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glCopyBufferSubData(writeOffset = %d)", (int) writeOffset);
-      return;
-   }
-
-   if (size < 0) {
-      _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glCopyBufferSubData(writeOffset = %d)", (int) size);
-      return;
-   }
-
-   if (readOffset + size > src->Size) {
-      _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glCopyBufferSubData(readOffset + size = %d)",
-                  (int) (readOffset + size));
-      return;
-   }
-
-   if (writeOffset + size > dst->Size) {
-      _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glCopyBufferSubData(writeOffset + size = %d)",
-                  (int) (writeOffset + size));
-      return;
-   }
-
-   if (src == dst) {
-      if (readOffset + size <= writeOffset) {
-         /* OK */
-      }
-      else if (writeOffset + size <= readOffset) {
-         /* OK */
-      }
-      else {
-         /* overlapping src/dst is illegal */
-         _mesa_error(ctx, GL_INVALID_VALUE,
-                     "glCopyBufferSubData(overlapping src/dst)");
-         return;
-      }
-   }
-
-   ctx->Driver.CopyBufferSubData(ctx, src, dst, readOffset, writeOffset, size);
+   copy_buffer(ctx, "glCopyBufferSubData", src, dst,
+               readOffset, writeOffset, size);
 }
-
 
 
 static void *
