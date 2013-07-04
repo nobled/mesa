@@ -645,7 +645,6 @@ _mesa_free_buffer_objects( struct gl_context *ctx )
 
 static bool
 handle_bind_buffer_gen(struct gl_context *ctx,
-		       GLenum target,
 		       GLuint buffer,
 		       struct gl_buffer_object **buf_handle)
 {
@@ -707,7 +706,7 @@ bind_buffer_object(struct gl_context *ctx, GLenum target, GLuint buffer)
    else {
       /* non-default buffer object */
       newBufObj = _mesa_lookup_bufferobj(ctx, buffer);
-      if (!handle_bind_buffer_gen(ctx, target, buffer, &newBufObj))
+      if (!handle_bind_buffer_gen(ctx, buffer, &newBufObj))
          return;
    }
    
@@ -2188,7 +2187,7 @@ _mesa_BindBufferRange(GLenum target, GLuint index,
    } else {
       bufObj = _mesa_lookup_bufferobj(ctx, buffer);
    }
-   if (!handle_bind_buffer_gen(ctx, target, buffer, &bufObj))
+   if (!handle_bind_buffer_gen(ctx, buffer, &bufObj))
       return;
 
    if (!bufObj) {
@@ -2230,7 +2229,7 @@ _mesa_BindBufferBase(GLenum target, GLuint index, GLuint buffer)
    } else {
       bufObj = _mesa_lookup_bufferobj(ctx, buffer);
    }
-   if (!handle_bind_buffer_gen(ctx, target, buffer, &bufObj))
+   if (!handle_bind_buffer_gen(ctx, buffer, &bufObj))
       return;
 
    if (!bufObj) {
