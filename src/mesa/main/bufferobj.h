@@ -72,7 +72,7 @@ _mesa_lookup_bufferobj(struct gl_context *ctx, GLuint buffer);
 extern void
 _mesa_initialize_buffer_object( struct gl_context *ctx,
 				struct gl_buffer_object *obj,
-				GLuint name, GLenum target );
+				GLuint name );
 
 extern void
 _mesa_reference_buffer_object_(struct gl_context *ctx,
