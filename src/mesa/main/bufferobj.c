@@ -230,14 +230,14 @@ buffer_object_subdata_range_good( struct gl_context * ctx,
  * Default callback for the \c dd_function_table::NewBufferObject() hook.
  */
 static struct gl_buffer_object *
-_mesa_new_buffer_object( struct gl_context *ctx, GLuint name, GLenum target )
+_mesa_new_buffer_object( struct gl_context *ctx, GLuint name )
 {
    struct gl_buffer_object *obj;
 
    (void) ctx;
 
    obj = MALLOC_STRUCT(gl_buffer_object);
-   _mesa_initialize_buffer_object(ctx, obj, name, target);
+   _mesa_initialize_buffer_object(ctx, obj, name);
    return obj;
 }
 
@@ -337,10 +337,8 @@ _mesa_reference_buffer_object_(struct gl_context *ctx,
 void
 _mesa_initialize_buffer_object( struct gl_context *ctx,
 				struct gl_buffer_object *obj,
-				GLuint name, GLenum target )
+				GLuint name )
 {
-   (void) target;
-
    memset(obj, 0, sizeof(struct gl_buffer_object));
    _glthread_INIT_MUTEX(obj->Mutex);
    obj->RefCount = 1;
@@ -663,7 +661,7 @@ handle_bind_buffer_gen(struct gl_context *ctx,
        * never used before, allocate a buffer object now.
        */
       ASSERT(ctx->Driver.NewBufferObject);
-      buf = ctx->Driver.NewBufferObject(ctx, buffer, target);
+      buf = ctx->Driver.NewBufferObject(ctx, buffer);
       if (!buf) {
 	 _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindBufferARB");
 	 return false;

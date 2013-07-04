@@ -552,8 +552,7 @@ struct dd_function_table {
    void (*BindBuffer)( struct gl_context *ctx, GLenum target,
 		       struct gl_buffer_object *obj );
 
-   struct gl_buffer_object * (*NewBufferObject)( struct gl_context *ctx, GLuint buffer,
-						 GLenum target );
+   struct gl_buffer_object * (*NewBufferObject)( struct gl_context *ctx, GLuint buffer );
    
    void (*DeleteBuffer)( struct gl_context *ctx, struct gl_buffer_object *obj );
 
