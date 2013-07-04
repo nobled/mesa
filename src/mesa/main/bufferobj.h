@@ -158,6 +158,27 @@ _mesa_NamedBufferDataEXT(GLuint buffer, GLsizeiptrARB size,
 void GLAPIENTRY
 _mesa_NamedBufferSubDataEXT(GLuint buffer, GLintptrARB offset,
                             GLsizeiptrARB size, const GLvoid * data);
+void GLAPIENTRY
+_mesa_GetNamedBufferSubDataEXT(GLuint buffer, GLintptrARB offset,
+                               GLsizeiptrARB size, void * data);
+void * GLAPIENTRY
+_mesa_MapNamedBufferEXT(GLuint buffer, GLenum access);
+GLboolean GLAPIENTRY
+_mesa_UnmapNamedBufferEXT(GLuint buffer);
+void GLAPIENTRY
+_mesa_GetNamedBufferParameterivEXT(GLuint buffer, GLenum pname, GLint *params);
+void GLAPIENTRY
+_mesa_GetNamedBufferPointervEXT(GLuint buffer, GLenum pname, GLvoid **params);
+void GLAPIENTRY
+_mesa_NamedCopyBufferSubDataEXT(GLuint readBuffer, GLuint writeBuffer,
+                                GLintptr readOffset, GLintptr writeOffset,
+                                GLsizeiptr size);
+void * GLAPIENTRY
+_mesa_MapNamedBufferRangeEXT(GLuint buffer, GLintptr offset, GLsizeiptr length,
+                             GLbitfield access);
+void GLAPIENTRY
+_mesa_FlushMappedNamedBufferRangeEXT(GLuint buffer, GLintptr offset,
+                                     GLsizeiptr length);
 
 
 #endif

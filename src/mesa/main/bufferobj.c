@@ -1189,6 +1189,22 @@ _mesa_GetBufferSubData(GLenum target, GLintptrARB offset,
 }
 
 
+void GLAPIENTRY
+_mesa_GetNamedBufferSubDataEXT(GLuint buffer, GLintptrARB offset,
+                               GLsizeiptrARB size, void * data)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glGetNamedBufferSubDataEXT", buffer);
+   if (!bufObj)
+      return;
+
+   get_buffer_subdata(ctx, bufObj, offset, size, data,
+                      "glGetNamedBufferSubDataEXT");
+}
+
+
 static GLbitfield
 get_access_flags(struct gl_context *ctx, GLenum access, const char *func)
 {
@@ -1300,6 +1316,20 @@ _mesa_MapBuffer(GLenum target, GLenum access)
 }
 
 
+void * GLAPIENTRY
+_mesa_MapNamedBufferEXT(GLuint buffer, GLenum access)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object * bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glMapNamedBufferEXT", buffer);
+   if (!bufObj)
+      return NULL;
+
+   return map_buffer(ctx, bufObj, access, "glMapNamedBufferEXT");
+}
+
+
 static GLboolean
 unmap_buffer(struct gl_context *ctx, struct gl_buffer_object *bufObj,
              const char *func)
@@ -1371,6 +1401,20 @@ _mesa_UnmapBuffer(GLenum target)
 }
 
 
+GLboolean GLAPIENTRY
+_mesa_UnmapNamedBufferEXT(GLuint buffer)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glUnmapNamedBufferEXT", buffer);
+   if (!bufObj)
+      return GL_FALSE;
+
+   return unmap_buffer(ctx, bufObj, "glUnmapNamedBufferEXT");
+}
+
+
 void GLAPIENTRY
 _mesa_GetBufferParameteriv(GLenum target, GLenum pname, GLint *params)
 {
@@ -1424,6 +1468,25 @@ invalid_pname:
                _mesa_lookup_enum_by_nr(pname));
 }
 
+
+void GLAPIENTRY
+_mesa_GetNamedBufferParameterivEXT(GLuint buffer, GLenum pname, GLint *params)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+   GLint64 p = -1; /* an invalid value for every piece of queryable state */
+
+   bufObj = dsa_lookup_buffer(ctx, "glGetNamedBufferParameterivEXT", buffer);
+   if (!bufObj)
+      return;
+
+   get_buffer_param(ctx, bufObj, pname, &p, "glGetNamedBufferParameterivEXT");
+
+   if (p != -1)
+      *params = (GLint)p;
+}
+
+
 /**
  * New in GL 3.2
  * This is pretty much a duplicate of GetBufferParameteriv() but the
@@ -1466,6 +1529,21 @@ _mesa_GetBufferPointerv(GLenum target, GLenum pname, GLvoid **params)
       return;
 
    get_buffer_pointer(ctx, bufObj, pname, params, "glGetBufferPointerv");
+}
+
+
+void GLAPIENTRY
+_mesa_GetNamedBufferPointervEXT(GLuint buffer, GLenum pname, GLvoid **params)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object * bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glGetNamedBufferPointervEXT", buffer);
+   if (!bufObj)
+      return;
+
+   get_buffer_pointer(ctx, bufObj, pname, params,
+                      "glGetNamedBufferPointervEXT");
 }
 
 
@@ -1553,6 +1631,27 @@ _mesa_CopyBufferSubData(GLenum readTarget, GLenum writeTarget,
       return;
 
    copy_buffer(ctx, "glCopyBufferSubData", src, dst,
+               readOffset, writeOffset, size);
+}
+
+
+void GLAPIENTRY
+_mesa_NamedCopyBufferSubDataEXT(GLuint readBuffer, GLuint writeBuffer,
+                                GLintptr readOffset, GLintptr writeOffset,
+                                GLsizeiptr size)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *src, *dst;
+
+   src = dsa_lookup_buffer(ctx, "glNamedCopyBufferSubDataEXT", readBuffer);
+   if (!src)
+      return;
+
+   dst = dsa_lookup_buffer(ctx, "glNamedCopyBufferSubDataEXT", writeBuffer);
+   if (!dst)
+      return;
+
+   copy_buffer(ctx, "glNamedCopyBufferSubDataEXT", src, dst,
                readOffset, writeOffset, size);
 }
 
@@ -1695,6 +1794,22 @@ _mesa_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length,
 }
 
 
+void * GLAPIENTRY
+_mesa_MapNamedBufferRangeEXT(GLuint buffer, GLintptr offset, GLsizeiptr length,
+                             GLbitfield access)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glMapNamedBufferRangeEXT", buffer);
+   if (!bufObj)
+      return NULL;
+
+   return map_buffer_range(ctx, bufObj, offset, length, access,
+                           "glMapNamedBufferRangeEXT");
+}
+
+
 static void
 flush_mapped_buffer(struct gl_context *ctx, struct gl_buffer_object *bufObj,
                     GLintptr offset, GLsizeiptr length, const char *func)
@@ -1757,6 +1872,22 @@ _mesa_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
       return;
 
    flush_mapped_buffer(ctx, bufObj, offset, length, "glFlushMappedBufferRange");
+}
+
+
+void GLAPIENTRY
+_mesa_FlushMappedNamedBufferRangeEXT(GLuint buffer, GLintptr offset,
+                                     GLsizeiptr length)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_buffer_object *bufObj;
+
+   bufObj = dsa_lookup_buffer(ctx, "glFlushMappedNamedBufferRangeEXT", buffer);
+   if (!bufObj)
+      return;
+
+   flush_mapped_buffer(ctx, bufObj, offset, length,
+                       "glFlushMappedNamedBufferRangeEXT");
 }
 
 
