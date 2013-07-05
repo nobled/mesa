@@ -2005,6 +2005,33 @@ check_end_texture_render(struct gl_context *ctx, struct gl_framebuffer *fb)
    }
 }
 
+static struct gl_framebuffer *
+get_and_init_fbo(struct gl_context *ctx, GLuint framebuffer, const char *func,
+                 bool allow_user_names)
+{
+   struct gl_framebuffer *fb = _mesa_lookup_framebuffer(ctx, framebuffer);
+   if (fb == &DummyFramebuffer) {
+      /* ID was reserved, but no real framebuffer object made yet */
+      fb = NULL;
+   }
+   else if (!fb && !allow_user_names) {
+      /* All FBO IDs must be Gen'd */
+      _mesa_error(ctx, GL_INVALID_OPERATION, "%s(non-gen buffer)", func);
+      return NULL;
+   }
+
+   if (!fb) {
+	 /* create new framebuffer object */
+	 fb = ctx->Driver.NewFramebuffer(ctx, framebuffer);
+	 if (!fb) {
+	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindFramebufferEXT");
+	    return NULL;
+	 }
+         _mesa_HashInsert(ctx->Shared->FrameBuffers, framebuffer, fb);
+   }
+
+   return fb;
+}
 
 static void
 bind_framebuffer(GLenum target, GLuint framebuffer, bool allow_user_names)
@@ -2048,26 +2075,10 @@ bind_framebuffer(GLenum target, GLuint framebuffer, bool allow_user_names)
 
    if (framebuffer) {
       /* Binding a user-created framebuffer object */
-      newDrawFb = _mesa_lookup_framebuffer(ctx, framebuffer);
-      if (newDrawFb == &DummyFramebuffer) {
-         /* ID was reserved, but no real framebuffer object made yet */
-         newDrawFb = NULL;
-      }
-      else if (!newDrawFb && !allow_user_names) {
-         /* All FBO IDs must be Gen'd */
-         _mesa_error(ctx, GL_INVALID_OPERATION, "glBindFramebuffer(buffer)");
-         return;
-      }
-
-      if (!newDrawFb) {
-	 /* create new framebuffer object */
-	 newDrawFb = ctx->Driver.NewFramebuffer(ctx, framebuffer);
-	 if (!newDrawFb) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindFramebufferEXT");
-	    return;
-	 }
-         _mesa_HashInsert(ctx->Shared->FrameBuffers, framebuffer, newDrawFb);
-      }
+      newDrawFb = get_and_init_fbo(ctx, framebuffer, "glBindFramebuffer",
+                                   allow_user_names);
+      if (!newDrawFb)
+         return; /* error */
       newReadFb = newDrawFb;
    }
    else {
