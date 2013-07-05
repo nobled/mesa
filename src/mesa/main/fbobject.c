@@ -2244,6 +2244,27 @@ _mesa_GenFramebuffers(GLsizei n, GLuint *framebuffers)
 
 
 
+static GLenum
+check_fbo_status(struct gl_context *ctx, struct gl_framebuffer *fb)
+{
+   if (_mesa_is_winsys_fbo(fb)) {
+      /* EGL_KHR_surfaceless_context allows the winsys FBO to be incomplete. */
+      if (fb != &IncompleteFramebuffer) {
+         return GL_FRAMEBUFFER_COMPLETE_EXT;
+      } else {
+         return GL_FRAMEBUFFER_UNDEFINED;
+      }
+   }
+
+   /* No need to flush here */
+
+   if (fb->_Status != GL_FRAMEBUFFER_COMPLETE) {
+      _mesa_test_framebuffer_completeness(ctx, fb);
+   }
+
+   return fb->_Status;
+}
+
 GLenum GLAPIENTRY
 _mesa_CheckFramebufferStatus(GLenum target)
 {
@@ -2262,22 +2283,7 @@ _mesa_CheckFramebufferStatus(GLenum target)
       return 0;
    }
 
-   if (_mesa_is_winsys_fbo(buffer)) {
-      /* EGL_KHR_surfaceless_context allows the winsys FBO to be incomplete. */
-      if (buffer != &IncompleteFramebuffer) {
-         return GL_FRAMEBUFFER_COMPLETE_EXT;
-      } else {
-         return GL_FRAMEBUFFER_UNDEFINED;
-      }
-   }
-
-   /* No need to flush here */
-
-   if (buffer->_Status != GL_FRAMEBUFFER_COMPLETE) {
-      _mesa_test_framebuffer_completeness(ctx, buffer);
-   }
-
-   return buffer->_Status;
+   return check_fbo_status(ctx, buffer);
 }
 
 
