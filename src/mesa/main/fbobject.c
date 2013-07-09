@@ -2535,6 +2535,28 @@ _mesa_FramebufferTexture1D(GLenum target, GLenum attachment,
                        textarget, texture, level, 0, GL_FALSE);
 }
 
+
+void GLAPIENTRY
+_mesa_NamedFramebufferTexture1DEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum textarget, GLuint texture, GLint level)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = get_and_init_fbo(ctx, framebuffer, "glNamedFramebufferTexture1DEXT", false);
+   if (!fb)
+      return;
+
+   if (texture != 0) {
+      if (!valid_1d_target(ctx, textarget, "glNamedFramebufferTexture1DEXT"))
+         return;
+   }
+
+   framebuffer_texture(ctx, "glNamedFramebufferTexture1DEXT", fb, attachment,
+                       textarget, texture, level, 0, GL_FALSE);
+}
+
+
 static GLboolean
 valid_2d_target(struct gl_context *ctx, GLenum textarget, const char *caller)
 {
@@ -2597,6 +2619,27 @@ _mesa_FramebufferTexture2D(GLenum target, GLenum attachment,
    }
 
    framebuffer_texture(ctx, "glFramebufferTexture2D", fb, attachment,
+                       textarget, texture, level, 0, GL_FALSE);
+}
+
+
+void GLAPIENTRY
+_mesa_NamedFramebufferTexture2DEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum textarget, GLuint texture, GLint level)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = get_and_init_fbo(ctx, framebuffer, "glNamedFramebufferTexture2DEXT", false);
+   if (!fb)
+      return;
+
+   if (texture != 0) {
+      if (!valid_2d_target(ctx, textarget, "glNamedFramebufferTexture2DEXT"))
+         return;
+   }
+
+   framebuffer_texture(ctx, "glNamedFramebufferTexture2DEXT", fb, attachment,
                        textarget, texture, level, 0, GL_FALSE);
 }
 

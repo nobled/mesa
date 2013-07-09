@@ -228,6 +228,12 @@ _mesa_DiscardFramebufferEXT(GLenum target, GLsizei numAttachments,
 
 
 void GLAPIENTRY
+_mesa_NamedFramebufferTexture1DEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum textarget, GLuint texture, GLint level);
+void GLAPIENTRY
+_mesa_NamedFramebufferTexture2DEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum textarget, GLuint texture, GLint level);
+void GLAPIENTRY
 _mesa_NamedFramebufferTexture3DEXT(GLuint framebuffer, GLenum attachment,
                               GLenum textarget, GLuint texture,
                               GLint level, GLint zoffset);
