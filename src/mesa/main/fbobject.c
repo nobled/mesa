@@ -2321,32 +2321,31 @@ get_texobj(struct gl_context *ctx, const char *caller,
    GLboolean err = GL_TRUE;
 
    texObj = _mesa_lookup_texture(ctx, texture);
-   if (texObj != NULL) {
-      if (textarget == 0) {
-         /* If textarget == 0 it means we're being called by
-          * glFramebufferTextureLayer() and textarget is not used.
-          * The only legal texture types for that function are 3D and
-          * 1D/2D arrays textures.
-          */
-         err = (texObj->Target != GL_TEXTURE_3D) &&
-             (texObj->Target != GL_TEXTURE_1D_ARRAY_EXT) &&
-             (texObj->Target != GL_TEXTURE_2D_ARRAY_EXT) &&
-             (texObj->Target != GL_TEXTURE_CUBE_MAP_ARRAY) &&
-             (texObj->Target != GL_TEXTURE_2D_MULTISAMPLE_ARRAY);
-      }
-      else {
-         /* Make sure textarget is consistent with the texture's type */
-         err = (texObj->Target == GL_TEXTURE_CUBE_MAP)
-             ? !_mesa_is_cube_face(textarget)
-             : (texObj->Target != textarget);
-      }
-   }
-   else {
+   if (texObj == NULL) {
       /* can't render to a non-existant texture */
       _mesa_error(ctx, GL_INVALID_OPERATION,
                   "%s(non existant texture)",
                   caller);
       return NULL;
+   }
+
+   if (textarget == 0) {
+      /* If textarget == 0 it means we're being called by
+       * glFramebufferTextureLayer() and textarget is not used.
+       * The only legal texture types for that function are 3D and
+       * 1D/2D arrays textures.
+       */
+      err = (texObj->Target != GL_TEXTURE_3D) &&
+          (texObj->Target != GL_TEXTURE_1D_ARRAY_EXT) &&
+          (texObj->Target != GL_TEXTURE_2D_ARRAY_EXT) &&
+          (texObj->Target != GL_TEXTURE_CUBE_MAP_ARRAY) &&
+          (texObj->Target != GL_TEXTURE_2D_MULTISAMPLE_ARRAY);
+   }
+   else {
+      /* Make sure textarget is consistent with the texture's type */
+      err = (texObj->Target == GL_TEXTURE_CUBE_MAP)
+          ? !_mesa_is_cube_face(textarget)
+          : (texObj->Target != textarget);
    }
 
    if (err) {
