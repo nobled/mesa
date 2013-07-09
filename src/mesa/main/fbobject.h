@@ -226,6 +226,8 @@ _mesa_DiscardFramebufferEXT(GLenum target, GLsizei numAttachments,
 
 
 
+GLenum GLAPIENTRY
+_mesa_CheckNamedFramebufferStatusEXT(GLuint framebuffer, GLenum target);
 
 void GLAPIENTRY
 _mesa_NamedFramebufferTexture1DEXT(GLuint framebuffer, GLenum attachment,
