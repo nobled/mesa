@@ -224,4 +224,19 @@ extern void GLAPIENTRY
 _mesa_DiscardFramebufferEXT(GLenum target, GLsizei numAttachments,
                             const GLenum *attachments);
 
+
+
+
+void GLAPIENTRY
+_mesa_NamedFramebufferTexture3DEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum textarget, GLuint texture,
+                              GLint level, GLint zoffset);
+void GLAPIENTRY
+_mesa_NamedFramebufferTextureLayerEXT(GLuint framebuffer, GLenum attachment,
+                                 GLuint texture, GLint level, GLint layer);
+void GLAPIENTRY
+_mesa_NamedFramebufferTextureEXT(GLuint framebuffer, GLenum attachment,
+                         GLuint texture, GLint level);
+
+
 #endif /* FBOBJECT_H */
