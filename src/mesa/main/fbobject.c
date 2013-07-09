@@ -2616,6 +2616,29 @@ _mesa_FramebufferTexture3D(GLenum target, GLenum attachment,
 
 
 void GLAPIENTRY
+_mesa_NamedFramebufferTexture3DEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum textarget, GLuint texture,
+                              GLint level, GLint zoffset)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = get_and_init_fbo(ctx, framebuffer, "glNamedFramebufferTexture3DEXT", false);
+   if (!fb)
+      return;
+
+   if ((texture != 0) && (textarget != GL_TEXTURE_3D)) {
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "glFramebufferTexture3DEXT(textarget)");
+      return;
+   }
+
+   framebuffer_texture(ctx, "glFramebufferTexture3D", fb, attachment,
+                       textarget, texture, level, zoffset, GL_FALSE);
+}
+
+
+void GLAPIENTRY
 _mesa_FramebufferTextureLayer(GLenum target, GLenum attachment,
                                  GLuint texture, GLint level, GLint layer)
 {
@@ -2630,6 +2653,22 @@ _mesa_FramebufferTextureLayer(GLenum target, GLenum attachment,
    }
 
    framebuffer_texture(ctx, "glFramebufferTextureLayer", fb, attachment,
+                       0, texture, level, layer, GL_FALSE);
+}
+
+
+void GLAPIENTRY
+_mesa_NamedFramebufferTextureLayerEXT(GLuint framebuffer, GLenum attachment,
+                                 GLuint texture, GLint level, GLint layer)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = get_and_init_fbo(ctx, framebuffer, "glNamedFramebufferTextureLayerEXT", false);
+   if (!fb)
+      return;
+
+   framebuffer_texture(ctx, "glNamedFramebufferTextureLayerEXT", fb, attachment,
                        0, texture, level, layer, GL_FALSE);
 }
 
@@ -2655,6 +2694,28 @@ _mesa_FramebufferTexture(GLenum target, GLenum attachment,
    }
 
    framebuffer_texture(ctx, "glFramebufferTexture", fb, attachment,
+                       0, texture, level, 0, GL_TRUE);
+}
+
+
+void GLAPIENTRY
+_mesa_NamedFramebufferTextureEXT(GLuint framebuffer, GLenum attachment,
+                         GLuint texture, GLint level)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   if (!(ctx->Version >= 32 || ctx->Extensions.ARB_geometry_shader4)) {
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "unsupported function (glNamedFramebufferTextureEXT) called");
+      return;
+   }
+
+   fb = get_and_init_fbo(ctx, framebuffer, "glNamedFramebufferTextureEXT", false);
+   if (!fb)
+      return;
+
+   framebuffer_texture(ctx, "glNamedFramebufferTextureEXT", fb, attachment,
                        0, texture, level, 0, GL_TRUE);
 }
 
