@@ -2287,6 +2287,34 @@ _mesa_CheckFramebufferStatus(GLenum target)
 }
 
 
+GLenum GLAPIENTRY
+_mesa_CheckNamedFramebufferStatusEXT(GLuint framebuffer, GLenum target)
+{
+   struct gl_framebuffer *fb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, 0);
+
+   fb = get_and_init_fbo(ctx, framebuffer, "glCheckNamedFramebufferStatusEXT", false);
+   if (!fb)
+      return 0;
+
+   /* for validating the enum only */
+   if (!get_framebuffer_target(ctx, target)) {
+      _mesa_error(ctx, GL_INVALID_ENUM,
+                  "glCheckNamedFramebufferStatusEXT(target=%s)",
+                  _mesa_lookup_enum_by_nr(target));
+      return 0;
+   }
+
+
+   /* 'target' is otherwise ignored, the FBO completeness check doesn't care
+       if it's serving as a read buffer or as a draw buffer, although
+       it's allowed to, according to the spec. */
+   return check_fbo_status(ctx, fb);
+}
+
+
 /**
  * Replicate the src attachment point. Used by framebuffer_texture() when
  * the same texture is attached at GL_DEPTH_ATTACHMENT and
