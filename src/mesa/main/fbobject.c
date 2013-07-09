@@ -2488,6 +2488,29 @@ framebuffer_texture(struct gl_context *ctx, const char *caller,
 }
 
 
+static GLboolean
+valid_1d_target(struct gl_context *ctx, GLenum textarget, const char *caller)
+{
+   GLboolean error;
+
+   switch (textarget) {
+   case GL_TEXTURE_1D:
+      error = GL_FALSE;
+      break;
+   case GL_TEXTURE_1D_ARRAY:
+      error = !ctx->Extensions.EXT_texture_array;
+      break;
+   default:
+      error = GL_TRUE;
+   }
+
+   if (error)
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "%s(textarget=%s)", caller,
+                  _mesa_lookup_enum_by_nr(textarget));
+
+   return !error;
+}
 
 void GLAPIENTRY
 _mesa_FramebufferTexture1D(GLenum target, GLenum attachment,
@@ -2504,25 +2527,8 @@ _mesa_FramebufferTexture1D(GLenum target, GLenum attachment,
    }
 
    if (texture != 0) {
-      GLboolean error;
-
-      switch (textarget) {
-      case GL_TEXTURE_1D:
-         error = GL_FALSE;
-         break;
-      case GL_TEXTURE_1D_ARRAY:
-         error = !ctx->Extensions.EXT_texture_array;
-         break;
-      default:
-         error = GL_TRUE;
-      }
-
-      if (error) {
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glFramebufferTexture1DEXT(textarget=%s)",
-                     _mesa_lookup_enum_by_nr(textarget));
+      if (!valid_1d_target(ctx, textarget, "glFramebufferTexture1D"))
          return;
-      }
    }
 
    framebuffer_texture(ctx, "glFramebufferTexture1D", fb, attachment,
