@@ -2529,6 +2529,47 @@ _mesa_FramebufferTexture1D(GLenum target, GLenum attachment,
                        textarget, texture, level, 0, GL_FALSE);
 }
 
+static GLboolean
+valid_2d_target(struct gl_context *ctx, GLenum textarget, const char *caller)
+{
+   GLboolean error;
+
+   switch (textarget) {
+   case GL_TEXTURE_2D:
+      error = GL_FALSE;
+      break;
+   case GL_TEXTURE_RECTANGLE:
+      error = _mesa_is_gles(ctx)
+         || !ctx->Extensions.NV_texture_rectangle;
+      break;
+   case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+   case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+   case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+   case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+   case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+   case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+      error = !ctx->Extensions.ARB_texture_cube_map;
+      break;
+   case GL_TEXTURE_2D_ARRAY:
+      error = (_mesa_is_gles(ctx) && ctx->Version < 30)
+         || !ctx->Extensions.EXT_texture_array;
+      break;
+   case GL_TEXTURE_2D_MULTISAMPLE:
+   case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+      error = _mesa_is_gles(ctx)
+         || !ctx->Extensions.ARB_texture_multisample;
+      break;
+   default:
+      error = GL_TRUE;
+   }
+
+   if (error)
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "%s(textarget=%s)", caller,
+                  _mesa_lookup_enum_by_nr(textarget));
+
+   return !error;
+}
 
 void GLAPIENTRY
 _mesa_FramebufferTexture2D(GLenum target, GLenum attachment,
@@ -2545,43 +2586,8 @@ _mesa_FramebufferTexture2D(GLenum target, GLenum attachment,
    }
 
    if (texture != 0) {
-      GLboolean error;
-
-      switch (textarget) {
-      case GL_TEXTURE_2D:
-         error = GL_FALSE;
-         break;
-      case GL_TEXTURE_RECTANGLE:
-         error = _mesa_is_gles(ctx)
-            || !ctx->Extensions.NV_texture_rectangle;
-         break;
-      case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-      case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-      case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-      case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-      case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-      case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-         error = !ctx->Extensions.ARB_texture_cube_map;
-         break;
-      case GL_TEXTURE_2D_ARRAY:
-         error = (_mesa_is_gles(ctx) && ctx->Version < 30)
-            || !ctx->Extensions.EXT_texture_array;
-         break;
-      case GL_TEXTURE_2D_MULTISAMPLE:
-      case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
-         error = _mesa_is_gles(ctx)
-            || !ctx->Extensions.ARB_texture_multisample;
-         break;
-      default:
-         error = GL_TRUE;
-      }
-
-      if (error) {
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glFramebufferTexture2DEXT(textarget=%s)",
-                     _mesa_lookup_enum_by_nr(textarget));
+      if (!valid_2d_target(ctx, textarget, "glFramebufferTexture2D"))
          return;
-      }
    }
 
    framebuffer_texture(ctx, "glFramebufferTexture2D", fb, attachment,
