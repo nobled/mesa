@@ -249,6 +249,9 @@ void GLAPIENTRY
 _mesa_NamedFramebufferRenderbufferEXT(GLuint framebuffer, GLenum attachment,
                               GLenum renderbufferTarget,
                               GLuint renderbuffer);
+void GLAPIENTRY
+_mesa_GetNamedFramebufferAttachmentParameterivEXT(GLuint framebuffer,
+                              GLenum attachment, GLenum pname, GLint *params);
 
 
 #endif /* FBOBJECT_H */
