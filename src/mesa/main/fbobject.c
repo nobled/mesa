@@ -3172,6 +3172,23 @@ _mesa_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment,
 }
 
 
+void GLAPIENTRY
+_mesa_GetNamedFramebufferAttachmentParameterivEXT(GLuint framebuffer,
+                              GLenum attachment, GLenum pname, GLint *params)
+{
+   struct gl_framebuffer *fb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   fb = get_and_init_fbo(ctx, framebuffer,
+                         "glGetNamedFramebufferAttachmentParameterivEXT", false);
+   if (!fb)
+      return;
+
+   get_fbo_attachment_param(ctx, fb, attachment, pname, params,
+                            "glGetNamedFramebufferAttachmentParameterivEXT");
+}
+
+
 static GLboolean
 valid_mipmap_texture(struct gl_context *ctx, GLenum target, const char *func)
 {
