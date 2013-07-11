@@ -2893,6 +2893,22 @@ _mesa_FramebufferRenderbuffer(GLenum target, GLenum attachment,
 }
 
 
+void GLAPIENTRY
+_mesa_NamedFramebufferRenderbufferEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum renderbufferTarget,
+                              GLuint renderbuffer)
+{
+   struct gl_framebuffer *fb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   fb = get_and_init_fbo(ctx, framebuffer, "glNamedFramebufferRenderbufferEXT", false);
+   if (!fb)
+      return;
+
+   fbo_renderbuffer(ctx, fb, attachment, renderbufferTarget, renderbuffer,
+                    "glNamedFramebufferRenderbufferEXT");
+}
+
 
 static void
 get_fbo_attachment_param(struct gl_context *ctx, struct gl_framebuffer *buffer,
