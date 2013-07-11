@@ -2903,9 +2903,6 @@ _mesa_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment,
    GLenum err;
    GET_CURRENT_CONTEXT(ctx);
 
-   /* The error differs in GL and GLES. */
-   err = _mesa_is_desktop_gl(ctx) ? GL_INVALID_OPERATION : GL_INVALID_ENUM;
-
    buffer = get_framebuffer_target(ctx, target);
    if (!buffer) {
       _mesa_error(ctx, GL_INVALID_ENUM,
@@ -2963,6 +2960,9 @@ _mesa_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment,
          return;
       }
    }
+
+   /* The error differs in GL and GLES. */
+   err = _mesa_is_desktop_gl(ctx) ? GL_INVALID_OPERATION : GL_INVALID_ENUM;
 
    /* No need to flush here */
 
