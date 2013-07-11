@@ -3156,17 +3156,10 @@ _mesa_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment,
 }
 
 
-
-void GLAPIENTRY
-_mesa_GenerateMipmap(GLenum target)
+static GLboolean
+valid_mipmap_texture(struct gl_context *ctx, GLenum target, const char *func)
 {
-   struct gl_texture_image *srcImage;
-   struct gl_texture_object *texObj;
    GLboolean error;
-
-   GET_CURRENT_CONTEXT(ctx);
-
-   FLUSH_VERTICES(ctx, 0);
 
    switch (target) {
    case GL_TEXTURE_1D:
@@ -3192,13 +3185,18 @@ _mesa_GenerateMipmap(GLenum target)
       error = GL_TRUE;
    }
 
-   if (error) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glGenerateMipmapEXT(target=%s)",
+   if (error)
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target=%s)", func,
                   _mesa_lookup_enum_by_nr(target));
-      return;
-   }
 
-   texObj = _mesa_get_current_tex_object(ctx, target);
+   return !error;
+}
+
+static void
+gen_mipmap(struct gl_context *ctx, struct gl_texture_object *texObj,
+           GLenum target, const char *func)
+{
+   struct gl_texture_image *srcImage;
 
    if (texObj->BaseLevel >= texObj->MaxLevel) {
       /* nothing to do */
@@ -3208,7 +3206,7 @@ _mesa_GenerateMipmap(GLenum target)
    if (texObj->Target == GL_TEXTURE_CUBE_MAP &&
        !_mesa_cube_complete(texObj)) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGenerateMipmap(incomplete cube map)");
+                  "%s(incomplete cube map)", func);
       return;
    }
 
@@ -3218,7 +3216,7 @@ _mesa_GenerateMipmap(GLenum target)
    if (!srcImage) {
       _mesa_unlock_texture(ctx, texObj);
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGenerateMipmap(zero size base image)");
+                  "%s(zero size base image)", func);
       return;
    }
 
@@ -3227,7 +3225,7 @@ _mesa_GenerateMipmap(GLenum target)
        _mesa_is_stencil_format(srcImage->InternalFormat)) {
       _mesa_unlock_texture(ctx, texObj);
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGenerateMipmap(invalid internal format)");
+                  "%s(invalid internal format)", func);
       return;
    }
 
@@ -3243,6 +3241,23 @@ _mesa_GenerateMipmap(GLenum target)
    }
    _mesa_unlock_texture(ctx, texObj);
 }
+
+void GLAPIENTRY
+_mesa_GenerateMipmap(GLenum target)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!valid_mipmap_texture(ctx, target, "glGenerateMipmap"))
+      return;
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+
+   gen_mipmap(ctx, texObj, target, "glGenerateMipmap");
+}
+
 
 
 static const struct gl_renderbuffer_attachment *
