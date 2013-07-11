@@ -2803,38 +2803,30 @@ _mesa_NamedFramebufferTextureEXT(GLuint framebuffer, GLenum attachment,
 }
 
 
-void GLAPIENTRY
-_mesa_FramebufferRenderbuffer(GLenum target, GLenum attachment,
-                                 GLenum renderbufferTarget,
-                                 GLuint renderbuffer)
+static void
+fbo_renderbuffer(struct gl_context *ctx, struct gl_framebuffer *fb,
+                 GLenum attachment, GLenum renderbufferTarget,
+                 GLuint renderbuffer, const char *func)
 {
    struct gl_renderbuffer_attachment *att;
-   struct gl_framebuffer *fb;
    struct gl_renderbuffer *rb;
-   GET_CURRENT_CONTEXT(ctx);
-
-   fb = get_framebuffer_target(ctx, target);
-   if (!fb) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glFramebufferRenderbufferEXT(target)");
-      return;
-   }
 
    if (renderbufferTarget != GL_RENDERBUFFER_EXT) {
       _mesa_error(ctx, GL_INVALID_ENUM,
-                  "glFramebufferRenderbufferEXT(renderbufferTarget)");
+                  "%s(renderbufferTarget)", func);
       return;
    }
 
    if (_mesa_is_winsys_fbo(fb)) {
       /* Can't attach new renderbuffers to a window system framebuffer */
-      _mesa_error(ctx, GL_INVALID_OPERATION, "glFramebufferRenderbufferEXT");
+      _mesa_error(ctx, GL_INVALID_OPERATION, "%s", func);
       return;
    }
 
    att = _mesa_get_attachment(ctx, fb, attachment);
    if (att == NULL) {
       _mesa_error(ctx, GL_INVALID_ENUM,
-                  "glFramebufferRenderbufferEXT(invalid attachment %s)",
+                  "%s(invalid attachment %s)", func,
                   _mesa_lookup_enum_by_nr(attachment));
       return;
    }
@@ -2843,14 +2835,13 @@ _mesa_FramebufferRenderbuffer(GLenum target, GLenum attachment,
       rb = _mesa_lookup_renderbuffer(ctx, renderbuffer);
       if (!rb) {
 	 _mesa_error(ctx, GL_INVALID_OPERATION,
-		     "glFramebufferRenderbufferEXT(non-existant"
-                     " renderbuffer %u)", renderbuffer);
+		     "%s(non-existent renderbuffer %u)", func, renderbuffer);
 	 return;
       }
       else if (rb == &DummyRenderbuffer) {
          /* This is what NVIDIA does */
 	 _mesa_error(ctx, GL_INVALID_VALUE,
-		     "glFramebufferRenderbufferEXT(renderbuffer %u)",
+		     "%s(renderbuffer %u)", func,
                      renderbuffer);
 	 return;
       }
@@ -2866,8 +2857,7 @@ _mesa_FramebufferRenderbuffer(GLenum target, GLenum attachment,
       const GLenum baseFormat = _mesa_get_format_base_format(rb->Format);
       if (baseFormat != GL_DEPTH_STENCIL) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glFramebufferRenderbufferEXT(renderbuffer"
-                     " is not DEPTH_STENCIL format)");
+                     "%s(renderbuffer is not DEPTH_STENCIL format)", func);
          return;
       }
    }
@@ -2883,6 +2873,25 @@ _mesa_FramebufferRenderbuffer(GLenum target, GLenum attachment,
     */
    _mesa_update_framebuffer_visual(ctx, fb);
 }
+
+void GLAPIENTRY
+_mesa_FramebufferRenderbuffer(GLenum target, GLenum attachment,
+                              GLenum renderbufferTarget,
+                              GLuint renderbuffer)
+{
+   struct gl_framebuffer *fb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   fb = get_framebuffer_target(ctx, target);
+   if (!fb) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glFramebufferRenderbufferEXT(target)");
+      return;
+   }
+
+   fbo_renderbuffer(ctx, fb, attachment, renderbufferTarget, renderbuffer,
+                    "glFramebufferRenderbuffer");
+}
+
 
 
 void GLAPIENTRY
