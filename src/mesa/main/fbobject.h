@@ -245,6 +245,10 @@ _mesa_NamedFramebufferTextureLayerEXT(GLuint framebuffer, GLenum attachment,
 void GLAPIENTRY
 _mesa_NamedFramebufferTextureEXT(GLuint framebuffer, GLenum attachment,
                          GLuint texture, GLint level);
+void GLAPIENTRY
+_mesa_NamedFramebufferRenderbufferEXT(GLuint framebuffer, GLenum attachment,
+                              GLenum renderbufferTarget,
+                              GLuint renderbuffer);
 
 
 #endif /* FBOBJECT_H */
