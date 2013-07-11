@@ -1247,6 +1247,9 @@ _mesa_get_and_init_texture(struct gl_context *ctx, GLuint name, GLenum target,
 {
    struct gl_texture_object *newTexObj = NULL;
 
+   if (_mesa_is_cube_face(target))
+      target = GL_TEXTURE_CUBE_MAP;
+
    /*
     * Get pointer to new texture object (newTexObj)
     */
