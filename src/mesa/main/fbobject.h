@@ -262,6 +262,9 @@ void GLAPIENTRY
 _mesa_NamedRenderbufferStorageMultisampleEXT(GLuint renderbuffer,
                                      GLsizei samples, GLenum internalFormat,
                                      GLsizei width, GLsizei height);
+void GLAPIENTRY
+_mesa_GetNamedRenderbufferParameterivEXT(GLuint renderbuffer,
+                                         GLenum pname, GLint *params);
 
 
 #endif /* FBOBJECT_H */
