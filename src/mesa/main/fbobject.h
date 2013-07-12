@@ -267,4 +267,9 @@ _mesa_GetNamedRenderbufferParameterivEXT(GLuint renderbuffer,
                                          GLenum pname, GLint *params);
 
 
+void GLAPIENTRY
+_mesa_GenerateMultiTexMipmapEXT(GLenum texunit, GLenum target);
+void GLAPIENTRY
+_mesa_GenerateTextureMipmapEXT(GLuint texture, GLenum target);
+
 #endif /* FBOBJECT_H */
