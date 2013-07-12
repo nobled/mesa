@@ -1152,6 +1152,38 @@ _mesa_IsRenderbuffer(GLuint renderbuffer)
 }
 
 
+static struct gl_renderbuffer *
+get_and_init_renderbuffer(struct gl_context *ctx, GLuint renderbuffer,
+                          const char *func, bool allow_user_names)
+{
+   struct gl_renderbuffer *newRb;
+
+   newRb = _mesa_lookup_renderbuffer(ctx, renderbuffer);
+   if (newRb == &DummyRenderbuffer) {
+      /* ID was reserved, but no real renderbuffer object made yet */
+      newRb = NULL;
+   }
+   else if (!newRb && !allow_user_names) {
+      /* All RB IDs must be Gen'd */
+      _mesa_error(ctx, GL_INVALID_OPERATION, "gl%s(non-gen buffer)", func);
+      return NULL;
+   }
+
+   if (!newRb) {
+      /* create new renderbuffer object */
+      newRb = ctx->Driver.NewRenderbuffer(ctx, renderbuffer);
+      if (!newRb) {
+         _mesa_error(ctx, GL_OUT_OF_MEMORY, "gl%s", func);
+         return NULL;
+      }
+      ASSERT(newRb->AllocStorage);
+      _mesa_HashInsert(ctx->Shared->RenderBuffers, renderbuffer, newRb);
+      newRb->RefCount = 1; /* referenced by hash table */
+   }
+
+   return newRb;
+}
+
 static void
 bind_renderbuffer(GLenum target, GLuint renderbuffer, bool allow_user_names)
 {
@@ -1168,28 +1200,10 @@ bind_renderbuffer(GLenum target, GLuint renderbuffer, bool allow_user_names)
     */
 
    if (renderbuffer) {
-      newRb = _mesa_lookup_renderbuffer(ctx, renderbuffer);
-      if (newRb == &DummyRenderbuffer) {
-         /* ID was reserved, but no real renderbuffer object made yet */
-         newRb = NULL;
-      }
-      else if (!newRb && !allow_user_names) {
-         /* All RB IDs must be Gen'd */
-         _mesa_error(ctx, GL_INVALID_OPERATION, "glBindRenderbuffer(buffer)");
+      newRb = get_and_init_renderbuffer(ctx, renderbuffer, "BindRenderbuffer",
+                                        allow_user_names);
+      if (!newRb)
          return;
-      }
-
-      if (!newRb) {
-	 /* create new renderbuffer object */
-	 newRb = ctx->Driver.NewRenderbuffer(ctx, renderbuffer);
-	 if (!newRb) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindRenderbufferEXT");
-	    return;
-	 }
-         ASSERT(newRb->AllocStorage);
-         _mesa_HashInsert(ctx->Shared->RenderBuffers, renderbuffer, newRb);
-         newRb->RefCount = 1; /* referenced by hash table */
-      }
    }
    else {
       newRb = NULL;
