@@ -254,4 +254,14 @@ _mesa_GetNamedFramebufferAttachmentParameterivEXT(GLuint framebuffer,
                               GLenum attachment, GLenum pname, GLint *params);
 
 
+
+void GLAPIENTRY
+_mesa_NamedRenderbufferStorageEXT(GLuint renderbuffer, GLenum internalFormat,
+                          GLsizei width, GLsizei height);
+void GLAPIENTRY
+_mesa_NamedRenderbufferStorageMultisampleEXT(GLuint renderbuffer,
+                                     GLsizei samples, GLenum internalFormat,
+                                     GLsizei width, GLsizei height);
+
+
 #endif /* FBOBJECT_H */

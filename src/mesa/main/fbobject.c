@@ -1909,6 +1909,46 @@ _es_RenderbufferStorageEXT(GLenum target, GLenum internalFormat,
 }
 
 
+
+void GLAPIENTRY
+_mesa_NamedRenderbufferStorageEXT(GLuint renderbuffer, GLenum internalFormat,
+                          GLsizei width, GLsizei height)
+{
+   struct gl_renderbuffer *rb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   rb = get_and_init_renderbuffer(ctx, renderbuffer,
+                                  "NamedRenderbufferStorageEXT", false);
+   if (!rb)
+      return;
+
+   /* GL_ARB_fbo says calling this function is equivalent to calling
+    * glRenderbufferStorageMultisample() with samples=0.
+    */
+   renderbuffer_storage(ctx, rb, internalFormat, width, height, 0,
+                        "glNamedRenderbufferStorageEXT");
+}
+
+
+void GLAPIENTRY
+_mesa_NamedRenderbufferStorageMultisampleEXT(GLuint renderbuffer,
+                                     GLsizei samples, GLenum internalFormat,
+                                     GLsizei width, GLsizei height)
+{
+   struct gl_renderbuffer *rb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   rb = get_and_init_renderbuffer(ctx, renderbuffer,
+                                  "NamedRenderbufferStorageMultisampleEXT", false);
+   if (!rb)
+      return;
+
+   renderbuffer_storage(ctx, rb, internalFormat, width, height, samples,
+                        "glNamedRenderbufferStorageMultisampleEXT");
+}
+
+
+
 void GLAPIENTRY
 _mesa_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
 {
