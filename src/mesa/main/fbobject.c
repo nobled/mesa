@@ -1697,44 +1697,26 @@ invalidate_rb(GLuint key, void *data, void *userData)
 }
 
 
-/** sentinal value, see below */
-#define NO_SAMPLES 1000
 
 
 /**
- * Helper function used by _mesa_RenderbufferStorage() and 
- * _mesa_RenderbufferStorageMultisample().
- * samples will be NO_SAMPLES if called by _mesa_RenderbufferStorage().
+ * Helper function used by _mesa_RenderbufferStorage(),
+ * _mesa_RenderbufferStorageMultisample(), and _es_RenderbufferStorageEXT().
  */
 static void
-renderbuffer_storage(GLenum target, GLenum internalFormat,
-                     GLsizei width, GLsizei height, GLsizei samples)
+renderbuffer_storage(struct gl_context *ctx, struct gl_renderbuffer *rb,
+                     GLenum internalFormat, GLsizei width, GLsizei height,
+                     GLsizei samples, const char *func)
 {
-   const char *func = samples == NO_SAMPLES ?
-      "glRenderbufferStorage" : "glRenderbufferStorageMultisample";
-   struct gl_renderbuffer *rb;
    GLenum baseFormat;
    GLenum sample_count_error;
-   GET_CURRENT_CONTEXT(ctx);
 
    if (MESA_VERBOSE & VERBOSE_API) {
-      if (samples == NO_SAMPLES)
-         _mesa_debug(ctx, "%s(%s, %s, %d, %d)\n",
+      _mesa_debug(ctx, "%s(GL_RENDERBUFFER, %s, %d, %d, %d)\n",
                      func,
-                     _mesa_lookup_enum_by_nr(target),
-                     _mesa_lookup_enum_by_nr(internalFormat),
-                     width, height);
-      else
-         _mesa_debug(ctx, "%s(%s, %s, %d, %d, %d)\n",
-                     func,
-                     _mesa_lookup_enum_by_nr(target),
                      _mesa_lookup_enum_by_nr(internalFormat),
                      width, height, samples);
    }
-
-   rb = get_renderbuffer(ctx, target, func+2);
-   if (!rb)
-      return;
 
    baseFormat = _mesa_base_fbo_format(ctx, internalFormat);
    if (baseFormat == 0) {
@@ -1753,15 +1735,11 @@ renderbuffer_storage(GLenum target, GLenum internalFormat,
       return;
    }
 
-   if (samples == NO_SAMPLES) {
-      /* NumSamples == 0 indicates non-multisampling */
-      samples = 0;
-   }
-   else {
+   {
       /* check the sample count;
        * note: driver may choose to use more samples than what's requested
        */
-      sample_count_error = _mesa_check_sample_count(ctx, target,
+      sample_count_error = _mesa_check_sample_count(ctx, GL_RENDERBUFFER,
             internalFormat, samples);
       if (sample_count_error != GL_NO_ERROR) {
          _mesa_error(ctx, sample_count_error, "%s(samples)", func);
@@ -1854,13 +1832,20 @@ get_component_bits(GLenum pname, GLenum baseFormat, gl_format format)
 
 void GLAPIENTRY
 _mesa_RenderbufferStorage(GLenum target, GLenum internalFormat,
-                             GLsizei width, GLsizei height)
+                          GLsizei width, GLsizei height)
 {
+   struct gl_renderbuffer *rb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   rb = get_renderbuffer(ctx, target, "RenderbufferStorage");
+   if (!rb)
+      return;
+
    /* GL_ARB_fbo says calling this function is equivalent to calling
-    * glRenderbufferStorageMultisample() with samples=0.  We pass in
-    * a token value here just for error reporting purposes.
+    * glRenderbufferStorageMultisample() with samples=0.
     */
-   renderbuffer_storage(target, internalFormat, width, height, NO_SAMPLES);
+   renderbuffer_storage(ctx, rb, internalFormat, width, height, 0,
+                        "glRenderbufferStorage");
 }
 
 
@@ -1869,7 +1854,15 @@ _mesa_RenderbufferStorageMultisample(GLenum target, GLsizei samples,
                                      GLenum internalFormat,
                                      GLsizei width, GLsizei height)
 {
-   renderbuffer_storage(target, internalFormat, width, height, samples);
+   struct gl_renderbuffer *rb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   rb = get_renderbuffer(ctx, target, "RenderbufferStorageMultisample");
+   if (!rb)
+      return;
+
+   renderbuffer_storage(ctx, rb, internalFormat, width, height, samples,
+                        "glRenderbufferStorageMultisample");
 }
 
 
@@ -1880,6 +1873,13 @@ void GLAPIENTRY
 _es_RenderbufferStorageEXT(GLenum target, GLenum internalFormat,
 			   GLsizei width, GLsizei height)
 {
+   struct gl_renderbuffer *rb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   rb = get_renderbuffer(ctx, target, "RenderbufferStorageEXT");
+   if (!rb)
+      return;
+
    switch (internalFormat) {
    case GL_RGB565:
       /* XXX this confuses GL_RENDERBUFFER_INTERNAL_FORMAT_OES */
@@ -1890,7 +1890,8 @@ _es_RenderbufferStorageEXT(GLenum target, GLenum internalFormat,
       break;
    }
 
-   renderbuffer_storage(target, internalFormat, width, height, 0);
+   renderbuffer_storage(ctx, rb, internalFormat, width, height, 0,
+                        "glRenderbufferStorageEXT");
 }
 
 
