@@ -1650,6 +1650,28 @@ _mesa_base_fbo_format(struct gl_context *ctx, GLenum internalFormat)
 }
 
 
+
+static struct gl_renderbuffer *
+get_renderbuffer(struct gl_context *ctx, GLenum target, const char *func)
+{
+   struct gl_renderbuffer *rb;
+
+   if (target != GL_RENDERBUFFER) {
+      _mesa_error(ctx, GL_INVALID_ENUM,
+                  "gl%s(target=%s)", func, _mesa_lookup_enum_by_nr(target));
+      return NULL;
+   }
+
+   rb = ctx->CurrentRenderbuffer;
+   if (!rb)
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "gl%s(no GL_RENDERBUFFER bound)", func);
+
+   return rb;
+}
+
+
+
 /**
  * Invalidate a renderbuffer attachment.  Called from _mesa_HashWalk().
  */
@@ -1710,10 +1732,9 @@ renderbuffer_storage(GLenum target, GLenum internalFormat,
                      width, height, samples);
    }
 
-   if (target != GL_RENDERBUFFER_EXT) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "%s(target)", func);
+   rb = get_renderbuffer(ctx, target, func+2);
+   if (!rb)
       return;
-   }
 
    baseFormat = _mesa_base_fbo_format(ctx, internalFormat);
    if (baseFormat == 0) {
@@ -1746,12 +1767,6 @@ renderbuffer_storage(GLenum target, GLenum internalFormat,
          _mesa_error(ctx, sample_count_error, "%s(samples)", func);
          return;
       }
-   }
-
-   rb = ctx->CurrentRenderbuffer;
-   if (!rb) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "%s", func);
-      return;
    }
 
    FLUSH_VERTICES(ctx, _NEW_BUFFERS);
@@ -1808,18 +1823,9 @@ _mesa_EGLImageTargetRenderbufferStorageOES(GLenum target, GLeglImageOES image)
       return;
    }
 
-   if (target != GL_RENDERBUFFER) {
-      _mesa_error(ctx, GL_INVALID_ENUM,
-                  "EGLImageTargetRenderbufferStorageOES");
+   rb = get_renderbuffer(ctx, target, "EGLImageTargetRenderbufferStorageOES");
+   if (!rb)
       return;
-   }
-
-   rb = ctx->CurrentRenderbuffer;
-   if (!rb) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "EGLImageTargetRenderbufferStorageOES");
-      return;
-   }
 
    FLUSH_VERTICES(ctx, _NEW_BUFFERS);
 
@@ -1894,18 +1900,9 @@ _mesa_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
    struct gl_renderbuffer *rb;
    GET_CURRENT_CONTEXT(ctx);
 
-   if (target != GL_RENDERBUFFER_EXT) {
-      _mesa_error(ctx, GL_INVALID_ENUM,
-                  "glGetRenderbufferParameterivEXT(target)");
+   rb = get_renderbuffer(ctx, target, "GetRenderbufferParameterivEXT");
+   if (!rb)
       return;
-   }
-
-   rb = ctx->CurrentRenderbuffer;
-   if (!rb) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGetRenderbufferParameterivEXT");
-      return;
-   }
 
    /* No need to flush here since we're just quering state which is
     * not effected by rendering.
