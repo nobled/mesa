@@ -1949,16 +1949,10 @@ _mesa_NamedRenderbufferStorageMultisampleEXT(GLuint renderbuffer,
 
 
 
-void GLAPIENTRY
-_mesa_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
+static void
+get_rb_param(struct gl_context *ctx, struct gl_renderbuffer *rb,
+             GLenum pname, GLint *params, const char *func)
 {
-   struct gl_renderbuffer *rb;
-   GET_CURRENT_CONTEXT(ctx);
-
-   rb = get_renderbuffer(ctx, target, "GetRenderbufferParameterivEXT");
-   if (!rb)
-      return;
-
    /* No need to flush here since we're just quering state which is
     * not effected by rendering.
     */
@@ -1990,10 +1984,24 @@ _mesa_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
       /* fallthrough */
    default:
       _mesa_error(ctx, GL_INVALID_ENUM,
-                  "glGetRenderbufferParameterivEXT(target)");
+                  "%s(pname=%s)", func, _mesa_lookup_enum_by_nr(pname));
       return;
    }
 }
+
+void GLAPIENTRY
+_mesa_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
+{
+   struct gl_renderbuffer *rb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   rb = get_renderbuffer(ctx, target, "GetRenderbufferParameterivEXT");
+   if (!rb)
+      return;
+
+   get_rb_param(ctx, rb, pname, params, "GetRenderbufferParameterivEXT");
+}
+
 
 
 GLboolean GLAPIENTRY
