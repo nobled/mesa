@@ -48,6 +48,7 @@
 #include "state.h"
 #include "teximage.h"
 #include "texobj.h"
+#include "texstate.h"
 
 
 /** Set this to 1 to debug/log glBlitFramebuffer() calls */
@@ -3365,6 +3366,49 @@ _mesa_GenerateMipmap(GLenum target)
    texObj = _mesa_get_current_tex_object(ctx, target);
 
    gen_mipmap(ctx, texObj, target, "glGenerateMipmap");
+}
+
+
+void GLAPIENTRY
+_mesa_GenerateMultiTexMipmapEXT(GLenum texunit, GLenum target)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+   struct gl_texture_unit *texUnit;
+   const GLuint unit = texunit - GL_TEXTURE0;
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!valid_mipmap_texture(ctx, target, "glGenerateMultiTexMipmapEXT"))
+      return;
+
+   texUnit = _mesa_get_tex_unit_err(ctx, unit, "glGenerateMultiTexMipmapEXT");
+   if (!texUnit)
+     return; /* GL_INVALID_OPERATION */
+
+   texObj =  _mesa_select_tex_object(ctx, texUnit, target);
+
+   gen_mipmap(ctx, texObj, target, "glGenerateMultiTexMipmapEXT");
+}
+
+
+void GLAPIENTRY
+_mesa_GenerateTextureMipmapEXT(GLuint texture, GLenum target)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (!valid_mipmap_texture(ctx, target, "glGenerateTextureMipmapEXT"))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                   "glGenerateTextureMipmapEXT");
+   if (!texObj)
+      return; /* error */
+
+   gen_mipmap(ctx, texObj, target, "glGenerateTextureMipmapEXT");
 }
 
 
