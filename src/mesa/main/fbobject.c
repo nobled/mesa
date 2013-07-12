@@ -2003,6 +2003,22 @@ _mesa_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
 }
 
 
+void GLAPIENTRY
+_mesa_GetNamedRenderbufferParameterivEXT(GLuint renderbuffer,
+                                         GLenum pname, GLint *params)
+{
+   struct gl_renderbuffer *rb;
+   GET_CURRENT_CONTEXT(ctx);
+
+   rb = get_and_init_renderbuffer(ctx, renderbuffer,
+                                  "GetNamedRenderbufferParameterivEXT", false);
+   if (!rb)
+      return;
+
+   get_rb_param(ctx, rb, pname, params, "GetNamedRenderbufferParameterivEXT");
+}
+
+
 
 GLboolean GLAPIENTRY
 _mesa_IsFramebuffer(GLuint framebuffer)
