@@ -634,28 +634,14 @@ _mesa_readbuffer(struct gl_context *ctx, struct gl_framebuffer *fb,
 }
 
 
-
-/**
- * Called by glReadBuffer to set the source renderbuffer for reading pixels.
- * \param mode color buffer such as GL_FRONT, GL_BACK, etc.
- */
-void GLAPIENTRY
-_mesa_ReadBuffer(GLenum buffer)
+static GLboolean
+read_buffer(struct gl_context *ctx, struct gl_framebuffer *fb, GLenum buffer,
+            const char *func)
 {
-   struct gl_framebuffer *fb;
    GLbitfield supportedMask;
    GLint srcBuffer;
-   GET_CURRENT_CONTEXT(ctx);
 
    FLUSH_VERTICES(ctx, 0);
-
-   if (MESA_VERBOSE & VERBOSE_API)
-      _mesa_debug(ctx, "glReadBuffer %s\n", _mesa_lookup_enum_by_nr(buffer));
-
-   fb = ctx->ReadBuffer;
-
-   if (MESA_VERBOSE & VERBOSE_API)
-      _mesa_debug(ctx, "glReadBuffer %s\n", _mesa_lookup_enum_by_nr(buffer));
 
    if (buffer == GL_NONE) {
       /* This is legal--it means that no buffer should be bound for reading. */
@@ -666,14 +652,14 @@ _mesa_ReadBuffer(GLenum buffer)
       srcBuffer = read_buffer_enum_to_index(buffer);
       if (srcBuffer == -1) {
          _mesa_error(ctx, GL_INVALID_ENUM,
-                     "glReadBuffer(buffer=0x%x)", buffer);
-         return;
+                     "gl%s(buffer=0x%x)", func, buffer);
+         return GL_FALSE;
       }
       supportedMask = supported_buffer_bitmask(ctx, fb);
       if (((1 << srcBuffer) & supportedMask) == 0) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glReadBuffer(buffer=0x%x)", buffer);
-         return;
+                     "gl%s(buffer=0x%x)", func, buffer);
+         return GL_FALSE;
       }
    }
 
@@ -683,7 +669,28 @@ _mesa_ReadBuffer(GLenum buffer)
 
    /*
     * Call device driver function.
+    *
+    * XXX: new driver hook for non-bound framebuffer, for
+    * GL_EXT_direct_state_access?
     */
-   if (ctx->Driver.ReadBuffer)
-      (*ctx->Driver.ReadBuffer)(ctx, buffer);
+   if (fb == ctx->ReadBuffer && ctx->Driver.ReadBuffer)
+         (*ctx->Driver.ReadBuffer)(ctx, buffer);
+
+   return GL_TRUE;
+}
+
+/**
+ * Called by glReadBuffer to set the source renderbuffer for reading pixels.
+ * \param mode color buffer such as GL_FRONT, GL_BACK, etc.
+ */
+void GLAPIENTRY
+_mesa_ReadBuffer(GLenum buffer)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb = ctx->ReadBuffer;
+
+   if (MESA_VERBOSE & VERBOSE_API)
+      _mesa_debug(ctx, "glReadBuffer %s\n", _mesa_lookup_enum_by_nr(buffer));
+
+   read_buffer(ctx, fb, buffer, "ReadBuffer");
 }
