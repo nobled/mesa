@@ -302,23 +302,14 @@ _mesa_DrawBuffer(GLenum buffer)
    draw_buffer(ctx, fb, buffer, "DrawBuffer");
 }
 
-/**
- * Called by glDrawBuffersARB; specifies the destination color renderbuffers
- * for N fragment program color outputs.
- * \sa _mesa_DrawBuffer
- * \param n  number of outputs
- * \param buffers  array [n] of renderbuffer names.  Unlike glDrawBuffer, the
- *                 names cannot specify more than one buffer.  For example,
- *                 GL_FRONT_AND_BACK is illegal.
- */
-void GLAPIENTRY
-_mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
+
+static GLboolean
+draw_buffers(struct gl_context *ctx, struct gl_framebuffer *fb,
+             GLsizei n, const GLenum *buffers, const char *func)
 {
    GLint output;
    GLbitfield usedBufferMask, supportedMask;
    GLbitfield destMask[MAX_DRAW_BUFFERS];
-   GET_CURRENT_CONTEXT(ctx);
-   struct gl_framebuffer *fb = ctx->DrawBuffer;
 
    FLUSH_VERTICES(ctx, 0);
 
@@ -330,8 +321,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
     *  MAX_DRAW_BUFFERS."
     */
    if (n < 0 || n > (GLsizei) ctx->Const.MaxDrawBuffers) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glDrawBuffersARB(n)");
-      return;
+      _mesa_error(ctx, GL_INVALID_VALUE, "gl%s(n)", func);
+      return GL_FALSE;
    }
 
    supportedMask = supported_buffer_bitmask(ctx, fb);
@@ -343,8 +334,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
     */
    if (_mesa_is_gles3(ctx) && _mesa_is_winsys_fbo(fb) &&
        (n != 1 || (buffers[0] != GL_NONE && buffers[0] != GL_BACK))) {
-      _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawBuffers(buffer)");
-      return;
+      _mesa_error(ctx, GL_INVALID_OPERATION, "gl%s(buffer)", func);
+      return GL_FALSE;
    }
 
    /* complicated error checking... */
@@ -363,8 +354,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
           */
          if (_mesa_is_user_fbo(fb) && buffers[output] >=
              GL_COLOR_ATTACHMENT0 + ctx->Const.MaxDrawBuffers) {
-            _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawBuffersARB(buffer)");
-            return;
+            _mesa_error(ctx, GL_INVALID_OPERATION, "gl%s(buffer)", func);
+            return GL_FALSE;
          }
 
          destMask[output] = draw_buffer_enum_to_bitmask(ctx, buffers[output],
@@ -375,8 +366,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
           *  4.5 or 4.6.  Otherwise, an INVALID_ENUM error is generated.
           */
          if (destMask[output] == BAD_MASK) {
-            _mesa_error(ctx, GL_INVALID_ENUM, "glDrawBuffersARB(buffer)");
-            return;
+            _mesa_error(ctx, GL_INVALID_ENUM, "gl%s(buffer)", func);
+            return GL_FALSE;
          }         
 
          /* From the OpenGL 3.0 specification, page 259:
@@ -388,8 +379,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
           *  table 4.4."
           */
          if (_mesa_bitcount(destMask[output]) > 1) {
-            _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawBuffersARB(buffer)");
-            return;
+            _mesa_error(ctx, GL_INVALID_OPERATION, "gl%s(buffer)", func);
+            return GL_FALSE;
          }
 
          /* From the OpenGL 3.0 specification, page 259:
@@ -405,8 +396,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
          destMask[output] &= supportedMask;
          if (destMask[output] == 0) {
             _mesa_error(ctx, GL_INVALID_OPERATION,
-                        "glDrawBuffersARB(unsupported buffer)");
-            return;
+                        "gl%s(unsupported buffer)", func);
+            return GL_FALSE;
          }
 
          /* ES 3.0 is even more restrictive.  From the ES 3.0 spec, page 180:
@@ -416,8 +407,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
          if (_mesa_is_gles3(ctx) && _mesa_is_user_fbo(fb) &&
              buffers[output] != GL_NONE &&
              buffers[output] != GL_COLOR_ATTACHMENT0 + output) {
-            _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawBuffers(buffer)");
-            return;
+            _mesa_error(ctx, GL_INVALID_OPERATION, "gl%s(buffer)", func);
+            return GL_FALSE;
          }
 
          /* From the OpenGL 3.0 specification, page 258:
@@ -427,8 +418,8 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
           */
          if (destMask[output] & usedBufferMask) {
             _mesa_error(ctx, GL_INVALID_OPERATION,
-                        "glDrawBuffersARB(duplicated buffer)");
-            return;
+                        "gl%s(duplicated buffer)", func);
+            return GL_FALSE;
          }
 
          /* update bitmask */
@@ -439,15 +430,41 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
    /* OK, if we get here, there were no errors so set the new state */
    _mesa_drawbuffers(ctx, n, buffers, destMask);
 
+
    /*
     * Call device driver function.  Note that n can be equal to 0,
     * in which case we don't want to reference buffers[0], which
     * may not be valid.
+    *
+    * XXX: new driver hook for non-bound framebuffer, for
+    * GL_EXT_direct_state_access?
     */
-   if (ctx->Driver.DrawBuffers)
-      ctx->Driver.DrawBuffers(ctx, n, buffers);
-   else if (ctx->Driver.DrawBuffer)
-      ctx->Driver.DrawBuffer(ctx, n > 0 ? buffers[0] : GL_NONE);
+   if (fb == ctx->DrawBuffer) {
+      if (ctx->Driver.DrawBuffers)
+         ctx->Driver.DrawBuffers(ctx, n, buffers);
+      else if (ctx->Driver.DrawBuffer)
+         ctx->Driver.DrawBuffer(ctx, n > 0 ? buffers[0] : GL_NONE);
+   }
+
+   return GL_TRUE;
+}
+
+/**
+ * Called by glDrawBuffersARB; specifies the destination color renderbuffers
+ * for N fragment program color outputs.
+ * \sa _mesa_DrawBuffer
+ * \param n  number of outputs
+ * \param buffers  array [n] of renderbuffer names.  Unlike glDrawBuffer, the
+ *                 names cannot specify more than one buffer.  For example,
+ *                 GL_FRONT_AND_BACK is illegal.
+ */
+void GLAPIENTRY
+_mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb = ctx->DrawBuffer;
+
+   draw_buffers(ctx, fb, n, buffers, "DrawBuffers");
 }
 
 
