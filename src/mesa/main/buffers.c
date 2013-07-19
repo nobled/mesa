@@ -217,6 +217,60 @@ read_buffer_enum_to_index(GLenum buffer)
 }
 
 
+static GLboolean
+draw_buffer(struct gl_context *ctx, struct gl_framebuffer *fb, GLenum buffer,
+            const char *func)
+{
+   GLbitfield destMask;
+
+   FLUSH_VERTICES(ctx, 0);
+
+   if (MESA_VERBOSE & VERBOSE_API) {
+      _mesa_debug(ctx, "gl%s %s\n", func, _mesa_lookup_enum_by_nr(buffer));
+   }
+
+   if (buffer == GL_NONE) {
+      destMask = 0x0;
+   }
+   else {
+      const GLbitfield supportedMask
+         = supported_buffer_bitmask(ctx, fb);
+      destMask = draw_buffer_enum_to_bitmask(ctx, buffer, fb);
+      if (destMask == BAD_MASK) {
+         /* totally bogus buffer */
+         _mesa_error(ctx, GL_INVALID_ENUM,
+                     "gl%s(buffer=0x%x)", func, buffer);
+         return GL_FALSE;
+      }
+      destMask &= supportedMask;
+      if (destMask == 0x0) {
+         /* none of the named color buffers exist! */
+         _mesa_error(ctx, GL_INVALID_OPERATION,
+                     "gl%s(buffer=0x%x)", func, buffer);
+         return GL_FALSE;
+      }
+   }
+
+   /* if we get here, there's no error so set new state */
+   _mesa_drawbuffers(ctx, 1, &buffer, &destMask);
+
+
+   /*
+    * Call device driver function.
+    * XXX: new driver hook for non-bound framebuffer, for
+    * GL_EXT_direct_state_access?
+    */
+   if (fb == ctx->DrawBuffer) {
+      if (ctx->Driver.DrawBuffers)
+         ctx->Driver.DrawBuffers(ctx, 1, &buffer);
+      else if (ctx->Driver.DrawBuffer)
+         ctx->Driver.DrawBuffer(ctx, buffer);
+   }
+
+   return GL_TRUE;
+}
+
+
 /**
  * Called by glDrawBuffer().
  * Specify which renderbuffer(s) to draw into for the first color output.
@@ -242,50 +296,11 @@ read_buffer_enum_to_index(GLenum buffer)
 void GLAPIENTRY
 _mesa_DrawBuffer(GLenum buffer)
 {
-   GLbitfield destMask;
    GET_CURRENT_CONTEXT(ctx);
    struct gl_framebuffer *fb = ctx->DrawBuffer;
 
-   FLUSH_VERTICES(ctx, 0);
-
-   if (MESA_VERBOSE & VERBOSE_API) {
-      _mesa_debug(ctx, "glDrawBuffer %s\n", _mesa_lookup_enum_by_nr(buffer));
-   }
-
-   if (buffer == GL_NONE) {
-      destMask = 0x0;
-   }
-   else {
-      const GLbitfield supportedMask
-         = supported_buffer_bitmask(ctx, fb);
-      destMask = draw_buffer_enum_to_bitmask(ctx, buffer, fb);
-      if (destMask == BAD_MASK) {
-         /* totally bogus buffer */
-         _mesa_error(ctx, GL_INVALID_ENUM,
-                     "glDrawBuffer(buffer=0x%x)", buffer);
-         return;
-      }
-      destMask &= supportedMask;
-      if (destMask == 0x0) {
-         /* none of the named color buffers exist! */
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glDrawBuffer(buffer=0x%x)", buffer);
-         return;
-      }
-   }
-
-   /* if we get here, there's no error so set new state */
-   _mesa_drawbuffers(ctx, 1, &buffer, &destMask);
-
-   /*
-    * Call device driver function.
-    */
-   if (ctx->Driver.DrawBuffers)
-      ctx->Driver.DrawBuffers(ctx, 1, &buffer);
-   else if (ctx->Driver.DrawBuffer)
-      ctx->Driver.DrawBuffer(ctx, buffer);
+   draw_buffer(ctx, fb, buffer, "DrawBuffer");
 }
-
 
 /**
  * Called by glDrawBuffersARB; specifies the destination color renderbuffers
