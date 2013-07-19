@@ -94,5 +94,24 @@ void GLAPIENTRY
 _mesa_MultiTexParameterIuivEXT(GLenum texunit, GLenum target,
                                GLenum pname, const GLuint *params);
 
+void GLAPIENTRY
+_mesa_TextureParameterfEXT(GLuint texture, GLenum target,
+                            GLenum pname, GLfloat param);
+void GLAPIENTRY
+_mesa_TextureParameterfvEXT(GLuint texture, GLenum target,
+                             GLenum pname, const GLfloat *params);
+void GLAPIENTRY
+_mesa_TextureParameteriEXT(GLuint texture, GLenum target,
+                            GLenum pname, GLint param);
+void GLAPIENTRY
+_mesa_TextureParameterivEXT(GLuint texture, GLenum target,
+                             GLenum pname, const GLint *params);
+void GLAPIENTRY
+_mesa_TextureParameterIivEXT(GLuint texture, GLenum target,
+                              GLenum pname, const GLint *params);
+void GLAPIENTRY
+_mesa_TextureParameterIuivEXT(GLuint texture, GLenum target,
+                               GLenum pname, const GLuint *params);
+
 
 #endif /* TEXPARAM_H */
