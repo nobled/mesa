@@ -252,7 +252,7 @@ draw_buffer(struct gl_context *ctx, struct gl_framebuffer *fb, GLenum buffer,
    }
 
    /* if we get here, there's no error so set new state */
-   _mesa_drawbuffers(ctx, 1, &buffer, &destMask);
+   _mesa_drawbuffers(ctx, fb, 1, &buffer, &destMask);
 
 
    /*
@@ -428,7 +428,7 @@ draw_buffers(struct gl_context *ctx, struct gl_framebuffer *fb,
    }
 
    /* OK, if we get here, there were no errors so set the new state */
-   _mesa_drawbuffers(ctx, n, buffers, destMask);
+   _mesa_drawbuffers(ctx, fb, n, buffers, destMask);
 
 
    /*
@@ -490,12 +490,13 @@ updated_drawbuffers(struct gl_context *ctx)
 
 /**
  * Helper function to set the GL_DRAW_BUFFER state in the context and
- * current FBO.  Called via glDrawBuffer(), glDrawBuffersARB()
+ * given FBO.  Called via glDrawBuffer(), glDrawBuffersARB()
  *
  * All error checking will have been done prior to calling this function
  * so nothing should go wrong at this point.
  *
  * \param ctx  current context
+ * \param fb   framebuffer object to work on
  * \param n    number of color outputs to set
  * \param buffers  array[n] of colorbuffer names, like GL_LEFT.
  * \param destMask  array[n] of BUFFER_BIT_* bitmasks which correspond to the
@@ -503,10 +504,9 @@ updated_drawbuffers(struct gl_context *ctx)
  *                  BUFFER_BIT_FRONT_LEFT | BUFFER_BIT_BACK_LEFT).
  */
 void
-_mesa_drawbuffers(struct gl_context *ctx, GLuint n, const GLenum *buffers,
-                  const GLbitfield *destMask)
+_mesa_drawbuffers(struct gl_context *ctx, struct gl_framebuffer *fb,
+                  GLuint n, const GLenum *buffers, const GLbitfield *destMask)
 {
-   struct gl_framebuffer *fb = ctx->DrawBuffer;
    GLbitfield mask[MAX_DRAW_BUFFERS];
    GLuint buf;
 
@@ -604,7 +604,7 @@ _mesa_update_draw_buffers(struct gl_context *ctx)
    for (i = 0; i < ctx->Const.MaxDrawBuffers; i++)
       buffers[i] = ctx->Color.DrawBuffer[i];
 
-   _mesa_drawbuffers(ctx, ctx->Const.MaxDrawBuffers, buffers, NULL);
+   _mesa_drawbuffers(ctx, ctx->DrawBuffer, ctx->Const.MaxDrawBuffers, buffers, NULL);
 }
 
 
