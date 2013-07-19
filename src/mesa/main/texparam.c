@@ -2251,3 +2251,102 @@ _mesa_GetMultiTexParameterIuivEXT(GLenum texunit, GLenum target,
       }
    }
 }
+
+
+
+void GLAPIENTRY
+_mesa_GetTextureParameterfvEXT(GLuint texture, GLenum target,
+                                GLenum pname, GLfloat *params )
+{
+   struct gl_texture_object *obj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   if (!valid_texparam_target(ctx, target, "GetTextureParameterfvEXT"))
+      return;
+
+   obj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glGetTextureParameterfvEXT");
+   if (!obj)
+      return;
+
+   get_tex_paramf(ctx, obj, target, pname, params);
+}
+
+void GLAPIENTRY
+_mesa_GetTextureParameterivEXT(GLuint texture, GLenum target,
+                                GLenum pname, GLint *params )
+{
+   struct gl_texture_object *obj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   if (!valid_texparam_target(ctx, target, "GetTextureParameterivEXT"))
+      return;
+
+   obj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glGetTextureParameterivEXT");
+   if (!obj)
+      return;
+
+   get_tex_parami(ctx, obj, target, pname, params);
+}
+
+/** New in GL 3.0 */
+void GLAPIENTRY
+_mesa_GetTextureParameterIivEXT(GLuint texture, GLenum target,
+                                GLenum pname, GLint *params)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   if (!valid_texparam_target(ctx, target, "GetTextureParameterIivEXT"))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glGetTextureParameterIivEXT");
+   if (!texObj)
+      return;
+   
+   switch (pname) {
+   case GL_TEXTURE_BORDER_COLOR:
+      COPY_4V(params, texObj->Sampler.BorderColor.i);
+      break;
+   default:
+      get_tex_parami(ctx, texObj, target, pname, params);
+   }
+}
+
+
+/** New in GL 3.0 */
+void GLAPIENTRY
+_mesa_GetTextureParameterIuivEXT(GLuint texture, GLenum target,
+                                GLenum pname, GLuint *params)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   if (!valid_texparam_target(ctx, target, "GetTextureParameterIuivEXT"))
+      return;
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glGetTextureParameterIuivEXT");
+   if (!texObj)
+      return;
+   
+   switch (pname) {
+   case GL_TEXTURE_BORDER_COLOR:
+      COPY_4V(params, texObj->Sampler.BorderColor.i);
+      break;
+   default:
+      {
+         GLint ip[4];
+         get_tex_parami(ctx, texObj, target, pname, ip);
+         params[0] = ip[0];
+         if (pname == GL_TEXTURE_SWIZZLE_RGBA_EXT || 
+             pname == GL_TEXTURE_CROP_RECT_OES) {
+            params[1] = ip[1];
+            params[2] = ip[2];
+            params[3] = ip[3];
+         }
+      }
+   }
+}
