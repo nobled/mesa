@@ -610,16 +610,16 @@ _mesa_update_draw_buffers(struct gl_context *ctx)
 
 /**
  * Like \sa _mesa_drawbuffers(), this is a helper function for setting
- * GL_READ_BUFFER state in the context and current FBO.
+ * GL_READ_BUFFER state in the context and given FBO.
  * \param ctx  the rendering context
+ * \param fb   the given framebuffer object
  * \param buffer  GL_FRONT, GL_BACK, GL_COLOR_ATTACHMENT0, etc.
  * \param bufferIndex  the numerical index corresponding to 'buffer'
  */
 void
-_mesa_readbuffer(struct gl_context *ctx, GLenum buffer, GLint bufferIndex)
+_mesa_readbuffer(struct gl_context *ctx, struct gl_framebuffer *fb,
+                 GLenum buffer, GLint bufferIndex)
 {
-   struct gl_framebuffer *fb = ctx->ReadBuffer;
-
    if (_mesa_is_winsys_fbo(fb)) {
       /* Only update the per-context READ_BUFFER state if we're bound to
        * a window-system framebuffer.
@@ -679,7 +679,7 @@ _mesa_ReadBuffer(GLenum buffer)
 
    /* OK, all error checking has been completed now */
 
-   _mesa_readbuffer(ctx, buffer, srcBuffer);
+   _mesa_readbuffer(ctx, fb, buffer, srcBuffer);
 
    /*
     * Call device driver function.
