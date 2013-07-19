@@ -302,6 +302,7 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
    GLbitfield usedBufferMask, supportedMask;
    GLbitfield destMask[MAX_DRAW_BUFFERS];
    GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb = ctx->DrawBuffer;
 
    FLUSH_VERTICES(ctx, 0);
 
@@ -317,14 +318,14 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
       return;
    }
 
-   supportedMask = supported_buffer_bitmask(ctx, ctx->DrawBuffer);
+   supportedMask = supported_buffer_bitmask(ctx, fb);
    usedBufferMask = 0x0;
 
    /* From the ES 3.0 specification, page 180:
     * "If the GL is bound to the default framebuffer, then n must be 1
     *  and the constant must be BACK or NONE."
     */
-   if (_mesa_is_gles3(ctx) && _mesa_is_winsys_fbo(ctx->DrawBuffer) &&
+   if (_mesa_is_gles3(ctx) && _mesa_is_winsys_fbo(fb) &&
        (n != 1 || (buffers[0] != GL_NONE && buffers[0] != GL_BACK))) {
       _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawBuffers(buffer)");
       return;
@@ -344,14 +345,14 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
           *     or equal to the value of MAX_COLOR_ATTACHMENTS, then the error
           *     INVALID_OPERATION results."
           */
-         if (_mesa_is_user_fbo(ctx->DrawBuffer) && buffers[output] >=
+         if (_mesa_is_user_fbo(fb) && buffers[output] >=
              GL_COLOR_ATTACHMENT0 + ctx->Const.MaxDrawBuffers) {
             _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawBuffersARB(buffer)");
             return;
          }
 
          destMask[output] = draw_buffer_enum_to_bitmask(ctx, buffers[output],
-                                                        ctx->DrawBuffer);
+                                                        fb);
 
          /* From the OpenGL 3.0 specification, page 258:
           * "Each buffer listed in bufs must be one of the values from tables
@@ -396,7 +397,7 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
           * "If the GL is bound to a framebuffer object, the ith buffer listed
           *  in bufs must be COLOR_ATTACHMENTi or NONE. [...] INVALID_OPERATION."
           */
-         if (_mesa_is_gles3(ctx) && _mesa_is_user_fbo(ctx->DrawBuffer) &&
+         if (_mesa_is_gles3(ctx) && _mesa_is_user_fbo(fb) &&
              buffers[output] != GL_NONE &&
              buffers[output] != GL_COLOR_ATTACHMENT0 + output) {
             _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawBuffers(buffer)");
