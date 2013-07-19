@@ -1682,39 +1682,11 @@ invalid_pname:
 }
 
 
-void GLAPIENTRY
-_mesa_GetTexLevelParameterfv( GLenum target, GLint level,
-                              GLenum pname, GLfloat *params )
+static void
+get_texlevel_param(struct gl_context *ctx, struct gl_texture_object *texObj,
+                   GLenum target, GLint level, GLenum pname, GLint *params)
 {
-   GLint iparam;
-   _mesa_GetTexLevelParameteriv( target, level, pname, &iparam );
-   *params = (GLfloat) iparam;
-}
-
-
-void GLAPIENTRY
-_mesa_GetTexLevelParameteriv( GLenum target, GLint level,
-                              GLenum pname, GLint *params )
-{
-   const struct gl_texture_unit *texUnit;
-   struct gl_texture_object *texObj;
    GLint maxLevels;
-   GET_CURRENT_CONTEXT(ctx);
-   const GLuint unit = ctx->Texture.CurrentUnit;
-
-   if (unit >= ctx->Const.MaxCombinedTextureImageUnits) {
-      _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glGetTexLevelParameteriv(texture unit = %u)", unit);
-      return;
-   }
-
-   texUnit = _mesa_get_current_tex_unit(ctx);
-
-   if (!legal_get_tex_level_parameter_target(ctx, target)) {
-      _mesa_error(ctx, GL_INVALID_ENUM,
-                  "glGetTexLevelParameter[if]v(target=0x%x)", target);
-      return;
-   }
 
    maxLevels = _mesa_max_texture_levels(ctx, target);
    assert(maxLevels != 0);
@@ -1724,12 +1696,37 @@ _mesa_GetTexLevelParameteriv( GLenum target, GLint level,
       return;
    }
 
-   texObj = _mesa_select_tex_object(ctx, texUnit, target);
-
    if (target == GL_TEXTURE_BUFFER)
       get_tex_level_parameter_buffer(ctx, texObj, pname, params);
    else
       get_tex_level_parameter_image(ctx, texObj, target, level, pname, params);
+}
+
+void GLAPIENTRY
+_mesa_GetTexLevelParameterfv( GLenum target, GLint level,
+                              GLenum pname, GLfloat *params )
+{
+   GLint iparam;
+   _mesa_GetTexLevelParameteriv( target, level, pname, &iparam );
+   *params = (GLfloat) iparam;
+}
+
+void GLAPIENTRY
+_mesa_GetTexLevelParameteriv( GLenum target, GLint level,
+                              GLenum pname, GLint *params )
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   if (!legal_get_tex_level_parameter_target(ctx, target)) {
+      _mesa_error(ctx, GL_INVALID_ENUM,
+                  "glGetTexLevelParameter[if]v(target=0x%x)", target);
+      return;
+   }
+
+   texObj = _mesa_get_current_tex_object(ctx, target);
+
+   get_texlevel_param(ctx, texObj, target, level, pname, params);
 }
 
 
