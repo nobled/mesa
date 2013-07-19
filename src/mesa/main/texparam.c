@@ -1730,16 +1730,11 @@ _mesa_GetTexLevelParameteriv( GLenum target, GLint level,
 }
 
 
-void GLAPIENTRY
-_mesa_GetTexParameterfv( GLenum target, GLenum pname, GLfloat *params )
+
+static void
+get_tex_paramf(struct gl_context *ctx, struct gl_texture_object *obj,
+               GLenum target, GLenum pname, GLfloat *params )
 {
-   struct gl_texture_object *obj;
-   GET_CURRENT_CONTEXT(ctx);
-
-   obj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_TRUE);
-   if (!obj)
-      return;
-
    _mesa_lock_texture(ctx, obj);
    switch (pname) {
       case GL_TEXTURE_MAG_FILTER:
@@ -1923,17 +1918,10 @@ invalid_pname:
    _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexParameterfv(pname=0x%x)", pname);
 }
 
-
-void GLAPIENTRY
-_mesa_GetTexParameteriv( GLenum target, GLenum pname, GLint *params )
+static void
+get_tex_parami(struct gl_context *ctx, struct gl_texture_object *obj,
+               GLenum target, GLenum pname, GLint *params )
 {
-   struct gl_texture_object *obj;
-   GET_CURRENT_CONTEXT(ctx);
-
-   obj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_TRUE);
-   if (!obj)
-      return;
-
    _mesa_lock_texture(ctx, obj);
    switch (pname) {
       case GL_TEXTURE_MAG_FILTER:
@@ -2105,6 +2093,32 @@ invalid_pname:
 }
 
 
+void GLAPIENTRY
+_mesa_GetTexParameterfv( GLenum target, GLenum pname, GLfloat *params )
+{
+   struct gl_texture_object *obj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   obj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_TRUE);
+   if (!obj)
+      return;
+
+   get_tex_paramf(ctx, obj, target, pname, params);
+}
+
+void GLAPIENTRY
+_mesa_GetTexParameteriv(GLenum target, GLenum pname, GLint *params )
+{
+   struct gl_texture_object *obj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   obj = get_texobj(ctx, ctx->Texture.CurrentUnit, target, GL_TRUE);
+   if (!obj)
+      return;
+
+   get_tex_parami(ctx, obj, target, pname, params);
+}
+
 /** New in GL 3.0 */
 void GLAPIENTRY
 _mesa_GetTexParameterIiv(GLenum target, GLenum pname, GLint *params)
@@ -2121,7 +2135,7 @@ _mesa_GetTexParameterIiv(GLenum target, GLenum pname, GLint *params)
       COPY_4V(params, texObj->Sampler.BorderColor.i);
       break;
    default:
-      _mesa_GetTexParameteriv(target, pname, params);
+      get_tex_parami(ctx, texObj, target, pname, params);
    }
 }
 
@@ -2144,7 +2158,7 @@ _mesa_GetTexParameterIuiv(GLenum target, GLenum pname, GLuint *params)
    default:
       {
          GLint ip[4];
-         _mesa_GetTexParameteriv(target, pname, ip);
+         get_tex_parami(ctx, texObj, target, pname, ip);
          params[0] = ip[0];
          if (pname == GL_TEXTURE_SWIZZLE_RGBA_EXT || 
              pname == GL_TEXTURE_CROP_RECT_OES) {
