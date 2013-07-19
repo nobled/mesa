@@ -244,6 +244,7 @@ _mesa_DrawBuffer(GLenum buffer)
 {
    GLbitfield destMask;
    GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb = ctx->DrawBuffer;
 
    FLUSH_VERTICES(ctx, 0);
 
@@ -256,8 +257,8 @@ _mesa_DrawBuffer(GLenum buffer)
    }
    else {
       const GLbitfield supportedMask
-         = supported_buffer_bitmask(ctx, ctx->DrawBuffer);
-      destMask = draw_buffer_enum_to_bitmask(ctx, buffer, ctx->DrawBuffer);
+         = supported_buffer_bitmask(ctx, fb);
+      destMask = draw_buffer_enum_to_bitmask(ctx, buffer, fb);
       if (destMask == BAD_MASK) {
          /* totally bogus buffer */
          _mesa_error(ctx, GL_INVALID_ENUM,
