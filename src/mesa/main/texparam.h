@@ -139,4 +139,11 @@ void GLAPIENTRY
 _mesa_GetTextureParameterIuivEXT(GLuint texture, GLenum target,
                                 GLenum pname, GLuint *params);
 
+void GLAPIENTRY
+_mesa_GetMultiTexLevelParameterfvEXT(GLenum texunit, GLenum target, GLint level,
+                                     GLenum pname, GLfloat *params);
+void GLAPIENTRY
+_mesa_GetMultiTexLevelParameterivEXT(GLenum texunit, GLenum target, GLint level,
+                                     GLenum pname, GLint *params);
+
 #endif /* TEXPARAM_H */
