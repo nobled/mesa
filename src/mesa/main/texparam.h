@@ -72,4 +72,27 @@ extern void GLAPIENTRY
 _mesa_TexParameterIuiv(GLenum target, GLenum pname, const GLuint *params);
 
 
+
+/* GL_EXT_direct_state_access */
+
+void GLAPIENTRY
+_mesa_MultiTexParameterfEXT(GLenum texunit, GLenum target,
+                            GLenum pname, GLfloat param);
+void GLAPIENTRY
+_mesa_MultiTexParameterfvEXT(GLenum texunit, GLenum target,
+                             GLenum pname, const GLfloat *params);
+void GLAPIENTRY
+_mesa_MultiTexParameteriEXT(GLenum texunit, GLenum target,
+                            GLenum pname, GLint param);
+void GLAPIENTRY
+_mesa_MultiTexParameterivEXT(GLenum texunit, GLenum target,
+                             GLenum pname, const GLint *params);
+void GLAPIENTRY
+_mesa_MultiTexParameterIivEXT(GLenum texunit, GLenum target,
+                              GLenum pname, const GLint *params);
+void GLAPIENTRY
+_mesa_MultiTexParameterIuivEXT(GLenum texunit, GLenum target,
+                               GLenum pname, const GLuint *params);
+
+
 #endif /* TEXPARAM_H */

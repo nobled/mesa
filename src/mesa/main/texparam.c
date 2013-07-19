@@ -1068,6 +1068,125 @@ _mesa_TexParameterIuiv(GLenum target, GLenum pname, const GLuint *params)
 }
 
 
+/* GL_EXT_direct_state_access */
+
+void GLAPIENTRY
+_mesa_MultiTexParameterfEXT(GLenum texunit, GLenum target,
+                            GLenum pname, GLfloat param)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   texObj = get_texobj(ctx, texunit - GL_TEXTURE0, target, GL_FALSE);
+   if (!texObj)
+      return;
+
+   (void) set_tex_parameterf_wrapper(ctx, texObj, pname, param);
+
+   assert(!ctx->Driver.TexParameter);
+}
+
+
+void GLAPIENTRY
+_mesa_MultiTexParameterfvEXT(GLenum texunit, GLenum target,
+                             GLenum pname, const GLfloat *params)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   texObj = get_texobj(ctx, texunit - GL_TEXTURE0, target, GL_FALSE);
+   if (!texObj)
+      return;
+
+   (void) set_tex_parameterfv_wrapper(ctx, texObj, pname, params);
+
+   assert(!ctx->Driver.TexParameter);
+}
+
+
+void GLAPIENTRY
+_mesa_MultiTexParameteriEXT(GLenum texunit, GLenum target,
+                            GLenum pname, GLint param)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   texObj = get_texobj(ctx, texunit - GL_TEXTURE0, target, GL_FALSE);
+   if (!texObj)
+      return;
+
+   (void) set_tex_parameteri_wrapper(ctx, texObj, pname, param);
+
+   assert(!ctx->Driver.TexParameter);
+}
+
+
+void GLAPIENTRY
+_mesa_MultiTexParameterivEXT(GLenum texunit, GLenum target,
+                             GLenum pname, const GLint *params)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   texObj = get_texobj(ctx, texunit - GL_TEXTURE0, target, GL_FALSE);
+   if (!texObj)
+      return;
+
+   (void) set_tex_parameteriv_wrapper(ctx, texObj, pname, params);
+   assert(!ctx->Driver.TexParameter);
+}
+
+
+void GLAPIENTRY
+_mesa_MultiTexParameterIivEXT(GLenum texunit, GLenum target,
+                              GLenum pname, const GLint *params)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   texObj = get_texobj(ctx, texunit - GL_TEXTURE0, target, GL_FALSE);
+   if (!texObj)
+      return;
+
+   switch (pname) {
+   case GL_TEXTURE_BORDER_COLOR:
+      FLUSH_VERTICES(ctx, _NEW_TEXTURE);
+      /* set the integer-valued border color */
+      COPY_4V(texObj->Sampler.BorderColor.i, params);
+      break;
+   default:
+      (void) set_tex_parameteriv_wrapper(ctx, texObj, pname, params);
+      break;
+   }
+   assert(!ctx->Driver.TexParameter);
+}
+
+
+void GLAPIENTRY
+_mesa_MultiTexParameterIuivEXT(GLenum texunit, GLenum target,
+                               GLenum pname, const GLuint *params)
+{
+   struct gl_texture_object *texObj;
+   GET_CURRENT_CONTEXT(ctx);
+
+   texObj = get_texobj(ctx, texunit - GL_TEXTURE0, target, GL_FALSE);
+   if (!texObj)
+      return;
+
+   switch (pname) {
+   case GL_TEXTURE_BORDER_COLOR:
+      FLUSH_VERTICES(ctx, _NEW_TEXTURE);
+      /* set the unsigned integer-valued border color */
+      COPY_4V(texObj->Sampler.BorderColor.ui, params);
+      break;
+   default:
+      (void) set_tex_parameteriv_wrapper(ctx, texObj, pname, (const GLint *) params);
+      break;
+   }
+   assert(!ctx->Driver.TexParameter);
+}
+
+
 static GLboolean
 legal_get_tex_level_parameter_target(struct gl_context *ctx, GLenum target)
 {
