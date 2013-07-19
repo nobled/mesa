@@ -1763,6 +1763,37 @@ _mesa_GetMultiTexLevelParameterivEXT(GLenum texunit, GLenum target, GLint level,
 }
 
 
+void GLAPIENTRY
+_mesa_GetTextureLevelParameterfvEXT(GLuint texture, GLenum target, GLint level,
+                                     GLenum pname, GLfloat *params)
+{
+   GLint iparam;
+   _mesa_GetTextureLevelParameterivEXT(texture, target, level, pname, &iparam );
+   *params = (GLfloat) iparam;
+}
+
+void GLAPIENTRY
+_mesa_GetTextureLevelParameterivEXT(GLuint texture, GLenum target, GLint level,
+                                     GLenum pname, GLint *params)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_texture_object *texObj;
+
+   if (!legal_get_tex_level_parameter_target(ctx, target)) {
+      _mesa_error(ctx, GL_INVALID_ENUM,
+                  "glGetTextureLevelParameter[if]vEXT(target=0x%x)", target);
+      return;
+   }
+
+   texObj = _mesa_get_and_init_texture(ctx, texture, target,
+                                       "glGetTextureLevelParameterivEXT");
+   if (!texObj)
+      return;
+
+   get_texlevel_param(ctx, texObj, target, level, pname, params);
+}
+
+
 
 static void
 get_tex_paramf(struct gl_context *ctx, struct gl_texture_object *obj,
