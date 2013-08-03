@@ -67,6 +67,10 @@ _mesa_lookup_renderbuffer(struct gl_context *ctx, GLuint id);
 extern struct gl_framebuffer *
 _mesa_lookup_framebuffer(struct gl_context *ctx, GLuint id);
 
+extern struct gl_framebuffer *
+_mesa_get_and_init_fbo(struct gl_context *ctx, GLuint framebuffer,
+                       const char *func);
+
 extern struct gl_renderbuffer_attachment *
 _mesa_get_attachment(struct gl_context *ctx, struct gl_framebuffer *fb,
                      GLenum attachment);
