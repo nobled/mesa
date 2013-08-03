@@ -2110,6 +2110,13 @@ get_and_init_fbo(struct gl_context *ctx, GLuint framebuffer, const char *func,
    return fb;
 }
 
+struct gl_framebuffer *
+_mesa_get_and_init_fbo(struct gl_context *ctx, GLuint framebuffer,
+                       const char *func)
+{
+   return get_and_init_fbo(ctx, framebuffer, func, false);
+}
+
 static void
 bind_framebuffer(GLenum target, GLuint framebuffer, bool allow_user_names)
 {
