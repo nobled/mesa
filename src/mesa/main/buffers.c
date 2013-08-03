@@ -467,6 +467,20 @@ _mesa_DrawBuffers(GLsizei n, const GLenum *buffers)
    draw_buffers(ctx, fb, n, buffers, "DrawBuffers");
 }
 
+void GLAPIENTRY
+_mesa_FramebufferDrawBuffersEXT(GLuint framebuffer, GLsizei n, const GLenum *buffers)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = _mesa_get_and_init_fbo(ctx, framebuffer, "glFramebufferDrawBuffersEXT");
+   if (!fb)
+      return;
+
+   if (!draw_buffers(ctx, fb, n, buffers, "FramebufferDrawBuffersEXT"))
+      return;
+}
+
 
 /**
  * Performs necessary state updates when _mesa_drawbuffers makes an

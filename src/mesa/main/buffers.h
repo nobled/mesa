@@ -60,4 +60,8 @@ extern void GLAPIENTRY
 _mesa_ReadBuffer( GLenum mode );
 
 
+extern void GLAPIENTRY
+_mesa_FramebufferDrawBuffersEXT(GLuint fb, GLsizei n, const GLenum *buffers);
+
+
 #endif
