@@ -470,6 +470,33 @@ _mesa_PointSizePointerOES(GLenum type, GLsizei stride, const GLvoid *ptr)
 }
 
 
+static void
+attrib_pointer(struct gl_context *ctx,
+               struct gl_array_object *ArrayObj,
+               struct gl_buffer_object *ArrayBufferObj,
+               const char *func,
+               GLuint index, GLint size, GLenum type,
+               GLboolean normalized, GLsizei stride, const GLvoid *ptr)
+{
+   const GLbitfield legalTypes = (BYTE_BIT | UNSIGNED_BYTE_BIT |
+                                  SHORT_BIT | UNSIGNED_SHORT_BIT |
+                                  INT_BIT | UNSIGNED_INT_BIT |
+                                  HALF_BIT | FLOAT_BIT | DOUBLE_BIT |
+                                  FIXED_ES_BIT | FIXED_GL_BIT |
+                                  UNSIGNED_INT_2_10_10_10_REV_BIT |
+                                  INT_2_10_10_10_REV_BIT);
+
+   if (index >= ctx->Const.VertexProgram.MaxAttribs) {
+      _mesa_error(ctx, GL_INVALID_VALUE, "glVertexAttribPointerARB(index)");
+      return;
+   }
+
+   update_array(ctx, ArrayObj, ArrayBufferObj, func,
+                VERT_ATTRIB_GENERIC(index),
+                legalTypes, 1, BGRA_OR_4,
+                size, type, stride, normalized, GL_FALSE, ptr);
+}
+
 /**
  * Set a generic vertex attribute array.
  * Note that these arrays DO NOT alias the conventional GL vertex arrays
@@ -480,26 +507,39 @@ _mesa_VertexAttribPointer(GLuint index, GLint size, GLenum type,
                              GLboolean normalized,
                              GLsizei stride, const GLvoid *ptr)
 {
-   const GLbitfield legalTypes = (BYTE_BIT | UNSIGNED_BYTE_BIT |
-                                  SHORT_BIT | UNSIGNED_SHORT_BIT |
-                                  INT_BIT | UNSIGNED_INT_BIT |
-                                  HALF_BIT | FLOAT_BIT | DOUBLE_BIT |
-                                  FIXED_ES_BIT | FIXED_GL_BIT |
-                                  UNSIGNED_INT_2_10_10_10_REV_BIT |
-                                  INT_2_10_10_10_REV_BIT);
    GET_CURRENT_CONTEXT(ctx);
 
+   attrib_pointer(ctx, ctx->Array.ArrayObj, ctx->Array.ArrayBufferObj,
+                  "glVertexAttribPointer", index, size, type, normalized,
+                  stride, ptr);
+}
+
+
+
+static void
+attrib_ipointer(struct gl_context *ctx,
+                struct gl_array_object *ArrayObj,
+                struct gl_buffer_object *ArrayBufferObj,
+                const char *func,
+                GLuint index, GLint size, GLenum type,
+                GLsizei stride, const GLvoid *ptr)
+{
+   const GLbitfield legalTypes = (BYTE_BIT | UNSIGNED_BYTE_BIT |
+                                  SHORT_BIT | UNSIGNED_SHORT_BIT |
+                                  INT_BIT | UNSIGNED_INT_BIT);
+   const GLboolean normalized = GL_FALSE;
+   const GLboolean integer = GL_TRUE;
+
    if (index >= ctx->Const.VertexProgram.MaxAttribs) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glVertexAttribPointerARB(index)");
+      _mesa_error(ctx, GL_INVALID_VALUE, "glVertexAttribIPointer(index)");
       return;
    }
 
-   update_array(ctx, ctx->Array.ArrayObj, ctx->Array.ArrayBufferObj,
-                "glVertexAttribPointer", VERT_ATTRIB_GENERIC(index),
-                legalTypes, 1, BGRA_OR_4,
-                size, type, stride, normalized, GL_FALSE, ptr);
+   update_array(ctx, ArrayObj, ArrayBufferObj, func,
+                VERT_ATTRIB_GENERIC(index),
+                legalTypes, 1, 4,
+                size, type, stride, normalized, integer, ptr);
 }
-
 
 /**
  * GL_EXT_gpu_shader4 / GL 3.0.
@@ -511,22 +551,11 @@ void GLAPIENTRY
 _mesa_VertexAttribIPointer(GLuint index, GLint size, GLenum type,
                            GLsizei stride, const GLvoid *ptr)
 {
-   const GLbitfield legalTypes = (BYTE_BIT | UNSIGNED_BYTE_BIT |
-                                  SHORT_BIT | UNSIGNED_SHORT_BIT |
-                                  INT_BIT | UNSIGNED_INT_BIT);
-   const GLboolean normalized = GL_FALSE;
-   const GLboolean integer = GL_TRUE;
    GET_CURRENT_CONTEXT(ctx);
 
-   if (index >= ctx->Const.VertexProgram.MaxAttribs) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glVertexAttribIPointer(index)");
-      return;
-   }
-
-   update_array(ctx, ctx->Array.ArrayObj, ctx->Array.ArrayBufferObj,
-                "glVertexAttribIPointer", VERT_ATTRIB_GENERIC(index),
-                legalTypes, 1, 4,
-                size, type, stride, normalized, integer, ptr);
+   attrib_ipointer(ctx, ctx->Array.ArrayObj, ctx->Array.ArrayBufferObj,
+                  "glVertexAttribPointer", index, size, type,
+                  stride, ptr);
 }
 
 
