@@ -51,6 +51,9 @@ _mesa_lookup_arrayobj(struct gl_context *ctx, GLuint id);
 extern struct gl_array_object *
 _mesa_new_array_object( struct gl_context *ctx, GLuint name );
 
+extern struct gl_array_object *
+_mesa_lookup_array_object( struct gl_context *ctx, GLuint name, const char *func );
+
 extern void
 _mesa_delete_array_object( struct gl_context *ctx, struct gl_array_object *obj );
 
