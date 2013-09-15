@@ -327,6 +327,33 @@ _mesa_update_array_object_max_element(struct gl_context *ctx,
 /**********************************************************************/
 
 
+static struct gl_array_object *
+lookup_arrayobj_helper(struct gl_context *ctx, GLuint id,
+                       GLboolean genRequired, const char *func)
+{
+   struct gl_array_object *newObj;
+
+   newObj = _mesa_lookup_arrayobj(ctx, id);
+   if (newObj)
+      return newObj;
+
+   if (genRequired) {
+         _mesa_error(ctx, GL_INVALID_OPERATION, "gl%s(non-gen name %u)", func, id);
+         return NULL;
+   }
+
+   /* For APPLE version, generate a new array object now */
+   newObj = (*ctx->Driver.NewArrayObject)(ctx, id);
+   if (!newObj) {
+      _mesa_error(ctx, GL_OUT_OF_MEMORY, "gl%s", func);
+      return NULL;
+   }
+
+   save_array_object(ctx, newObj);
+
+   return newObj;
+}
+
 /**
  * Helper for _mesa_BindVertexArray() and _mesa_BindVertexArrayAPPLE().
  * \param genRequired  specifies behavour when id was not generated with
@@ -354,22 +381,10 @@ bind_vertex_array(struct gl_context *ctx, GLuint id, GLboolean genRequired)
    }
    else {
       /* non-default array object */
-      newObj = _mesa_lookup_arrayobj(ctx, id);
-      if (!newObj) {
-         if (genRequired) {
-            _mesa_error(ctx, GL_INVALID_OPERATION, "glBindVertexArray(non-gen name)");
-            return;
-         }
-
-         /* For APPLE version, generate a new array object now */
-	 newObj = (*ctx->Driver.NewArrayObject)(ctx, id);
-         if (!newObj) {
-            _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindVertexArrayAPPLE");
-            return;
-         }
-
-         save_array_object(ctx, newObj);
-      }
+      newObj = lookup_arrayobj_helper(ctx, id, genRequired,
+                  genRequired ? "BindVertexArray" : "BindVertexArrayAPPLE");
+      if (!newObj)
+         return;
 
       if (!newObj->EverBound) {
          /* The "Interactions with APPLE_vertex_array_object" section of the
