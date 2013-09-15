@@ -354,6 +354,12 @@ lookup_arrayobj_helper(struct gl_context *ctx, GLuint id,
    return newObj;
 }
 
+struct gl_array_object *
+_mesa_lookup_array_object(struct gl_context *ctx, GLuint name, const char *func)
+{
+   return lookup_arrayobj_helper(ctx, name, GL_TRUE, func);
+}
+
 /**
  * Helper for _mesa_BindVertexArray() and _mesa_BindVertexArrayAPPLE().
  * \param genRequired  specifies behavour when id was not generated with
