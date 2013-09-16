@@ -121,6 +121,7 @@ API_XML = \
 	APPLE_object_purgeable.xml \
 	APPLE_vertex_array_object.xml \
 	ARB_uniform_buffer_object.xml \
+	EXT_direct_state_access.xml \
 	EXT_draw_buffers2.xml \
 	EXT_framebuffer_object.xml \
 	EXT_gpu_shader4.xml \
