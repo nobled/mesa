@@ -13148,4 +13148,6 @@
 
 <xi:include href="EXT_transform_feedback.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
+<xi:include href="EXT_direct_state_access.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
 </OpenGLAPI>
