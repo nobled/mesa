@@ -195,6 +195,16 @@ _mesa_GetVertexAttribIuiv(GLuint index, GLenum pname, GLuint *params);
 extern void GLAPIENTRY
 _mesa_GetVertexAttribPointerv(GLuint index, GLenum pname, GLvoid **pointer);
 
+void GLAPIENTRY
+_mesa_GetVertexArrayPointeri_vEXT(GLuint vaobj, GLuint index, GLenum pname,
+                                  GLvoid **param);
+
+void GLAPIENTRY
+_mesa_GetVertexArrayIntegervEXT(GLuint vaobj, GLenum pname, GLint *param);
+
+void GLAPIENTRY
+_mesa_GetVertexArrayIntegeri_vEXT(GLuint vaobj, GLuint index, GLenum pname,
+                                  GLint *param);
 
 extern void GLAPIENTRY
 _mesa_InterleavedArrays(GLenum format, GLsizei stride, const GLvoid *pointer);
