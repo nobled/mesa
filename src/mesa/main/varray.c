@@ -696,6 +696,52 @@ _mesa_DisableVertexAttribArray(GLuint index)
    disable_varray(ctx, "DisableVertexAttribArray", ctx->Array.ArrayObj, index);
 }
 
+void GLAPIENTRY
+_mesa_EnableVertexArrayAttribEXT(GLuint vaobj, GLuint index)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_array_object *arrayObj;
+
+   if (vaobj == 0)
+      arrayObj = ctx->Array.DefaultArrayObj;
+   else
+      arrayObj = _mesa_lookup_array_object(ctx, vaobj,
+                                    "EnableVertexArrayAttribEXT");
+   /* GL_EXT_direct_state_access: "However these commands fail and an
+    INVALID_OPERATION error is generated if vaobj is not a name returned
+    from a previous call to GenVertexArrays, or if such a name has since
+    been deleted with DeleteVertexArrays."
+
+    The _mesa_lookup_array_object() call records the error for us. */
+   if (!arrayObj)
+      return;
+
+   enable_varray(ctx, "EnableVertexAttribArray", arrayObj, index);
+}
+
+void GLAPIENTRY
+_mesa_DisableVertexArrayAttribEXT(GLuint vaobj, GLuint index)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_array_object *arrayObj;
+
+   if (vaobj == 0)
+      arrayObj = ctx->Array.DefaultArrayObj;
+   else
+      arrayObj = _mesa_lookup_array_object(ctx, vaobj,
+                                    "DisableVertexArrayAttribEXT");
+   /* GL_EXT_direct_state_access: "However these commands fail and an
+    INVALID_OPERATION error is generated if vaobj is not a name returned
+    from a previous call to GenVertexArrays, or if such a name has since
+    been deleted with DeleteVertexArrays."
+
+    The _mesa_lookup_array_object() call records the error for us. */
+   if (!arrayObj)
+      return;
+
+   disable_varray(ctx, "DisableVertexAttribArray", arrayObj, index);
+}
+
 
 /**
  * Return info for a vertex attribute array (no alias with legacy

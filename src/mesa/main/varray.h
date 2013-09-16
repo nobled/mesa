@@ -165,6 +165,13 @@ extern void GLAPIENTRY
 _mesa_DisableVertexAttribArray(GLuint index);
 
 
+void GLAPIENTRY
+_mesa_DisableVertexArrayAttribEXT(GLuint vaobj, GLuint index);
+
+void GLAPIENTRY
+_mesa_EnableVertexArrayAttribEXT(GLuint vaobj, GLuint index);
+
+
 extern void GLAPIENTRY
 _mesa_GetVertexAttribdv(GLuint index, GLenum pname, GLdouble *params);
 
