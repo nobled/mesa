@@ -1795,6 +1795,57 @@ _mesa_GetInteger64i_v( GLenum pname, GLuint index, GLint64 *params )
 }
 
 void GLAPIENTRY
+_mesa_GetFloati_v( GLenum pname, GLuint index, GLfloat *params )
+{
+   union value v;
+   enum value_type type =
+      find_value_indexed("glGetFloati_v", pname, index, &v);
+
+   switch (type) {
+   case TYPE_INT:
+      params[0] = INT_TO_FLOAT(v.value_int);
+      break;
+   case TYPE_INT_4:
+      params[0] = INT_TO_FLOAT(v.value_int_4[0]);
+      params[1] = INT_TO_FLOAT(v.value_int_4[1]);
+      params[2] = INT_TO_FLOAT(v.value_int_4[2]);
+      params[3] = INT_TO_FLOAT(v.value_int_4[3]);
+      break;
+   case TYPE_INT64:
+      params[0] = v.value_int;
+      break;
+   default:
+      ; /* nothing - GL error was recorded */
+   }
+}
+
+void GLAPIENTRY
+_mesa_GetDoublei_v( GLenum pname, GLuint index, GLdouble *params )
+{
+   union value v;
+   enum value_type type =
+      find_value_indexed("glGetDoublei_v", pname, index, &v);
+
+   switch (type) {
+   case TYPE_INT:
+      params[0] = v.value_int;
+      break;
+   case TYPE_INT_4:
+      params[0] = v.value_int_4[0];
+      params[1] = v.value_int_4[1];
+      params[2] = v.value_int_4[2];
+      params[3] = v.value_int_4[3];
+      break;
+   case TYPE_INT64:
+      params[0] = v.value_int;
+      break;
+   default:
+      ; /* nothing - GL error was recorded */
+   }
+}
+
+
+void GLAPIENTRY
 _mesa_GetFixedv(GLenum pname, GLfixed *params)
 {
    const struct value_desc *d;
