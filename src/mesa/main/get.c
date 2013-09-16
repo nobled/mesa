@@ -29,6 +29,7 @@
 #include "enable.h"
 #include "enums.h"
 #include "extensions.h"
+#include "fbobject.h"
 #include "get.h"
 #include "macros.h"
 #include "mtypes.h"
@@ -1884,5 +1885,46 @@ _mesa_GetFixedv(GLenum pname, GLfixed *params)
       shift = d->type - TYPE_BIT_0;
       params[0] = BOOLEAN_TO_FIXED((*(GLbitfield *) p >> shift) & 1);
       break;
+   }
+}
+
+void GLAPIENTRY
+_mesa_GetFramebufferParameterivEXT(GLuint framebuffer, GLenum pname,
+                                   GLint *param)
+{
+   const char *func = "glGetFramebufferParameterivEXT";
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fbo;
+
+   fbo = _mesa_get_and_init_fbo(ctx, framebuffer, func);
+   if (!fbo)
+      return; /* error */
+
+   /* GL_EXT_direct_state_access:
+     "The pname parameter must be one of
+      framebuffer dependent values listed in either table 4.nnn (namely
+      DRAW_BUFFER, READ_BUFFER, or DRAW_BUFFER0 through DRAW_BUFFER15)."
+    */
+   switch (pname) {
+   case GL_READ_BUFFER:
+      *param = fbo->ColorReadBuffer;
+      return;
+   case GL_DRAW_BUFFER:
+   case GL_DRAW_BUFFER0:
+      *param = fbo->ColorDrawBuffer[0];
+      return;
+   case GL_DRAW_BUFFER1:
+   case GL_DRAW_BUFFER2:
+   case GL_DRAW_BUFFER3:
+   case GL_DRAW_BUFFER4:
+   case GL_DRAW_BUFFER5:
+   case GL_DRAW_BUFFER6:
+   case GL_DRAW_BUFFER7:
+      STATIC_ASSERT(MAX_DRAW_BUFFERS == 8);
+      *param = fbo->ColorDrawBuffer[pname - GL_DRAW_BUFFER0];
+      return;
+   default:
+      _mesa_error(ctx, GL_INVALID_ENUM, "%s(pname=%s)", func,
+               _mesa_lookup_enum_by_nr(pname));
    }
 }
