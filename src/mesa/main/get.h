@@ -65,6 +65,11 @@ _mesa_GetInteger64i_v( GLenum pname, GLuint index, GLint64 *params );
 extern void GLAPIENTRY
 _mesa_GetPointerv( GLenum pname, GLvoid **params );
 
+extern void GLAPIENTRY
+_mesa_GetFramebufferParameterivEXT(GLuint framebuffer, GLenum pname,
+                                   GLint *param);
+
+
 extern const GLubyte * GLAPIENTRY
 _mesa_GetString( GLenum name );
 
