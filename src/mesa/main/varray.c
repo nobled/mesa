@@ -960,6 +960,98 @@ _mesa_GetVertexAttribPointerv(GLuint index, GLenum pname, GLvoid **pointer)
                       index, pname, pointer);
 }
 
+void GLAPIENTRY
+_mesa_GetVertexArrayPointeri_vEXT(GLuint vaobj, GLuint index, GLenum pname,
+                                  GLvoid **param)
+{
+   const char *func = "GetVertexArrayPointeri_vEXT";
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_array_object *ArrayObj;
+
+   if (vaobj == 0)
+      ArrayObj = ctx->Array.DefaultArrayObj;
+   else
+      ArrayObj = _mesa_lookup_array_object(ctx, vaobj, func);
+   if (!ArrayObj)
+      return; /* error */
+
+   assert(ctx->API == API_OPENGL_CORE);
+   /* GL_EXT_direct_state_access: "For GetVertexArrayPointeri_vEXT, pname
+    * must be VERTEX_ATTRIB_ARRAY_POINTER or TEXTURE_COORD_ARRAY_POINTER"
+    *
+    * TEXTURE_COORD_* is deprecated, so just reuse GetVertexAttribPointerv.
+    */
+   get_vertex_pointer(ctx, func, ArrayObj, index, pname, param);
+}
+
+void GLAPIENTRY
+_mesa_GetVertexArrayIntegervEXT(GLuint vaobj, GLenum pname, GLint *param)
+{
+   const char *func = "GetVertexArrayIntegervEXT";
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_array_object *ArrayObj;
+
+   if (vaobj == 0)
+      ArrayObj = ctx->Array.DefaultArrayObj;
+   else
+      ArrayObj = _mesa_lookup_array_object(ctx, vaobj, func);
+   if (!ArrayObj)
+      return; /* error */
+
+   assert(ctx->API == API_OPENGL_CORE);
+   /* GL_EXT_direct_state_access:
+      "For
+       GetVertexArrayIntegervEXT, pname must be one of the "Get value" tokens
+       in tables 6.6, 6.7, 6.8, and 6.9 that use GetIntegerv, IsEnabled, or
+       GetPointerv"
+    */
+   switch (pname) {
+   case GL_ELEMENT_ARRAY_BUFFER_BINDING:
+      *param = ArrayObj->ElementArrayBufferObj->Name;
+      return;
+   default:
+      /* all other valid enums are deprecated state,
+         per Tables 6.6 to 6.9 in glspec31undep.20090528.pdf */
+      _mesa_error(ctx, GL_INVALID_ENUM, "gl%s(pname=%s)", func,
+               _mesa_lookup_enum_by_nr(pname));
+   }
+}
+
+void GLAPIENTRY
+_mesa_GetVertexArrayIntegeri_vEXT(GLuint vaobj, GLuint index, GLenum pname,
+                                  GLint *param)
+{
+   const char *func = "GetVertexArrayIntegeri_vEXT";
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_array_object *ArrayObj;
+   GLintptr tmp = -1;
+
+   if (vaobj == 0)
+      ArrayObj = ctx->Array.DefaultArrayObj;
+   else
+      ArrayObj = _mesa_lookup_array_object(ctx, vaobj, func);
+   if (!ArrayObj)
+      return; /* error */
+
+   assert(ctx->API == API_OPENGL_CORE);
+   /* GL_EXT_direct_state_access:
+      "For
+       GetVertexArrayIntegervEXT, pname must be one of the "Get value" tokens
+       in tables 6.6, 6.7, 6.8, and 6.9 that use GetIntegerv, IsEnabled, or
+       GetPointerv"
+    */
+   if (pname == GL_VERTEX_ATTRIB_ARRAY_POINTER) {
+      get_vertex_pointer(ctx, "GetVertexArrayIntegeri_vEXT", ArrayObj,
+                      index, pname, (GLvoid**)&tmp);
+      if (tmp != -1)
+         *param = (GLint)tmp;
+      return;
+   }
+   /* aside from *_POINTER, all other valid non-deprecated values are handled
+      by this helper. */
+   get_vertex_array_attrib(ctx, ArrayObj, index, pname,
+                           "glGetVertexArrayIntegeri_vEXT");
+}
 
 void GLAPIENTRY
 _mesa_VertexPointerEXT(GLint size, GLenum type, GLsizei stride,
