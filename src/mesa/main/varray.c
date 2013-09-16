@@ -749,8 +749,8 @@ _mesa_DisableVertexArrayAttribEXT(GLuint vaobj, GLuint index)
  * not handle the 4-element GL_CURRENT_VERTEX_ATTRIB_ARB query.
  */
 static GLuint
-get_vertex_array_attrib(struct gl_context *ctx, GLuint index, GLenum pname,
-                  const char *caller)
+get_vertex_array_attrib(struct gl_context *ctx, struct gl_array_object *ArrayObj,
+                        GLuint index, GLenum pname, const char *caller)
 {
    const struct gl_client_array *array;
 
@@ -761,7 +761,7 @@ get_vertex_array_attrib(struct gl_context *ctx, GLuint index, GLenum pname,
 
    ASSERT(VERT_ATTRIB_GENERIC(index) < Elements(ctx->Array.ArrayObj->VertexAttrib));
 
-   array = &ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_GENERIC(index)];
+   array = &ArrayObj->VertexAttrib[VERT_ATTRIB_GENERIC(index)];
 
    switch (pname) {
    case GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB:
@@ -838,7 +838,8 @@ _mesa_GetVertexAttribfv(GLuint index, GLenum pname, GLfloat *params)
       }
    }
    else {
-      params[0] = (GLfloat) get_vertex_array_attrib(ctx, index, pname,
+      params[0] = (GLfloat) get_vertex_array_attrib(ctx, ctx->Array.ArrayObj,
+                                                    index, pname,
                                                     "glGetVertexAttribfv");
    }
 }
@@ -859,7 +860,8 @@ _mesa_GetVertexAttribdv(GLuint index, GLenum pname, GLdouble *params)
       }
    }
    else {
-      params[0] = (GLdouble) get_vertex_array_attrib(ctx, index, pname,
+      params[0] = (GLdouble) get_vertex_array_attrib(ctx, ctx->Array.ArrayObj,
+                                                     index, pname,
                                                      "glGetVertexAttribdv");
    }
 }
@@ -881,7 +883,8 @@ _mesa_GetVertexAttribiv(GLuint index, GLenum pname, GLint *params)
       }
    }
    else {
-      params[0] = (GLint) get_vertex_array_attrib(ctx, index, pname,
+      params[0] = (GLint) get_vertex_array_attrib(ctx, ctx->Array.ArrayObj,
+                                                  index, pname,
                                                   "glGetVertexAttribiv");
    }
 }
@@ -901,7 +904,8 @@ _mesa_GetVertexAttribIiv(GLuint index, GLenum pname, GLint *params)
       }
    }
    else {
-      params[0] = (GLint) get_vertex_array_attrib(ctx, index, pname,
+      params[0] = (GLint) get_vertex_array_attrib(ctx, ctx->Array.ArrayObj,
+                                                  index, pname,
                                                   "glGetVertexAttribIiv");
    }
 }
@@ -921,7 +925,8 @@ _mesa_GetVertexAttribIuiv(GLuint index, GLenum pname, GLuint *params)
       }
    }
    else {
-      params[0] = get_vertex_array_attrib(ctx, index, pname,
+      params[0] = get_vertex_array_attrib(ctx, ctx->Array.ArrayObj,
+                                          index, pname,
                                           "glGetVertexAttribIuiv");
    }
 }
