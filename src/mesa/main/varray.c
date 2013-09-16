@@ -926,25 +926,33 @@ _mesa_GetVertexAttribIuiv(GLuint index, GLenum pname, GLuint *params)
    }
 }
 
+static void
+get_vertex_pointer(struct gl_context *ctx, const char *func,
+                   struct gl_array_object *ArrayObj, GLuint index,
+                   GLenum pname, GLvoid **pointer)
+{
+   if (index >= ctx->Const.VertexProgram.MaxAttribs) {
+      _mesa_error(ctx, GL_INVALID_VALUE, "gl%s(index)", func);
+      return;
+   }
+
+   if (pname != GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "gl%s(pname)", func);
+      return;
+   }
+
+   ASSERT(VERT_ATTRIB_GENERIC(index) < Elements(ctx->Array.ArrayObj->VertexAttrib));
+
+   *pointer = (GLvoid *) ArrayObj->VertexAttrib[VERT_ATTRIB_GENERIC(index)].Ptr;
+}
 
 void GLAPIENTRY
 _mesa_GetVertexAttribPointerv(GLuint index, GLenum pname, GLvoid **pointer)
 {
    GET_CURRENT_CONTEXT(ctx);
 
-   if (index >= ctx->Const.VertexProgram.MaxAttribs) {
-      _mesa_error(ctx, GL_INVALID_VALUE, "glGetVertexAttribPointerARB(index)");
-      return;
-   }
-
-   if (pname != GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB) {
-      _mesa_error(ctx, GL_INVALID_ENUM, "glGetVertexAttribPointerARB(pname)");
-      return;
-   }
-
-   ASSERT(VERT_ATTRIB_GENERIC(index) < Elements(ctx->Array.ArrayObj->VertexAttrib));
-
-   *pointer = (GLvoid *) ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_GENERIC(index)].Ptr;
+   get_vertex_pointer(ctx, "GetVertexAttribPointerv", ctx->Array.ArrayObj,
+                      index, pname, pointer);
 }
 
 
