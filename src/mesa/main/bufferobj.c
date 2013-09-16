@@ -673,6 +673,21 @@ handle_bind_buffer_gen(struct gl_context *ctx,
    return true;
 }
 
+struct gl_buffer_object *
+_mesa_get_and_init_bufobj(struct gl_context *ctx, GLuint buffer,
+                          const char *func)
+{
+   struct gl_buffer_object *bufObj;
+   if (buffer == 0)
+      return ctx->Shared->NullBufferObj;
+   else
+      bufObj = _mesa_lookup_bufferobj(ctx, buffer);
+
+   if (!handle_bind_buffer_gen(ctx, func, buffer, &bufObj))
+      return NULL;
+   return bufObj;
+}
+
 /**
  * Bind the specified target to buffer for the specified context.
  * Called by glBindBuffer() and other functions.

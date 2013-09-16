@@ -69,6 +69,10 @@ _mesa_update_default_objects_buffer_objects(struct gl_context *ctx);
 extern struct gl_buffer_object *
 _mesa_lookup_bufferobj(struct gl_context *ctx, GLuint buffer);
 
+extern struct gl_buffer_object *
+_mesa_get_and_init_bufobj(struct gl_context *ctx, GLuint buffer,
+                          const char *func);
+
 extern void
 _mesa_initialize_buffer_object( struct gl_context *ctx,
 				struct gl_buffer_object *obj,
