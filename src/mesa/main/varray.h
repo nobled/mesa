@@ -147,6 +147,15 @@ void GLAPIENTRY
 _mesa_VertexAttribIPointer(GLuint index, GLint size, GLenum type,
                            GLsizei stride, const GLvoid *ptr);
 
+void GLAPIENTRY
+_mesa_VertexArrayVertexAttribOffsetEXT(GLuint vaobj, GLuint buffer,
+                             GLuint index, GLint size, GLenum type,
+                             GLboolean normalized,
+                             GLsizei stride, GLintptr offset);
+void GLAPIENTRY
+_mesa_VertexArrayVertexAttribIOffsetEXT(GLuint vaobj, GLuint buffer,
+                           GLuint index, GLint size, GLenum type,
+                           GLsizei stride, GLintptr offset);
 
 extern void GLAPIENTRY
 _mesa_EnableVertexAttribArray(GLuint index);
