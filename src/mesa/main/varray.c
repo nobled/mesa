@@ -558,6 +558,88 @@ _mesa_VertexAttribIPointer(GLuint index, GLint size, GLenum type,
                   stride, ptr);
 }
 
+void GLAPIENTRY
+_mesa_VertexArrayVertexAttribOffsetEXT(GLuint vaobj, GLuint buffer,
+                             GLuint index, GLint size, GLenum type,
+                             GLboolean normalized,
+                             GLsizei stride, GLintptr offset)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLvoid *ptr = (const GLvoid*)offset;
+   struct gl_array_object *ArrayObj;
+   struct gl_buffer_object *ArrayBufferObj;
+
+   if (vaobj == 0)
+      ArrayObj = ctx->Array.DefaultArrayObj;
+   else
+      ArrayObj = _mesa_lookup_array_object(ctx, vaobj,
+                                    "VertexArrayVertexAttribOffsetEXT");
+   /* GL_EXT_direct_state_access: "However these commands fail and an
+    INVALID_OPERATION error is generated if vaobj is not a name returned
+    from a previous call to GenVertexArrays, or if such a name has since
+    been deleted with DeleteVertexArrays."
+
+    The _mesa_lookup_array_object() call records the error for us. */
+   if (!ArrayObj)
+      return;
+
+   /* The buffer name zero is allowed, and _mesa_get_and_init_bufobj
+      will return ctx->Shared->NullBufferObj in that case:
+      "Because the GLintptr type has the same sizeof as a pointer,
+       applications seeking to pass pointers with a zero value for the
+       buffer parameter can do so by casting their pointer to a GLintptr."
+    */
+   ArrayBufferObj = _mesa_get_and_init_bufobj(ctx, buffer,
+                                  "glVertexArrayVertexAttribOffsetEXT");
+   if (!ArrayBufferObj)
+      return;
+
+   attrib_pointer(ctx, ArrayObj, ArrayBufferObj,
+                  "glVertexArrayVertexAttribOffsetEXT",
+                  index, size, type, normalized, stride, ptr);
+}
+
+
+void GLAPIENTRY
+_mesa_VertexArrayVertexAttribIOffsetEXT(GLuint vaobj, GLuint buffer,
+                           GLuint index, GLint size, GLenum type,
+                           GLsizei stride, GLintptr offset)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   const GLvoid *ptr = (const GLvoid*)offset;
+   struct gl_array_object *ArrayObj;
+   struct gl_buffer_object *ArrayBufferObj;
+
+   if (vaobj == 0)
+      ArrayObj = ctx->Array.DefaultArrayObj;
+   else
+      ArrayObj = _mesa_lookup_array_object(ctx, vaobj,
+                                    "VertexArrayVertexAttribOffsetEXT");
+   /* GL_EXT_direct_state_access: "However these commands fail and an
+    INVALID_OPERATION error is generated if vaobj is not a name returned
+    from a previous call to GenVertexArrays, or if such a name has since
+    been deleted with DeleteVertexArrays."
+
+    The _mesa_lookup_array_object() call records the error for us. */
+   if (!ArrayObj)
+      return;
+
+   /* The buffer name zero is allowed, and _mesa_get_and_init_bufobj
+      will return ctx->Shared->NullBufferObj in that case:
+      "Because the GLintptr type has the same sizeof as a pointer,
+       applications seeking to pass pointers with a zero value for the
+       buffer parameter can do so by casting their pointer to a GLintptr."
+    */
+   ArrayBufferObj = _mesa_get_and_init_bufobj(ctx, buffer,
+                                  "glVertexArrayVertexAttribOffsetEXT");
+   if (!ArrayBufferObj)
+      return;
+
+   attrib_ipointer(ctx, ArrayObj, ArrayBufferObj,
+                  "glVertexArrayVertexAttribIOffsetEXT", index, size, type,
+                  stride, ptr);
+}
+
 
 
 void GLAPIENTRY
