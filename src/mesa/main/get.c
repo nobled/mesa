@@ -1021,6 +1021,11 @@ check_extra(struct gl_context *ctx, const char *func, const struct value_desc *d
 static const struct value_desc error_value =
    { 0, 0, TYPE_INVALID, NO_OFFSET, NO_EXTRA };
 
+static const struct value_desc *
+find_value_desc(struct gl_context *ctx, const char *func, GLenum pname);
+static void
+get_value(struct gl_context *ctx, const struct value_desc *d,
+          void **p, union value *v);
 /**
  * Find the struct value_desc corresponding to the enum 'pname'.
  * 
@@ -1047,7 +1052,19 @@ static const struct value_desc *
 find_value(const char *func, GLenum pname, void **p, union value *v)
 {
    GET_CURRENT_CONTEXT(ctx);
-   struct gl_texture_unit *unit;
+   const struct value_desc *d = find_value_desc(ctx, func, pname);
+
+   if (d == &error_value)
+      return d;
+
+   get_value(ctx, d, p, v);
+
+   return d;
+}
+
+static const struct value_desc *
+find_value_desc(struct gl_context *ctx, const char *func, GLenum pname)
+{
    int mask, hash;
    const struct value_desc *d;
    int api;
@@ -1085,32 +1102,37 @@ find_value(const char *func, GLenum pname, void **p, union value *v)
 
    if (unlikely(d->extra && !check_extra(ctx, func, d)))
       return &error_value;
+   return d;
+}
+
+static void
+get_value(struct gl_context *ctx, const struct value_desc *d,
+          void **p, union value *v)
+{
+   struct gl_texture_unit *unit;
 
    switch (d->location) {
    case LOC_BUFFER:
       *p = ((char *) ctx->DrawBuffer + d->offset);
-      return d;
+      return;
    case LOC_CONTEXT:
       *p = ((char *) ctx + d->offset);
-      return d;
+      return;
    case LOC_ARRAY:
       *p = ((char *) ctx->Array.ArrayObj + d->offset);
-      return d;
+      return;
    case LOC_TEXUNIT:
       unit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
       *p = ((char *) unit + d->offset);
-      return d;
+      return;
    case LOC_CUSTOM:
       find_custom_value(ctx, d, v);
       *p = v;
-      return d;
+      return;
    default:
       assert(0);
       break;
    }
-
-   /* silence warning */
-   return &error_value;
 }
 
 static const int transpose[] = {
