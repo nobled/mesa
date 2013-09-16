@@ -302,6 +302,19 @@ _mesa_DrawBuffer(GLenum buffer)
    draw_buffer(ctx, fb, buffer, "DrawBuffer");
 }
 
+void GLAPIENTRY
+_mesa_FramebufferDrawBufferEXT(GLuint framebuffer, GLenum buffer)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = _mesa_get_and_init_fbo(ctx, framebuffer, "glFramebufferDrawBufferEXT");
+   if (!fb)
+      return;
+
+   draw_buffer(ctx, fb, buffer, "FramebufferDrawBufferEXT");
+}
+
 
 static GLboolean
 draw_buffers(struct gl_context *ctx, struct gl_framebuffer *fb,
@@ -707,4 +720,17 @@ _mesa_ReadBuffer(GLenum buffer)
       _mesa_debug(ctx, "glReadBuffer %s\n", _mesa_lookup_enum_by_nr(buffer));
 
    read_buffer(ctx, fb, buffer, "ReadBuffer");
+}
+
+void GLAPIENTRY
+_mesa_FramebufferReadBufferEXT(GLuint framebuffer, GLenum buffer)
+{
+   GET_CURRENT_CONTEXT(ctx);
+   struct gl_framebuffer *fb;
+
+   fb = _mesa_get_and_init_fbo(ctx, framebuffer, "glFramebufferReadBufferEXT");
+   if (!fb)
+      return;
+
+   read_buffer(ctx, fb, buffer, "FramebufferReadBufferEXT");
 }
