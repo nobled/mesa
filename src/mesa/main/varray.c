@@ -642,19 +642,14 @@ _mesa_VertexArrayVertexAttribIOffsetEXT(GLuint vaobj, GLuint buffer,
 
 
 
-void GLAPIENTRY
-_mesa_EnableVertexAttribArray(GLuint index)
+static void enable_varray(struct gl_context *ctx, const char *func,
+                          struct gl_array_object *arrayObj, GLuint index)
 {
-   struct gl_array_object *arrayObj;
-   GET_CURRENT_CONTEXT(ctx);
-
    if (index >= ctx->Const.VertexProgram.MaxAttribs) {
       _mesa_error(ctx, GL_INVALID_VALUE,
                   "glEnableVertexAttribArrayARB(index)");
       return;
    }
-
-   arrayObj = ctx->Array.ArrayObj;
 
    ASSERT(VERT_ATTRIB_GENERIC(index) < Elements(arrayObj->VertexAttrib));
 
@@ -666,20 +661,14 @@ _mesa_EnableVertexAttribArray(GLuint index)
    }
 }
 
-
-void GLAPIENTRY
-_mesa_DisableVertexAttribArray(GLuint index)
+static void disable_varray(struct gl_context *ctx, const char *func,
+                           struct gl_array_object *arrayObj, GLuint index)
 {
-   struct gl_array_object *arrayObj;
-   GET_CURRENT_CONTEXT(ctx);
-
    if (index >= ctx->Const.VertexProgram.MaxAttribs) {
       _mesa_error(ctx, GL_INVALID_VALUE,
                   "glDisableVertexAttribArrayARB(index)");
       return;
    }
-
-   arrayObj = ctx->Array.ArrayObj;
 
    ASSERT(VERT_ATTRIB_GENERIC(index) < Elements(arrayObj->VertexAttrib));
 
@@ -689,6 +678,22 @@ _mesa_DisableVertexAttribArray(GLuint index)
       arrayObj->VertexAttrib[VERT_ATTRIB_GENERIC(index)].Enabled = GL_FALSE;
       arrayObj->_Enabled &= ~VERT_BIT_GENERIC(index);
    }
+}
+
+void GLAPIENTRY
+_mesa_EnableVertexAttribArray(GLuint index)
+{
+   GET_CURRENT_CONTEXT(ctx);
+
+   enable_varray(ctx, "EnableVertexAttribArray", ctx->Array.ArrayObj, index);
+}
+
+void GLAPIENTRY
+_mesa_DisableVertexAttribArray(GLuint index)
+{
+   GET_CURRENT_CONTEXT(ctx);
+
+   disable_varray(ctx, "DisableVertexAttribArray", ctx->Array.ArrayObj, index);
 }
 
 
