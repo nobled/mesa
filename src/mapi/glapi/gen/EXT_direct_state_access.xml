@@ -1478,7 +1478,7 @@
         <param name="height" type="GLsizei"/>
     </function>
 
-
+<!-- NOT IMPLEMENTED: Requires GL_NV_framebuffer_multisample_coverage.
     <function name="NamedRenderbufferStorageMultisampleCoverageEXT" offset="assign">
         <param name="renderbuffer" type="GLuint"/>
         <param name="coverageSamples" type="GLsizei"/>
@@ -1487,6 +1487,7 @@
         <param name="width" type="GLsizei"/>
         <param name="height" type="GLsizei"/>
     </function>
+-->
 
     <function name="CheckNamedFramebufferStatusEXT" offset="assign">
         <param name="framebuffer" type="GLuint"/>
@@ -1590,6 +1591,7 @@
         <param name="level" type="GLint"/>
         <param name="layer" type="GLint"/>
     </function>
+<!-- NOT IMPLEMENTED. Not part of core GL, requires GL_EXT_geometry_shader4 or GL_NV_gpu_program4.
     <function name="NamedFramebufferTextureFaceEXT" offset="assign">
         <param name="framebuffer" type="GLuint"/>
         <param name="attachment" type="GLenum"/>
@@ -1597,8 +1599,9 @@
         <param name="level" type="GLint"/>
         <param name="face" type="GLenum"/>
     </function>
+-->
 
-
+<!-- NOT IMPLEMENTED. Requires GL_NV_explicit_multisample.
     <function name="TextureRenderbufferEXT" offset="assign">
         <param name="texture" type="GLuint"/>
         <param name="target" type="GLenum"/>
@@ -1610,6 +1613,7 @@
         <param name="target" type="GLenum"/>
         <param name="renderbuffer" type="GLuint"/>
     </function>
+-->
 
 <!-- NOT IMPLEMENTED
     <function name="VertexArrayVertexOffsetEXT" offset="assign" deprecated="3.1">
