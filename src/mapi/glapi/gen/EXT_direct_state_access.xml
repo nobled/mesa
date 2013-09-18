@@ -17,6 +17,7 @@
     <enum name="TRANSPOSE_PROGRAM_MATRIX_EXT"              value="0x8E2E"/>
     <enum name="PROGRAM_MATRIX_STACK_DEPTH_EXT"            value="0x8E2F"/>
 
+<!-- NOT IMPLEMENTED
     <function name="ClientAttribDefaultEXT" offset="assign" deprecated="3.1">
         <param name="mask" type="GLbitfield"/>
     </function>
@@ -111,7 +112,7 @@
     <function name="MatrixPopEXT" offset="assign" deprecated="3.1">
         <param name="matrixMode" type="GLenum"/>
     </function>
-
+-->
 
     <function name="TextureParameteriEXT" offset="assign">
         <param name="texture" type="GLuint"/>
@@ -318,6 +319,7 @@
         <param name="texture" type="GLuint"/>
     </function>
 
+<!-- NOT IMPLEMENTED
     <function name="MultiTexCoordPointerEXT" offset="assign" deprecated="3.1">
         <param name="texunit" type="GLenum"/>
         <param name="size" type="GLint"/>
@@ -433,7 +435,7 @@
         <param name="pname" type="GLenum"/>
         <param name="params" type="GLint *" output="true" variable_param="pname"/>
     </function>
-
+-->
 
     <function name="MultiTexParameterfEXT" offset="assign">
         <param name="texunit" type="GLenum"/>
@@ -645,6 +647,7 @@
         <param name="height" type="GLsizei"/>
     </function>
 
+<!-- NOT IMPLEMENTED
     <function name="EnableClientStateIndexedEXT" offset="assign" deprecated="3.1">
         <param name="array" type="GLenum"/>
         <param name="index" type="GLuint"/>
@@ -664,7 +667,7 @@
         <param name="array" type="GLenum"/>
         <param name="index" type="GLuint"/>
     </function>
-
+-->
 
     <function name="GetFloatIndexedvEXT" alias="GetFloati_v">
         <param name="target" type="GLenum"/>
@@ -677,13 +680,13 @@
         <param name="index" type="GLuint"/>
         <param name="params" type="GLdouble *" output="true" variable_param="pname"/>
     </function>
-
-    <function name="GetPointerIndexedvEXT" alias="GetPointeri_vEXT">
+<!-- NOT IMPLEMENTED.
+    <function name="GetPointerIndexedvEXT" alias="GetPointeri_vEXT" deprecated="3.1">
         <param name="target" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLvoid **" output="true" variable_param="pname"/>
     </function>
-
+-->
 
     <function name="GetFloati_vEXT" alias="GetFloati_v">
         <param name="pname" type="GLenum"/>
@@ -696,13 +699,13 @@
         <param name="index" type="GLuint"/>
         <param name="params" type="GLdouble *" output="true" variable_param="pname"/>
     </function>
-
+<!-- NOT IMPLEMENTED
     <function name="GetPointeri_vEXT" offset="assign" deprecated="3.1">
         <param name="pname" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLvoid **" output="true"/>
     </function>
-
+-->
 
 <!-- These 5 are already specified in EXT_draw_buffers2.xml:
 
@@ -733,13 +736,13 @@
 
 -->
 
+<!-- NOT IMPLEMENTED. Also many of them have "GLX protocol TODO" per spec
     <function name="NamedProgramStringEXT" offset="assign" deprecated="3.1">
         <param name="program" type="GLuint"/>
         <param name="target" type="GLenum"/>
         <param name="format" type="GLenum"/>
         <param name="len" type="GLsizei" counter="true"/>
         <param name="string" type="const GLvoid *" count="len"/>
-        <!--glx protocol todo; see spec -->
     </function>
 
     <function name="NamedProgramLocalParameter4dEXT" offset="assign" deprecated="3.1">
@@ -757,7 +760,6 @@
         <param name="target" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="const GLdouble *" count="4"/>
-        <!--glx protocol todo; see spec -->
     </function>
 
     <function name="NamedProgramLocalParameter4fEXT" offset="assign" deprecated="3.1">
@@ -775,7 +777,6 @@
         <param name="target" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="const GLfloat *" count="4"/>
-        <!--glx protocol todo; see spec -->
     </function>
 
     <function name="GetNamedProgramLocalParameterdvEXT" offset="assign" deprecated="3.1">
@@ -783,7 +784,6 @@
         <param name="target" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLdouble *" output="true" count="4"/>
-        <!--glx protocol todo; see spec -->
     </function>
 
     <function name="GetNamedProgramLocalParameterfvEXT" offset="assign" deprecated="3.1">
@@ -791,7 +791,6 @@
         <param name="target" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLfloat *" output="true" count="4"/>
-        <!--glx protocol todo; see spec -->
     </function>
 
 
@@ -800,7 +799,6 @@
         <param name="target" type="GLenum"/>
         <param name="pname" type="GLenum"/>
         <param name="params" type="GLint *" output="true" variable_param="pname"/>
-        <!--glx protocol todo; see spec -->
     </function>
 
     <function name="GetNamedProgramStringEXT" offset="assign" deprecated="3.1">
@@ -808,8 +806,8 @@
         <param name="target" type="GLenum"/>
         <param name="pname" type="GLenum"/>
         <param name="string" type="GLvoid *" output="true"/>
-        <!--glx protocol todo; see spec -->
     </function>
+-->
 
     <function name="CompressedTextureImage3DEXT" offset="assign">
         <param name="texture" type="GLuint"/>
@@ -975,7 +973,7 @@
         <param name="img" type="GLvoid *" output="true"/>
     </function>
 
-
+<!-- NOT IMPLEMENTED
     <function name="MatrixLoadTransposefEXT" offset="assign" deprecated="3.1">
         <param name="matrixMode" type="GLenum"/>
         <param name="m" type="const GLfloat *"/>
@@ -995,6 +993,7 @@
         <param name="matrixMode" type="GLenum"/>
         <param name="m" type="const GLdouble *"/>
     </function>
+-->
 
     <function name="NamedBufferDataEXT" offset="assign">
         <param name="buffer" type="GLuint"/>
@@ -1389,7 +1388,7 @@
         <param name="value" type="const GLuint *"/>
     </function>
 
-
+<!-- NOT IMPLEMENTED
     <function name="NamedProgramLocalParameters4fvEXT" offset="assign" deprecated="3.1">
         <param name="program" type="GLuint"/>
         <param name="target" type="GLenum"/>
@@ -1457,7 +1456,7 @@
         <param name="index" type="GLuint"/>
         <param name="params" type="GLint *" output="true"/>
     </function>
-
+-->
     <function name="NamedRenderbufferStorageEXT" offset="assign">
         <param name="renderbuffer" type="GLuint"/>
         <param name="internalformat" type="GLenum"/>
@@ -1612,6 +1611,7 @@
         <param name="renderbuffer" type="GLuint"/>
     </function>
 
+<!-- NOT IMPLEMENTED
     <function name="VertexArrayVertexOffsetEXT" offset="assign" deprecated="3.1">
         <param name="vaobj" type="GLuint"/>
         <param name="buffer" type="GLuint"/>
@@ -1681,6 +1681,7 @@
         <param name="stride" type="GLsizei"/>
         <param name="offset" type="GLintptr"/>
     </function>
+-->
     <function name="VertexArrayVertexAttribOffsetEXT" offset="assign">
         <param name="vaobj" type="GLuint"/>
         <param name="buffer" type="GLuint"/>
@@ -1701,7 +1702,7 @@
         <param name="offset" type="GLintptr"/>
     </function>
 
-
+<!-- NOT IMPLEMENTED
     <function name="EnableVertexArrayEXT" offset="assign" deprecated="3.1">
         <param name="vaobj" type="GLuint"/>
         <param name="array" type="GLenum"/>
@@ -1711,7 +1712,7 @@
         <param name="vaobj" type="GLuint"/>
         <param name="array" type="GLenum"/>
     </function>
-
+-->
 
     <function name="EnableVertexArrayAttribEXT" offset="assign">
         <param name="vaobj" type="GLuint"/>
@@ -1728,11 +1729,13 @@
         <param name="pname" type="GLenum"/>
         <param name="param" type="GLint *" output="true" variable_param="pname"/>
     </function>
+<!-- NOT IMPLEMENTED
     <function name="GetVertexArrayPointervEXT" offset="assign" deprecated="3.1">
         <param name="vaobj" type="GLuint"/>
         <param name="pname" type="GLenum"/>
         <param name="param" type="GLvoid **" output="true" variable_param="pname"/>
     </function>
+-->
     <function name="GetVertexArrayIntegeri_vEXT" offset="assign">
         <param name="vaobj" type="GLuint"/>
         <param name="index" type="GLuint"/>
