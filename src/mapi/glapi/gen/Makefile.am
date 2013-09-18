@@ -119,6 +119,7 @@ API_XML = \
 	AMD_draw_buffers_blend.xml \
 	AMD_performance_monitor.xml \
 	ARB_vertex_type_2_10_10_10_rev.xml \
+	ARB_viewport_array.xml \
 	APPLE_object_purgeable.xml \
 	APPLE_vertex_array_object.xml \
 	ARB_uniform_buffer_object.xml \
