@@ -1042,14 +1042,14 @@
     </function>
 
 
-    <function name="ProgramUniform1fEXT" offset="assign">
+    <function name="ProgramUniform1fEXT" alias="ProgramUniform1f">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLfloat"/>
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform2fEXT" offset="assign">
+    <function name="ProgramUniform2fEXT" alias="ProgramUniform2f">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLfloat"/>
@@ -1057,7 +1057,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform3fEXT" offset="assign">
+    <function name="ProgramUniform3fEXT" alias="ProgramUniform3f">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLfloat"/>
@@ -1066,7 +1066,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform4fEXT" offset="assign">
+    <function name="ProgramUniform4fEXT" alias="ProgramUniform4f">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLfloat"/>
@@ -1077,14 +1077,14 @@
     </function>
 
 
-    <function name="ProgramUniform1iEXT" offset="assign">
+    <function name="ProgramUniform1iEXT" alias="ProgramUniform1i">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLint"/>
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform2iEXT" offset="assign">
+    <function name="ProgramUniform2iEXT" alias="ProgramUniform2i">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLint"/>
@@ -1092,7 +1092,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform3iEXT" offset="assign">
+    <function name="ProgramUniform3iEXT" alias="ProgramUniform3i">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLint"/>
@@ -1101,7 +1101,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform4iEXT" offset="assign">
+    <function name="ProgramUniform4iEXT" alias="ProgramUniform4i">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLint"/>
@@ -1112,7 +1112,7 @@
     </function>
 
 
-    <function name="ProgramUniform1fvEXT" offset="assign">
+    <function name="ProgramUniform1fvEXT" alias="ProgramUniform1fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1120,7 +1120,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform2fvEXT" offset="assign">
+    <function name="ProgramUniform2fvEXT" alias="ProgramUniform2fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1128,7 +1128,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform3fvEXT" offset="assign">
+    <function name="ProgramUniform3fvEXT" alias="ProgramUniform3fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1136,7 +1136,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform4fvEXT" offset="assign">
+    <function name="ProgramUniform4fvEXT" alias="ProgramUniform4fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1145,7 +1145,7 @@
     </function>
 
 
-    <function name="ProgramUniform1ivEXT" offset="assign">
+    <function name="ProgramUniform1ivEXT" alias="ProgramUniform1iv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1153,7 +1153,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform2ivEXT" offset="assign">
+    <function name="ProgramUniform2ivEXT" alias="ProgramUniform2iv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1161,7 +1161,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform3ivEXT" offset="assign">
+    <function name="ProgramUniform3ivEXT" alias="ProgramUniform3iv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1169,7 +1169,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniform4ivEXT" offset="assign">
+    <function name="ProgramUniform4ivEXT" alias="ProgramUniform4iv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1178,7 +1178,7 @@
     </function>
 
 
-    <function name="ProgramUniformMatrix2fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix2fvEXT" alias="ProgramUniformMatrix2fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1187,7 +1187,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniformMatrix3fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix3fvEXT" alias="ProgramUniformMatrix3fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1196,7 +1196,7 @@
         <glx ignore="true"/>
     </function>
 
-    <function name="ProgramUniformMatrix4fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix4fvEXT" alias="ProgramUniformMatrix4fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1206,7 +1206,7 @@
     </function>
 
 
-    <function name="ProgramUniformMatrix2x3fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix2x3fvEXT" alias="ProgramUniformMatrix2x3fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1214,7 +1214,7 @@
         <param name="value" type="const GLfloat *"/>
         <glx ignore="true"/>
     </function>
-    <function name="ProgramUniformMatrix3x2fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix3x2fvEXT" alias="ProgramUniformMatrix3x2fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1222,7 +1222,7 @@
         <param name="value" type="const GLfloat *"/>
         <glx ignore="true"/>
     </function>
-    <function name="ProgramUniformMatrix2x4fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix2x4fvEXT" alias="ProgramUniformMatrix2x4fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1230,7 +1230,7 @@
         <param name="value" type="const GLfloat *"/>
         <glx ignore="true"/>
     </function>
-    <function name="ProgramUniformMatrix4x2fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix4x2fvEXT" alias="ProgramUniformMatrix4x2fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1238,7 +1238,7 @@
         <param name="value" type="const GLfloat *"/>
         <glx ignore="true"/>
     </function>
-    <function name="ProgramUniformMatrix3x4fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix3x4fvEXT" alias="ProgramUniformMatrix3x4fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1246,7 +1246,7 @@
         <param name="value" type="const GLfloat *"/>
         <glx ignore="true"/>
     </function>
-    <function name="ProgramUniformMatrix4x3fvEXT" offset="assign">
+    <function name="ProgramUniformMatrix4x3fvEXT" alias="ProgramUniformMatrix4x3fv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="count" type="GLsizei"/>
@@ -1330,20 +1330,20 @@
     </function>
 
 
-    <function name="ProgramUniform1uiEXT" offset="assign">
+    <function name="ProgramUniform1uiEXT" alias="ProgramUniform1ui">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLuint"/>
     </function>
 
-    <function name="ProgramUniform2uiEXT" offset="assign">
+    <function name="ProgramUniform2uiEXT" alias="ProgramUniform2ui">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLuint"/>
         <param name="v1" type="GLuint"/>
     </function>
 
-    <function name="ProgramUniform3uiEXT" offset="assign">
+    <function name="ProgramUniform3uiEXT" alias="ProgramUniform3ui">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLuint"/>
@@ -1351,7 +1351,7 @@
         <param name="v2" type="GLuint"/>
     </function>
 
-    <function name="ProgramUniform4uiEXT" offset="assign">
+    <function name="ProgramUniform4uiEXT" alias="ProgramUniform4ui">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
         <param name="v0" type="GLuint"/>
@@ -1361,28 +1361,28 @@
     </function>
 
 
-    <function name="ProgramUniform1uivEXT" offset="assign">
+    <function name="ProgramUniform1uivEXT" alias="ProgramUniform1uiv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
 	<param name="count" type="GLsizei"/>
         <param name="value" type="const GLuint *"/>
     </function>
 
-    <function name="ProgramUniform2uivEXT" offset="assign">
+    <function name="ProgramUniform2uivEXT" alias="ProgramUniform2uiv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
 	<param name="count" type="GLsizei"/>
         <param name="value" type="const GLuint *"/>
     </function>
 
-    <function name="ProgramUniform3uivEXT" offset="assign">
+    <function name="ProgramUniform3uivEXT" alias="ProgramUniform3uiv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
 	<param name="count" type="GLsizei"/>
         <param name="value" type="const GLuint *"/>
     </function>
 
-    <function name="ProgramUniform4uivEXT" offset="assign">
+    <function name="ProgramUniform4uivEXT" alias="ProgramUniform4uiv">
         <param name="program" type="GLuint"/>
         <param name="location" type="GLint"/>
 	<param name="count" type="GLsizei"/>
