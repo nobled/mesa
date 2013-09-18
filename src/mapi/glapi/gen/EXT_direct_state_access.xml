@@ -666,13 +666,13 @@
     </function>
 
 
-    <function name="GetFloatIndexedvEXT" alias="GetFloati_vEXT">
+    <function name="GetFloatIndexedvEXT" alias="GetFloati_v">
         <param name="target" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLfloat *" output="true" variable_param="pname"/>
     </function>
 
-    <function name="GetDoubleIndexedvEXT" alias="GetDoublei_vEXT">
+    <function name="GetDoubleIndexedvEXT" alias="GetDoublei_v">
         <param name="target" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLdouble *" output="true" variable_param="pname"/>
@@ -685,13 +685,13 @@
     </function>
 
 
-    <function name="GetFloati_vEXT" offset="assign">
+    <function name="GetFloati_vEXT" alias="GetFloati_v">
         <param name="pname" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLfloat *" output="true" variable_param="pname"/>
     </function>
 
-    <function name="GetDoublei_vEXT" offset="assign">
+    <function name="GetDoublei_vEXT" alias="GetDoublei_v">
         <param name="pname" type="GLenum"/>
         <param name="index" type="GLuint"/>
         <param name="params" type="GLdouble *" output="true" variable_param="pname"/>

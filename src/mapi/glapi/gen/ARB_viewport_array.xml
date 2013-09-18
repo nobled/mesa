@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE OpenGLAPI SYSTEM "gl_API.dtd">
+
+
+<OpenGLAPI>
+
+<category name="GL_ARB_viewport_array" number="100">
+
+    <function name="GetFloati_v" offset="assign">
+        <param name="pname" type="GLenum"/>
+        <param name="index" type="GLuint"/>
+        <param name="params" type="GLfloat *" output="true" variable_param="pname"/>
+    </function>
+
+    <function name="GetDoublei_v" offset="assign">
+        <param name="pname" type="GLenum"/>
+        <param name="index" type="GLuint"/>
+        <param name="params" type="GLdouble *" output="true" variable_param="pname"/>
+    </function>
+
+</category>
+
+
+</OpenGLAPI>

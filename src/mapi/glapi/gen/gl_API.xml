@@ -8275,7 +8275,11 @@
 
 <xi:include href="ARB_separate_shader_objects.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
-<!-- ARB extensions #98...#108 -->
+<!-- ARB extensions #98, #99 -->
+
+<xi:include href="ARB_viewport_array.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+<!-- ARB extensions #101...#108 -->
 
 <xi:include href="ARB_ES2_compatibility.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 
