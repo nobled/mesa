@@ -177,6 +177,7 @@ static const struct extension extension_table[] = {
    { "GL_EXT_compiled_vertex_array",               o(dummy_true),                              GLL,            1996 },
    { "GL_EXT_copy_texture",                        o(dummy_true),                              GLL,            1995 },
    { "GL_EXT_depth_bounds_test",                   o(EXT_depth_bounds_test),                   GL,             2002 },
+   { "GL_EXT_direct_state_access",                 o(dummy_true),                              GLC,            2009 },
    { "GL_EXT_draw_buffers2",                       o(EXT_draw_buffers2),                       GL,             2006 },
    { "GL_EXT_draw_instanced",                      o(ARB_draw_instanced),                      GL,             2006 },
    { "GL_EXT_draw_range_elements",                 o(dummy_true),                              GLL,            1997 },
