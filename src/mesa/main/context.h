@@ -185,8 +185,8 @@ _mesa_Flush( void );
 
 
 /**
- * Are we currently between glBegin and glEnd?
- * During execution, not display list compilation.
+ * Checking if we are between glBegin and glEnd
+ * During execution, do not display list compilation.
  */
 static inline GLboolean
 _mesa_inside_begin_end(const struct gl_context *ctx)
@@ -196,7 +196,7 @@ _mesa_inside_begin_end(const struct gl_context *ctx)
 
 
 /**
- * Are we currently between glBegin and glEnd in a display list?
+ * Checking if between glBegin and glEnd in a display list.
  */
 static inline GLboolean
 _mesa_inside_dlist_begin_end(const struct gl_context *ctx)
